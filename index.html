@@ -12,189 +12,89 @@
       --radius:14px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0f1216,#171a1f);}
-    /* Kovový rám (stredná hrúbka) */
+    body{margin:0;background:linear-gradient(180deg,#0f1216,#171a1f);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .frame{
-      max-width: 1280px; margin: 24px auto; padding: 16px;
-      background: linear-gradient(135deg,var(--metal-2),var(--metal-3));
-      border: 6px solid var(--metal-1);
-      border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.4);
-      position: relative;
+      max-width:1280px;margin:24px auto;padding:16px;
+      background:linear-gradient(135deg,var(--metal-2),var(--metal-3));
+      border:6px solid var(--metal-1);border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.4);position:relative;
     }
-    /* „nity“ v rohoch */
-    .frame::before,.frame::after{
-      content:""; position:absolute; width:14px; height:14px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #d6cba8 0 40%, #867f6a 60% 100%);
-      box-shadow: inset 0 0 2px rgba(0,0,0,.5);
-    }
-    .frame::before{left:10px; top:10px}
-    .frame::after{right:10px; top:10px}
-    .row{display:flex; gap:16px}
-
-    /* Horný rad – tri panely v jednej línii */
-    .top{align-items:center}
-    .panel{
-      background: rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius);
-      padding: 12px;
-      backdrop-filter: blur(2px);
-      color:#e5e7eb;
-      min-height: 120px;
-    }
-    .dr, .student{flex:0 0 23%;}
-    .task{flex:1; min-height: 160px; position:relative; display:flex; flex-direction:column;}
-    .task h2{margin:0 0 8px 0; font-size:18px}
-    .task .scroll{
-      overflow:auto; max-height:120px; padding-right:8px;
-    }
-
-    /* Bublina Dr. Phasora (s krížikom) */
-    .bubble{
-      position:absolute; left: 12px; top: -10px;
-      max-width: 260px; background:#fff; color:#111;
-      border-radius: 12px; padding:10px 36px 10px 12px;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-      border:2px solid #6b4ca6;
-      transform: translateY(-100%); /* nad panel */
-    }
-    .bubble:after{
-      content:""; position:absolute; bottom:-10px; left:24px;
-      border:10px solid transparent; border-top-color:#fff;
-      filter: drop-shadow(0 -2px 0 #6b4ca6);
-    }
-    .bubble .close{
-      position:absolute; right:8px; top:4px; width:24px; height:24px;
-      display:grid; place-items:center; cursor:pointer;
-      font-weight:bold; border-radius:6px; color:#6b4ca6;
-    }
+    .frame::before,.frame::after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60% 100%);box-shadow:inset 0 0 2px rgba(0,0,0,.5)}
+    .frame::before{left:10px;top:10px}.frame::after{right:10px;top:10px}
+    .row{display:flex;gap:16px}
+    .top{align-items:center;position:relative;z-index:2}
+    .panel{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:12px;
+      backdrop-filter:blur(2px);color:#e5e7eb;min-height:120px}
+    .dr,.student{flex:0 0 23%}
+    .task{flex:1;min-height:160px;position:relative;display:flex;flex-direction:column;padding-top:48px}
+    .task h2{margin:0 0 8px 0;font-size:18px}
+    .task .scroll{overflow:auto;max-height:120px;padding-right:8px}
+    /* Bublina nad panelom zadania */
+    .bubble.wide{position:absolute;left:0;right:0;top:-10px;max-width:none;width:calc(100% - 8px);
+      background:#fff;color:#111;border-radius:12px;padding:10px 36px 10px 12px;box-shadow:0 10px 20px rgba(0,0,0,.25);border:2px solid #6b4ca6;
+      transform:translateY(-100%)}
+    .bubble.wide:after{content:"";position:absolute;bottom:-10px;left:40px;border:10px solid transparent;border-top-color:#fff;
+      filter:drop-shadow(0 -2px 0 #6b4ca6)}
+    .bubble .close{position:absolute;right:8px;top:4px;width:24px;height:24px;display:grid;place-items:center;cursor:pointer;
+      font-weight:700;border-radius:6px;color:#6b4ca6}
     .bubble .close:hover{background:#f2eaff}
-
-    /* Stĺpec zámkov vpravo */
-    .locks{
-      display:flex; flex-direction:column; gap:6px;
-      margin-left:auto;
+    /* Zámky */
+    .locks{display:flex;flex-direction:column;gap:6px;margin-left:auto}
+    .lock{width:26px;height:26px;border-radius:6px;background:#0e1218;border:1px solid #2a3039;display:grid;place-items:center;color:#fcd34d;font-size:16px;
+      box-shadow:inset 0 0 6px rgba(0,0,0,.6)}
+    /* Plátno – jeden veľký hárok papiera */
+    .play{margin-top:16px;position:relative;z-index:1}
+    .workbench{
+      width:100%;aspect-ratio:16/9;min-height:420px;
+      background:var(--cream);border:1px solid rgba(0,0,0,.12);border-radius:var(--radius);position:relative;overflow:hidden;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)
     }
-    .lock{
-      width:26px; height:26px; border-radius:6px;
-      background: #0e1218; border:1px solid #2a3039;
-      display:grid; place-items:center; color:#fcd34d; font-size:16px;
-      box-shadow: inset 0 0 6px rgba(0,0,0,.6);
-    }
-
-    /* Herné plátno 16:9 s dvoma štvorcami */
-    .play{margin-top:16px; position:relative;}
-    .play-169{
-      width:100%; aspect-ratio: 16 / 9;
-      background: radial-gradient(1200px 800px at 20% -10%, rgba(255,255,255,.05), transparent 60%),
-                  radial-gradient(900px 600px at 80% 120%, rgba(255,255,255,.04), transparent 60%),
-                  linear-gradient(135deg, rgba(255,255,255,.02), transparent);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius);
-      padding:12px; display:flex; gap:12px; align-items:center; justify-content:center;
-    }
-    .square{
-      flex:0 0 calc(50% - 6px);
-      aspect-ratio: 1 / 1;
-      border-radius: var(--radius);
-      background: var(--cream);
-      position:relative; overflow:hidden;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
-    }
-    /* Mriežka: tyrkys, jemná + každý 10. riadok */
-    .square::before{
-      content:""; position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 20px),
-        repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 20px),
-        repeating-linear-gradient(0deg, transparent 0 200px, var(--grid-10) 200px 201px, transparent 201px 400px),
-        repeating-linear-gradient(90deg, transparent 0 200px, var(--grid-10) 200px 201px, transparent 201px 400px);
-      opacity:.55;
-    }
-
+    @media (max-width:1280px){.workbench{min-height:360px}}
+    .workbench::before{content:"";position:absolute;inset:0;background:
+      repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 20px),
+      repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 20px),
+      repeating-linear-gradient(0deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px),
+      repeating-linear-gradient(90deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px);
+      opacity:.55;pointer-events:none}
+    .zone{position:absolute;top:0;bottom:0}
+    .zone.left{left:0;right:50%}.zone.right{left:50%;right:0}
+    /* Osciloskop */
+    #osc{position:absolute;inset:0;width:100%;height:100%}
+    .osc-ui{position:absolute;left:12px;bottom:12px;right:12px;display:flex;gap:16px;align-items:center;
+      padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.12);backdrop-filter:blur(1px);color:#111}
+    #playBtn{padding:6px 10px;border-radius:8px;border:1px solid #374151;background:#111827;color:#f8fafc;cursor:pointer}
+    #playBtn.paused{opacity:.7}
+    .osc-ui input[type="range"]{width:220px;margin:0 8px}
+    /* Pravá zóna – krabičky */
+    .taskBox,.answerBox{position:absolute;left:18px;right:18px;background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.1);
+      border-radius:12px;padding:12px;color:#111;box-shadow:0 3px 10px rgba(0,0,0,.08)}
+    .taskBox{top:18px}.taskBox .line{margin:2px 0}.taskBox .small{opacity:.8}
+    .answerBox{bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .answerBox input{width:140px;padding:6px 8px;border-radius:8px;border:1px solid #c9c9c9}
+    .answerBox button{padding:8px 14px;border-radius:10px;border:1px solid #1f2937;background:#111827;color:#f8fafc;cursor:pointer}
+    .feedback{min-height:1.2em;font-weight:700}
     /* Spodný HUD */
-    .hud{
-      margin-top:12px; padding:10px 12px;
-      background: var(--hud); color:var(--hudText);
-      border-radius: var(--radius);
-      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
-      font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    .hud{margin-top:12px;padding:10px 12px;background:var(--hud);color:var(--hudText);border-radius:var(--radius);
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;position:relative;z-index:3}
+    .hud .group{display:flex;gap:14px;align-items:center}
+    .pill{background:#111827;padding:6px 10px;border-radius:999px;border:1px solid #374151}
+    .hud select{background:#111827;color:#f8fafc;border:1px solid #374151;border-radius:8px;padding:3px 6px}
+    /* Typografia */
+    .math var{font-style:italic}.math sub{font-style:normal}.phi{font-family:"Cambria Math","STIX Two Math","DejaVu Sans",serif}
+    .shake{animation:shake .35s}.flash{animation:flash .4s}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    @keyframes flash{0%{background:#2b1111}100%{background:transparent}}
+    /* Iskra */
+    .spark{position:absolute;width:160px;height:160px;pointer-events:none;display:none;background:
+      radial-gradient(circle at 50% 50%,#FFD745 0 30%,rgba(255,215,69,.6) 35% 55%,transparent 60%),
+      conic-gradient(from 0deg,rgba(255,215,69,.9),rgba(243,190,87,.6),rgba(255,237,154,.7),rgba(255,215,69,.9));
+      filter:blur(1px) drop-shadow(0 0 10px rgba(255,215,69,.7));border-radius:50%;
+      transform:translate(-50%,-50%) scale(.8);animation:spark .6s ease-out forwards}
+    @keyframes spark{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(0deg)}
+      20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(12deg)}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.1) rotate(22deg)}
     }
-    .hud .group{display:flex; gap:14px; align-items:center}
-    .pill{
-      background:#111827; padding:6px 10px; border-radius:999px; border:1px solid #374151;
-    }
-
-    /* Typografia – naše normy */
-    .math var{font-style: italic}
-    .math sub{font-style: normal} /* indexy stojatým rezom */
-    .phi{font-family: "Cambria Math","STIX Two Math","DejaVu Sans",serif}
-    .shake{animation:shake .35s}
-    @keyframes shake {
-      0%,100%{transform:translateX(0)}
-      20%{transform:translateX(-6px)} 40%{transform:translateX(6px)}
-      60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
-    }
-    .flash{animation:flash .4s}
-    @keyframes flash { 0%{background:#2b1111} 100%{background:transparent} }
-    @media (max-width: 1200px){
-      .dr,.student{flex-basis: 25%}
-    }
-    /* OSC – plátno roztiahnuť, udržať pixel ratio */
-#osc{ position:absolute; inset:0; width:100%; height:100%; }
-
-/* UI pod osciloskopom */
-.osc-ui{
-  position:absolute; left:12px; bottom:12px; right:12px;
-  display:flex; justify-content:flex-start; gap:16px;
-  padding:8px 10px; border-radius:10px;
-  background: rgba(0,0,0,.08);
-  border:1px solid rgba(0,0,0,.12);
-  backdrop-filter: blur(1px);
-  color:#111;
-}
-.osc-ui label{ font-weight:600; }
-.osc-ui input[type="range"]{ width:220px; vertical-align:middle; margin:0 8px; }
-
-/* Pravá zóna – krabičky */
-.taskBox, .answerBox{
-  position: absolute; left: 18px; right: 18px;
-  background: rgba(255,255,255,.7); border:1px solid rgba(0,0,0,.1);
-  border-radius: 12px; padding: 12px; color:#111;
-  box-shadow: 0 3px 10px rgba(0,0,0,.08);
-}
-.taskBox{ top: 18px; }
-.taskBox .line{ margin: 2px 0; }
-.taskBox .small{ opacity:.8; }
-
-.answerBox{
-  bottom: 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-}
-.answerBox input{
-  width: 140px; padding:6px 8px; border-radius:8px; border:1px solid #c9c9c9;
-}
-.answerBox button{
-  padding:8px 14px; border-radius:10px; border:1px solid #1f2937;
-  background:#111827; color:#f8fafc; cursor:pointer;
-}
-.feedback{ min-height: 1.2em; font-weight:700; }
-
-/* žltá cartoon iskra */
-.spark{
-  position:absolute; width:160px; height:160px; pointer-events:none; display:none;
-  background: radial-gradient(circle at 50% 50%, #FFD745 0 30%, rgba(255,215,69,.6) 35% 55%, transparent 60%),
-              conic-gradient(from 0deg, rgba(255,215,69,.9), rgba(243,190,87,.6), rgba(255,237,154,.7), rgba(255,215,69,.9));
-  filter: blur(1px) drop-shadow(0 0 10px rgba(255,215,69,.7));
-  border-radius:50%;
-  transform: translate(-50%, -50%) scale(.8);
-  animation: spark .6s ease-out forwards;
-}
-@keyframes spark {
-  0%{ opacity:.0; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
-  20%{ opacity:1; transform:translate(-50%,-50%) scale(1.05) rotate(12deg); }
-  100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1) rotate(22deg); }
-}
-
   </style>
 </head>
 <body>
@@ -202,16 +102,15 @@
     <!-- Horný rad -->
     <section class="row top">
       <div class="panel dr" id="dr">
-        <!-- Bublina s krížikom (zatvára sa len X) -->
-        <div class="bubble" id="bubble">
-          <div class="close" id="bubbleClose">×</div>
-          MUHAHA! Nové zadanie čaká…
-        </div>
         <strong>Dr. Phasor</strong>
-        <!-- sem neskôr sprite -->
       </div>
 
       <div class="panel task" id="taskPanel">
+        <!-- Bublina na šírku panelu -->
+        <div class="bubble wide" id="bubble">
+          MUHAHA! Nové zadanie čaká…
+          <div class="close" id="bubbleClose">×</div>
+        </div>
         <h2>Úloha</h2>
         <div class="scroll math" id="taskText">
           Vypočítaj <var>u</var>(<var>t</var>) pri <var>U</var>=230&nbsp;V, <var>f</var>=50&nbsp;Hz, <span class="phi">φ</span>=10°.
@@ -221,60 +120,66 @@
 
       <div class="panel student">
         <strong>Študent</strong>
-        <div class="locks" aria-label="Zámky">
+        <div class="locks" aria-label="Zámky" id="locksCol">
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
         </div>
       </div>
     </section>
 
-    <!-- Herné plátno 16:9 -> dva štvorce -->
+    <!-- Plátno -->
     <section class="play">
-  <div class="workbench">
-    <!-- ĽAVÁ ZÓNA – osciloskop -->
-    <div class="zone left" id="leftZone">
-      <canvas id="osc" aria-label="osciloskop"></canvas>
+      <div class="workbench">
+        <!-- ĽAVÁ zóna: osciloskop -->
+        <div class="zone left">
+          <canvas id="osc" aria-label="osciloskop"></canvas>
+          <div class="osc-ui">
+            <button id="playBtn" type="button">▶︎ Play</button>
+            <label>Čas <var>t</var>:
+              <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
+              <span id="tReadout">2.0 ms</span>
+            </label>
+          </div>
+        </div>
 
-      <div class="osc-ui">
-        <label>Čas <var>t</var>: 
-          <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
-          <span id="tReadout">2.0 ms</span>
-        </label>
+        <!-- Pravá zóna: zadanie + odpoveď -->
+        <div class="zone right">
+          <div class="taskBox math" id="taskBox">
+            <div class="line"><strong>Zadanie:</strong> Vypočítaj <var>u</var>(<var>t</var>) v čase <span id="tGiven">2.0</span> ms pre</div>
+            <div class="line">&nbsp;&nbsp;<var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>)</div>
+            <div class="line small">&nbsp;&nbsp;kde <var>U</var><sub>m</sub> = √2 · <var>U</var></div>
+            <div class="line">Parametre: <var>U</var> = <span id="Ueff">230</span> V,&nbsp; <var>f</var> = <span id="freq">50</span> Hz,&nbsp; <span class="phi">φ</span> = <span id="phiDeg">10</span>°</div>
+          </div>
+
+          <div class="answerBox">
+            <label>Odpoveď: <var>u</var>(<var>t</var>) =
+              <input id="answer" type="number" step="0.01" placeholder="V">
+              <span>V</span>
+            </label>
+            <button id="checkBtn">Skontrolovať</button>
+            <div id="feedback" class="feedback"></div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- PRAVÁ ZÓNA – zadanie + odpoveď -->
-    <div class="zone right" id="rightZone">
-      <div class="taskBox math" id="taskBox">
-        <div class="line"><strong>Zadanie:</strong> Vypočítaj <var>u</var>(<var>t</var>) v čase <span id="tGiven">2.0</span> ms pre</div>
-        <div class="line">&nbsp;&nbsp;<var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + φ)</div>
-        <div class="line small">&nbsp;&nbsp;kde <var>U</var><sub>m</sub> = √2 · <var>U</var></div>
-        <div class="line">Parametre: <var>U</var> = <span id="Ueff">230</span> V,&nbsp; <var>f</var> = <span id="freq">50</span> Hz,&nbsp; φ = <span id="phiDeg">10</span>°</div>
-      </div>
-
-      <div class="answerBox">
-        <label>Odpoveď: <var>u</var>(<var>t</var>) = 
-          <input id="answer" type="number" step="0.01" placeholder="V">
-          <span>V</span>
-        </label>
-        <button id="checkBtn">Skontrolovať</button>
-        <div id="feedback" class="feedback"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- efekt iskry pri úspechu -->
-  <div id="spark" class="spark" aria-hidden="true"></div>
-</section>
-
+      <!-- efekt iskry pri úspechu -->
+      <div id="spark" class="spark" aria-hidden="true"></div>
+    </section>
 
     <!-- HUD -->
     <section class="hud" id="hud">
       <div class="group">
-        <span class="pill">TIME: 01:23</span>
-        <span class="pill">MODE: EASY</span>
-        <span class="pill">MISTAKES: 0/2</span>
-        <span class="pill">LOCKS LEFT: 10</span>
+        <span class="pill" id="timePill">TIME: 00:00</span>
+        <span class="pill">
+          MODE:
+          <select id="modeSelect" style="margin-left:6px">
+            <option value="EASY" selected>EASY</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HARD">HARD</option>
+          </select>
+        </span>
+        <span class="pill" id="mistakesPill">MISTAKES: 0/2</span>
+        <span class="pill" id="locksPill">LOCKS LEFT: 10</span>
       </div>
       <div class="group">
         <button class="pill" id="hintBtn">HINT</button>
@@ -283,19 +188,182 @@
   </main>
 
   <script>
-    // Zatváranie Phasorovej bubliny len cez X
-    document.getElementById('bubbleClose').addEventListener('click', () => {
-      document.getElementById('bubble').style.display = 'none';
+    // zatvorenie bubliny len cez X
+    document.getElementById('bubbleClose').addEventListener('click',()=>document.getElementById('bubble').style.display='none');
+
+    /* ===== Stav hry ===== */
+    const pills = {
+      mistakes: document.getElementById('mistakesPill'),
+      locks: document.getElementById('locksPill'),
+      time: document.getElementById('timePill')
+    };
+    let startTs = Date.now();
+
+    const state = {
+      mode:'EASY', mistakes:0,
+      U:230, f:50, phi:10, tGiven:2.0,  // zadanie
+      playing:false, tAnim:2.0          // osciloskop
+    };
+
+    const el = {
+      Ueff:document.getElementById('Ueff'), freq:document.getElementById('freq'), phiDeg:document.getElementById('phiDeg'), tGiven:document.getElementById('tGiven'),
+      tSlider:document.getElementById('tSlider'), tRead:document.getElementById('tReadout'), play:document.getElementById('playBtn'),
+      answer:document.getElementById('answer'), check:document.getElementById('checkBtn'), feedback:document.getElementById('feedback'),
+      bubble:document.getElementById('bubble'), taskPanel:document.getElementById('taskPanel'),
+      osc:document.getElementById('osc'), spark:document.getElementById('spark'),
+      modeSelect:document.getElementById('modeSelect'), locksCol:document.getElementById('locksCol')
+    };
+
+    // pomocníci
+    const TAU=Math.PI*2, deg2rad=d=>d*Math.PI/180, round2=x=>Math.round(x*100)/100;
+    const randFrom=a=>a[Math.floor(Math.random()*a.length)];
+    function tolByMode(){ return state.mode==='EASY'?0.50 : state.mode==='MEDIUM'?0.20 : 0.05; }
+
+    // nové zadanie
+    function newTask1(){
+      state.mistakes=0;
+      state.U = randFrom([230,120,100,60]);
+      state.f = 50; // zatiaľ
+      state.phi = randFrom([-30,-15,0,10,15,30]);
+      const Tms = 1000/state.f;
+      state.tGiven = +( (Math.random()*Tms).toFixed(1) );
+
+      el.Ueff.textContent=state.U;
+      el.freq.textContent=state.f;
+      el.phiDeg.textContent=state.phi;
+      el.tGiven.textContent=state.tGiven.toFixed(1);
+
+      el.tSlider.max=Tms.toFixed(1);
+      el.tSlider.value=state.tGiven;
+      el.tRead.textContent=state.tGiven.toFixed(1)+' ms';
+      state.tAnim=state.tGiven;
+
+      el.answer.value=''; el.feedback.textContent='';
+      resizeOsc(); drawOsc(); updateHud();
+    }
+
+    // u(t) v ms
+    function u_of_t_ms(tms){
+      const Um=Math.SQRT2*state.U, w=TAU*state.f, t=tms/1000, phi=deg2rad(state.phi);
+      return Um*Math.sin(w*t+phi);
+    }
+
+    /* ===== Osciloskop ===== */
+    let oscCtx,w,h,DPR=window.devicePixelRatio||1, rafId=null,lastTs=0,audioCtx=null;
+    function resizeOsc(){
+      const r=el.osc.getBoundingClientRect(); w=Math.floor(r.width*DPR); h=Math.floor(r.height*DPR);
+      el.osc.width=w; el.osc.height=h; oscCtx=el.osc.getContext('2d'); oscCtx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    function drawOsc(){
+      if(!oscCtx) resizeOsc();
+      oscCtx.clearRect(0,0,el.osc.width,el.osc.height);
+      const midY=h/DPR/2;
+      // osová čiara
+      oscCtx.strokeStyle='rgba(0,0,0,.12)'; oscCtx.lineWidth=1;
+      oscCtx.beginPath(); oscCtx.moveTo(0,midY); oscCtx.lineTo(w/DPR,midY); oscCtx.stroke();
+
+      const T=1/state.f, viewT=2*T, tToX=t=>(t/viewT)*(w/DPR);
+      const A=(h/DPR)*0.36, phi=deg2rad(state.phi), wang=TAU*state.f;
+
+      // sinus
+      oscCtx.strokeStyle='#159447'; oscCtx.lineWidth=2; oscCtx.beginPath();
+      for(let px=0; px<=w/DPR; px++){
+        const t=(px/(w/DPR))*viewT, y=midY - A*Math.sin(wang*t+phi);
+        if(px===0) oscCtx.moveTo(px,y); else oscCtx.lineTo(px,y);
+      } oscCtx.stroke();
+
+      // bodka
+      const Tms=1000/state.f, tms=state.playing?state.tAnim:+el.tSlider.value, t=(tms/1000)%viewT;
+      const x=tToX(t), y=midY - A*Math.sin(wang*t+phi);
+      oscCtx.fillStyle='#0aff6c'; oscCtx.beginPath(); oscCtx.arc(x,y,4,0,TAU); oscCtx.fill();
+
+      // text
+      const uval=u_of_t_ms(tms);
+      oscCtx.fillStyle='rgba(0,0,0,.7)'; oscCtx.font='600 12px system-ui';
+      oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`,8,16);
+    }
+    function loop(ts){
+      if(!state.playing){ rafId=null; return; }
+      if(!lastTs) lastTs=ts; const dt=(ts-lastTs)/1000; lastTs=ts;
+      const Tms=1000/state.f; const prev=state.tAnim; state.tAnim+=dt*1000;
+      if(state.tAnim>=Tms){ state.tAnim-=Tms; beep(); }
+      el.tSlider.value=state.tAnim.toFixed(1); el.tRead.textContent=el.tSlider.value+' ms';
+      drawOsc(); rafId=requestAnimationFrame(loop);
+    }
+    el.play.addEventListener('click',()=>{
+      state.playing=!state.playing; el.play.textContent = state.playing?'⏸︎ Pause':'▶︎ Play';
+      el.play.classList.toggle('paused',!state.playing);
+      if(state.playing){ lastTs=0; rafId=requestAnimationFrame(loop); } else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+    });
+    window.addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
+    el.tSlider.addEventListener('input',e=>{
+      el.tRead.textContent=(+e.target.value).toFixed(1)+' ms';
+      if(!state.playing) state.tAnim=+e.target.value;
+      drawOsc();
     });
 
-    // Ukážka vizuálnej chyby: flash + shake (1C)
-    function showFailFeedback(){
-      const panel = document.getElementById('taskPanel');
-      panel.classList.add('shake','flash');
-      setTimeout(()=>panel.classList.remove('shake','flash'), 450);
+    // pip
+    function beep(){
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=880; g.gain.value=0.04;
+      o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.08);
     }
-    // // odkomentuj na test
-    // setTimeout(showFailFeedback, 1200);
+
+    /* ===== Checker (0,01 V + tolerancia podľa módu) ===== */
+    el.check.addEventListener('click',()=>{
+      const ans=+el.answer.value; if(Number.isNaN(ans)){ el.feedback.textContent='Zadaj číslo (V).'; return; }
+      const corR = round2(u_of_t_ms(state.tGiven)), ansR = round2(ans), tol = tolByMode();
+      if(Math.abs(ansR - corR) <= tol){
+        el.feedback.textContent=`Správne! u(t) ≈ ${corR.toFixed(2)} V 🔓`; el.feedback.style.color='#159447';
+        dropOneLock(); successSpark(); newTask1();
+      }else{
+        state.mistakes++; failFeedback();
+        if(state.mode==='EASY' && state.mistakes===1){
+          el.feedback.textContent='Nápoveda: U_m = √2·U a ω = 2πf. t v sekundách.'; el.feedback.style.color='#b45309';
+        }else if(state.mistakes>=2){
+          el.feedback.textContent='MUHAHA! Nové zadanie.'; el.feedback.style.color='#ff3b3b';
+          showMuhaha(); newTask1();
+        }else{
+          el.feedback.textContent='Skús ešte raz.'; el.feedback.style.color='#ff3b3b';
+        }
+      }
+      updateHud();
+    });
+    function failFeedback(){ const p=el.taskPanel; p.classList.add('shake','flash'); setTimeout(()=>p.classList.remove('shake','flash'),450); }
+    function showMuhaha(){
+      el.bubble.style.display='block'; el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
+      document.getElementById('bubbleClose2').addEventListener('click',()=>el.bubble.style.display='none');
+    }
+
+    // zámok preč + iskra
+    function dropOneLock(){
+      const locks = el.locksCol.querySelectorAll('.lock');
+      if(locks.length){ locks[0].remove(); }
+    }
+    function successSpark(){
+      const drRect=document.getElementById('dr').getBoundingClientRect();
+      const frameRect=document.querySelector('.frame').getBoundingClientRect();
+      el.spark.style.display='block';
+      el.spark.style.left=(drRect.right - frameRect.left - 20)+'px';
+      el.spark.style.top =(drRect.top   - frameRect.top  + 30)+'px';
+      el.spark.classList.remove('spark'); void el.spark.offsetWidth; el.spark.classList.add('spark');
+      setTimeout(()=>{ el.spark.style.display='none'; },650);
+    }
+
+    // HUD + mód + čas
+    function updateHud(){
+      const left = el.locksCol.querySelectorAll('.lock').length;
+      pills.mistakes.textContent=`MISTAKES: ${state.mistakes}/2`;
+      pills.locks.textContent   =`LOCKS LEFT: ${left}`;
+    }
+    el.modeSelect.addEventListener('change',e=>{ state.mode=e.target.value; });
+    setInterval(()=>{ const s=Math.floor((Date.now()-startTs)/1000); const m=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0');
+      pills.time.textContent=`TIME: ${m}:${ss}`; },1000);
+
+    // štart
+    function boot(){ resizeOsc(); newTask1(); updateHud(); }
+    boot();
   </script>
 </body>
 </html>
