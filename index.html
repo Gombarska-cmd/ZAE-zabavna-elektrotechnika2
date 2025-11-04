@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <title>Escape the Phasor – Wireframe v2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --metal-1:#4A4E52; --metal-2:#565A60; --metal-3:#2E3135;
+      --cream:#FCF6E6; --grid:#C6FFFF; --grid-10:#9EEFEF;
+      --ok:#23c55e; --fail:#ff3b3b; --hud:#1f2937; --hudText:#f8fafc;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0f1216,#171a1f);}
+    /* Kovový rám (stredná hrúbka) */
+    .frame{
+      max-width: 1280px; margin: 24px auto; padding: 16px;
+      background: linear-gradient(135deg,var(--metal-2),var(--metal-3));
+      border: 6px solid var(--metal-1);
+      border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,.4);
+      position: relative;
+    }
+    /* „nity“ v rohoch */
+    .frame::before,.frame::after{
+      content:""; position:absolute; width:14px; height:14px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #d6cba8 0 40%, #867f6a 60% 100%);
+      box-shadow: inset 0 0 2px rgba(0,0,0,.5);
+    }
+    .frame::before{left:10px; top:10px}
+    .frame::after{right:10px; top:10px}
+    .row{display:flex; gap:16px}
+
+    /* Horný rad – tri panely v jednej línii */
+    .top{align-items:center}
+    .panel{
+      background: rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 12px;
+      backdrop-filter: blur(2px);
+      color:#e5e7eb;
+      min-height: 120px;
+    }
+    .dr, .student{flex:0 0 23%;}
+    .task{flex:1; min-height: 160px; position:relative; display:flex; flex-direction:column;}
+    .task h2{margin:0 0 8px 0; font-size:18px}
+    .task .scroll{
+      overflow:auto; max-height:120px; padding-right:8px;
+    }
+
+    /* Bublina Dr. Phasora (s krížikom) */
+    .bubble{
+      position:absolute; left: 12px; top: -10px;
+      max-width: 260px; background:#fff; color:#111;
+      border-radius: 12px; padding:10px 36px 10px 12px;
+      box-shadow:0 10px 20px rgba(0,0,0,.25);
+      border:2px solid #6b4ca6;
+      transform: translateY(-100%); /* nad panel */
+    }
+    .bubble:after{
+      content:""; position:absolute; bottom:-10px; left:24px;
+      border:10px solid transparent; border-top-color:#fff;
+      filter: drop-shadow(0 -2px 0 #6b4ca6);
+    }
+    .bubble .close{
+      position:absolute; right:8px; top:4px; width:24px; height:24px;
+      display:grid; place-items:center; cursor:pointer;
+      font-weight:bold; border-radius:6px; color:#6b4ca6;
+    }
+    .bubble .close:hover{background:#f2eaff}
+
+    /* Stĺpec zámkov vpravo */
+    .locks{
+      display:flex; flex-direction:column; gap:6px;
+      margin-left:auto;
+    }
+    .lock{
+      width:26px; height:26px; border-radius:6px;
+      background: #0e1218; border:1px solid #2a3039;
+      display:grid; place-items:center; color:#fcd34d; font-size:16px;
+      box-shadow: inset 0 0 6px rgba(0,0,0,.6);
+    }
+
+    /* Herné plátno 16:9 s dvoma štvorcami */
+    .play{margin-top:16px; position:relative;}
+    .play-169{
+      width:100%; aspect-ratio: 16 / 9;
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(255,255,255,.05), transparent 60%),
+                  radial-gradient(900px 600px at 80% 120%, rgba(255,255,255,.04), transparent 60%),
+                  linear-gradient(135deg, rgba(255,255,255,.02), transparent);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding:12px; display:flex; gap:12px; align-items:center; justify-content:center;
+    }
+    .square{
+      flex:0 0 calc(50% - 6px);
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius);
+      background: var(--cream);
+      position:relative; overflow:hidden;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    /* Mriežka: tyrkys, jemná + každý 10. riadok */
+    .square::before{
+      content:""; position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 20px),
+        repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 20px),
+        repeating-linear-gradient(0deg, transparent 0 200px, var(--grid-10) 200px 201px, transparent 201px 400px),
+        repeating-linear-gradient(90deg, transparent 0 200px, var(--grid-10) 200px 201px, transparent 201px 400px);
+      opacity:.55;
+    }
+
+    /* Spodný HUD */
+    .hud{
+      margin-top:12px; padding:10px 12px;
+      background: var(--hud); color:var(--hudText);
+      border-radius: var(--radius);
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+      font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    }
+    .hud .group{display:flex; gap:14px; align-items:center}
+    .pill{
+      background:#111827; padding:6px 10px; border-radius:999px; border:1px solid #374151;
+    }
+
+    /* Typografia – naše normy */
+    .math var{font-style: italic}
+    .math sub{font-style: normal} /* indexy stojatým rezom */
+    .phi{font-family: "Cambria Math","STIX Two Math","DejaVu Sans",serif}
+    .shake{animation:shake .35s}
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)} 40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+    }
+    .flash{animation:flash .4s}
+    @keyframes flash { 0%{background:#2b1111} 100%{background:transparent} }
+    @media (max-width: 1200px){
+      .dr,.student{flex-basis: 25%}
+    }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <!-- Horný rad -->
+    <section class="row top">
+      <div class="panel dr" id="dr">
+        <!-- Bublina s krížikom (zatvára sa len X) -->
+        <div class="bubble" id="bubble">
+          <div class="close" id="bubbleClose">×</div>
+          MUHAHA! Nové zadanie čaká…
+        </div>
+        <strong>Dr. Phasor</strong>
+        <!-- sem neskôr sprite -->
+      </div>
+
+      <div class="panel task" id="taskPanel">
+        <h2>Úloha</h2>
+        <div class="scroll math" id="taskText">
+          Vypočítaj <var>u</var>(<var>t</var>) pri <var>U</var>=230&nbsp;V, <var>f</var>=50&nbsp;Hz, <span class="phi">φ</span>=10°.
+          <br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>)
+        </div>
+      </div>
+
+      <div class="panel student">
+        <strong>Študent</strong>
+        <div class="locks" aria-label="Zámky">
+          <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
+          <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Herné plátno 16:9 -> dva štvorce -->
+    <section class="play">
+      <div class="play-169">
+        <div class="square" id="leftSquare">
+          <!-- sem pôjde fázorový diagram (canvas) -->
+        </div>
+        <div class="square" id="rightSquare">
+          <!-- sem pôjde skladačka/puzzle (drag&drop) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- HUD -->
+    <section class="hud" id="hud">
+      <div class="group">
+        <span class="pill">TIME: 01:23</span>
+        <span class="pill">MODE: EASY</span>
+        <span class="pill">MISTAKES: 0/2</span>
+        <span class="pill">LOCKS LEFT: 10</span>
+      </div>
+      <div class="group">
+        <button class="pill" id="hintBtn">HINT</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Zatváranie Phasorovej bubliny len cez X
+    document.getElementById('bubbleClose').addEventListener('click', () => {
+      document.getElementById('bubble').style.display = 'none';
+    });
+
+    // Ukážka vizuálnej chyby: flash + shake (1C)
+    function showFailFeedback(){
+      const panel = document.getElementById('taskPanel');
+      panel.classList.add('shake','flash');
+      setTimeout(()=>panel.classList.remove('shake','flash'), 450);
+    }
+    // // odkomentuj na test
+    // setTimeout(showFailFeedback, 1200);
+  </script>
+</body>
+</html>
