@@ -38,6 +38,109 @@
     .bubble .close{position:absolute;right:8px;top:4px;width:24px;height:24px;display:grid;place-items:center;cursor:pointer;
       font-weight:700;border-radius:6px;color:#6b4ca6}
     .bubble .close:hover{background:#f2eaff}
+/* scope = rám osciloskopu */
+.scope{
+  position:absolute; inset:12px 18px 64px 18px;   /* menšia plocha, miesto dole pre UI */
+  background:#0d0f11; border-radius:14px; padding:10px;
+  box-shadow: inset 0 0 0 2px #2a3039, inset 0 0 20px rgba(0,0,0,.6);
+}
+/* vnútorný „screen“ je samotné canvas */
+#osc{ width:100%; height:100%; display:block; border-radius:10px; }
+
+/* UI pod scope už máme – necháme ako je */
+
+/* kalkulačka */
+/* ===== Kalkulačka ===== */
+const calc = {
+  disp: document.getElementById('calcDisplay'),
+  modeBtn: document.getElementById('degRad'),
+  grid: document.querySelector('.calc-grid'),
+  rad: true,     // RAD/DEG prepínač (true=RAD)
+};
+
+calc.modeBtn.addEventListener('click', ()=>{
+  calc.rad = !calc.rad;
+  calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
+  calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
+});
+
+function insertToDisplay(s){ calc.disp.value += s; calc.disp.focus(); }
+function delOne(){ calc.disp.value = calc.disp.value.slice(0,-1); }
+function clearDisp(){ calc.disp.value=''; }
+
+function evalExpr(){
+  // nahradiť ^ → **, π, e
+  let expr = calc.disp.value.replaceAll('^','**')
+                            .replaceAll('π', Math.PI.toString())
+                            .replaceAll('e', Math.E.toString());
+
+  // nahradiť funkcie sin/cos/tan/sqrt
+  // s DEG/RAD režimom
+  const wrapTrig = fn => (calc.rad? fn : (x)=>fn(x*Math.PI/180));
+  const scope = {
+    sin: x=>wrapTrig(Math.sin)(x),
+    cos: x=>wrapTrig(Math.cos)(x),
+    tan: x=>wrapTrig(Math.tan)(x),
+    sqrt: Math.sqrt
+  };
+
+  // bezpečný eval: new Function + obmedzený scope
+  try{
+    const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
+    const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+    if(Number.isFinite(val)){ return val; }
+    return NaN;
+  }catch(e){ return NaN; }
+}
+
+calc.grid.addEventListener('click', (e)=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const num = b.getAttribute('data-num');
+  const op  = b.getAttribute('data-op');
+  const fn  = b.getAttribute('data-fn');
+
+  if(num!==null) insertToDisplay(num);
+  else if(op!==null) insertToDisplay(op);
+  else if(fn){
+    if(fn==='pi') insertToDisplay('π');
+    else if(fn==='e') insertToDisplay('e');
+    else if(fn==='sin' || fn==='cos' || fn==='tan' || fn==='sqrt') insertToDisplay(fn+'(');
+    else if(fn==='del') delOne();
+    else if(fn==='clear') clearDisp();
+    else if(fn==='eq'){
+      const v = evalExpr();
+      calc.disp.value = Number.isFinite(v) ? v : 'NaN';
+    }
+    else if(fn==='ans'){
+      const v = evalExpr();
+      if(Number.isFinite(v)){
+        document.getElementById('answer').value = (Math.round(v*100)/100).toFixed(2);
+      }
+    }
+  }
+});
+   
+.calc{ position:absolute; top:18px; left:18px; right:18px; bottom:110px;
+  background:rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.1);
+  border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08); color:#111;
+}
+.calc-top{ display:flex; gap:8px; }
+#calcDisplay{
+  flex:1; padding:8px 10px; border:1px solid #c9c9c9; border-radius:8px; font-size:16px;
+}
+#degRad{ padding:8px 10px; border-radius:8px; border:1px solid #374151; background:#111827; color:#f8fafc; cursor:pointer; }
+.calc-grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap:6px; }
+.calc-grid button{
+  padding:8px 10px; border:1px solid #bdbdbd; border-radius:8px; background:#f3f4f6; cursor:pointer; font-weight:600;
+}
+.calc-grid button.wide{ grid-column: span 2; }
+.calc-grid button.ghost{ background:#e5e7eb; }
+.calc-grid button.emph{ background:#111827; color:#f8fafc; border-color:#1f2937; }
+
+/* drobnosti */
+.answerBox{ bottom:18px; }
+
     /* Zámky */
     .locks{display:flex;flex-direction:column;gap:6px;margin-left:auto}
     .lock{width:26px;height:26px;border-radius:6px;background:#0e1218;border:1px solid #2a3039;display:grid;place-items:center;color:#fcd34d;font-size:16px;
@@ -45,9 +148,81 @@
     /* Plátno – jeden veľký hárok papiera */
     .play{margin-top:16px;position:relative;z-index:1}
     .workbench{
-      width:100%;aspect-ratio:16/9;min-height:420px;
-      background:var(--cream);border:1px solid rgba(0,0,0,.12);border-radius:var(--radius);position:relative;overflow:hidden;
-      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)
+     <div class="workbench">
+  <!-- ĽAVÁ zóna: osciloskop s rámom -->
+  <div class="zone left">
+    <div class="scope">
+      <canvas id="osc" aria-label="osciloskop"></canvas>
+    </div>
+    <div class="osc-ui">
+      <button id="playBtn" type="button">▶︎ Play</button>
+      <label>Čas <var>t</var>:
+        <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
+        <span id="tReadout">2.0 ms</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Pravá zóna: VEDECKÁ KALKULAČKA + odpoveď -->
+  <div class="zone right">
+    <div class="calc" id="calc">
+      <div class="calc-top">
+        <input id="calcDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" />
+        <button id="degRad">RAD</button>
+      </div>
+      <div class="calc-grid">
+        <!-- riadok 1 -->
+        <button data-fn="pi">π</button>
+        <button data-fn="e">e</button>
+        <button data-op="^">^</button>
+        <button data-op="(">(</button>
+        <button data-op=")">)</button>
+        <!-- riadok 2 -->
+        <button data-fn="sin">sin</button>
+        <button data-fn="cos">cos</button>
+        <button data-fn="tan">tan</button>
+        <button data-fn="sqrt">√</button>
+        <button data-op="/">÷</button>
+        <!-- riadok 3 -->
+        <button data-num="7">7</button>
+        <button data-num="8">8</button>
+        <button data-num="9">9</button>
+        <button data-op="*">×</button>
+        <button data-op="-">−</button>
+        <!-- riadok 4 -->
+        <button data-num="4">4</button>
+        <button data-num="5">5</button>
+        <button data-num="6">6</button>
+        <button data-op="+">+</button>
+        <button data-fn="del">DEL</button>
+        <!-- riadok 5 -->
+        <button data-num="1">1</button>
+        <button data-num="2">2</button>
+        <button data-num="3">3</button>
+        <button data-num="0" class="wide">0</button>
+        <button data-op=".">.</button>
+        <!-- riadok 6 -->
+        <button data-fn="clear" class="ghost">C</button>
+        <button data-fn="ans"   class="ghost">→ Odpoveď</button>
+        <button data-fn="eq"    class="emph">=</button>
+      
+      </div>
+    </div>
+
+    <div class="answerBox">
+      <label>Odpoveď: <var>u</var>(<var>t</var>) =
+        <input id="answer" type="number" step="0.01" placeholder="V">
+        <span>V</span>
+      </label>
+      <button id="checkBtn">Skontrolovať</button>
+      <div id="feedback" class="feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- iskra pri úspechu -->
+<div id="spark" class="spark" aria-hidden="true"></div>
+
     }
     @media (max-width:1280px){.workbench{min-height:360px}}
     .workbench::before{content:"";position:absolute;inset:0;background:
@@ -59,12 +234,73 @@
     .zone{position:absolute;top:0;bottom:0}
     .zone.left{left:0;right:50%}.zone.right{left:50%;right:0}
     /* Osciloskop */
-    #osc{position:absolute;inset:0;width:100%;height:100%}
-    .osc-ui{position:absolute;left:12px;bottom:12px;right:12px;display:flex;gap:16px;align-items:center;
-      padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.12);backdrop-filter:blur(1px);color:#111}
-    #playBtn{padding:6px 10px;border-radius:8px;border:1px solid #374151;background:#111827;color:#f8fafc;cursor:pointer}
-    #playBtn.paused{opacity:.7}
-    .osc-ui input[type="range"]{width:220px;margin:0 8px}
+   function drawOsc(){
+  if(!oscCtx) resizeOsc();
+  // rozmery vnútorného screen (canvas už sedí na scope vnútri)
+  oscCtx.clearRect(0,0,el.osc.width, el.osc.height);
+
+  const DPR = window.devicePixelRatio || 1;
+  const W = el.osc.width / DPR;
+  const H = el.osc.height / DPR;
+
+  // „mriežkový“ krok = 20 px → okraj 2 štvorčeky
+  const G = 20;
+  const PAD = 2 * G;         // 2 štvorčeky
+  const xmin = PAD, xmax = W - PAD;
+  const ymin = PAD, ymax = H - PAD;
+
+  // osy (čierna)
+  const midX = (xmin + xmax)/2;
+  const midY = (ymin + ymax)/2;
+  oscCtx.save();
+  oscCtx.scale(DPR, DPR);
+  oscCtx.strokeStyle = '#111';
+  oscCtx.lineWidth = 1.5;
+  // horizontálna
+  oscCtx.beginPath(); oscCtx.moveTo(xmin, midY); oscCtx.lineTo(xmax, midY); oscCtx.stroke();
+  // vertikálna
+  oscCtx.beginPath(); oscCtx.moveTo(midX, ymin); oscCtx.lineTo(midX, ymax); oscCtx.stroke();
+
+  // časová os – zobrazíme ~2 periódy v [xmin,xmax]
+  const T = 1/state.f;                // s
+  const viewT = 2*T;
+  const tToX = t => xmin + (t/viewT)*(xmax - xmin);
+
+  // menšia amplitúda – držíme 0.28 výšky (v rámci vnútorného rámu)
+  const A = ( (ymax - ymin) * 0.28 );
+  const phi = deg2rad(state.phi);
+  const wang = TAU*state.f;
+
+  // sinus (zelená)
+  oscCtx.strokeStyle = '#159447';
+  oscCtx.lineWidth = 2;
+  oscCtx.beginPath();
+  const STEPS = Math.max(200, (xmax-xmin)); // hladkosť
+  for(let i=0;i<=STEPS;i++){
+    const x = xmin + (i/STEPS)*(xmax-xmin);
+    const t = ( (x - xmin) / (xmax - xmin) ) * viewT;
+    const y = midY - A * Math.sin(wang*t + phi);
+    if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
+  }
+  oscCtx.stroke();
+
+  // bežiaca bodka (play/slider)
+  const Tms = 1000/state.f;
+  const tms = state.playing ? state.tAnim : +el.tSlider.value;
+  const t = (tms/1000) % viewT;
+  const x = tToX(t);
+  const y = midY - A * Math.sin(wang*t + phi);
+  oscCtx.fillStyle = '#0aff6c';
+  oscCtx.beginPath(); oscCtx.arc(x,y,4,0,TAU); oscCtx.fill();
+
+  // text
+  const uval = u_of_t_ms(tms);
+  oscCtx.fillStyle = 'rgba(0,0,0,.75)';
+  oscCtx.font = '600 12px system-ui';
+  oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
+  oscCtx.restore();
+}
+
     /* Pravá zóna – krabičky */
     .taskBox,.answerBox{position:absolute;left:18px;right:18px;background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.1);
       border-radius:12px;padding:12px;color:#111;box-shadow:0 3px 10px rgba(0,0,0,.08)}
