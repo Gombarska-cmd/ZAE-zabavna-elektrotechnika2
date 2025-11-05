@@ -317,9 +317,14 @@
     /* ===== Osciloskop ===== */
     let oscCtx,w,h,DPR=window.devicePixelRatio||1, rafId=null,lastTs=0,audioCtx=null;
     function resizeOsc(){
-      const r=el.osc.getBoundingClientRect(); w=Math.floor(r.width*DPR); h=Math.floor(r.height*DPR);
-      el.osc.width=w; el.osc.height=h; oscCtx=el.osc.getContext('2d'); oscCtx.setTransform(DPR,0,0,DPR,0,0);
-    }
+  const DPR = window.devicePixelRatio || 1;
+  const r = el.osc.getBoundingClientRect();
+  el.osc.width  = Math.floor(r.width  * DPR);
+  el.osc.height = Math.floor(r.height * DPR);
+  oscCtx = el.osc.getContext('2d');
+  // POZOR: žiadne setTransform tu – škálujeme až pri kreslení
+}
+
     function drawOsc(){
       if(!oscCtx) resizeOsc();
       oscCtx.clearRect(0,0,el.osc.width, el.osc.height);
