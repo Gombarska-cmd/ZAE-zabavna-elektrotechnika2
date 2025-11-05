@@ -326,33 +326,91 @@
 }
 
     function drawOsc(){
-      if(!oscCtx) resizeOsc();
-      oscCtx.clearRect(0,0,el.osc.width, el.osc.height);
+  if(!oscCtx) resizeOsc();
 
-      const W = el.osc.width / DPR, H = el.osc.height / DPR;
-      const G = 20, PAD = 2*G; // 2 štvorčeky
-      const xmin = PAD, xmax = W-PAD, ymin = PAD, ymax = H-PAD;
+  const DPR = window.devicePixelRatio || 1;
+  const Wpx = el.osc.width;      // pixely na fyzickom plátne
+  const Hpx = el.osc.height;
+  const W = Wpx / DPR;           // logické jednotky (CSS px)
+  const H = Hpx / DPR;
 
-      // čierne osy
-      const midX = (xmin+xmax)/2, midY = (ymin+ymax)/2;
-      oscCtx.save(); oscCtx.scale(DPR,DPR);
-      oscCtx.strokeStyle='#111'; oscCtx.lineWidth=1.5;
-      oscCtx.beginPath(); oscCtx.moveTo(xmin,midY); oscCtx.lineTo(xmax,midY); oscCtx.stroke();
-      oscCtx.beginPath(); oscCtx.moveTo(midX,ymin); oscCtx.lineTo(midX,ymax); oscCtx.stroke();
+  oscCtx.save();
+  oscCtx.scale(DPR, DPR);        // škálovanie LEN tu
+  oscCtx.clearRect(0, 0, W, H);
 
-      // 2 periódy
-      const T=1/state.f, viewT=2*T, tToX=t=> xmin + (t/viewT)*(xmax-xmin);
-      const A=(ymax-ymin)*0.28, phi=deg2rad(state.phi), wang=TAU*state.f;
+  // ----- parametre „scope“ plochy -----
+  const G = 20;                  // mriežkový krok
+  const PAD = 2 * G;             // okraj = 2 štvorčeky
+  const xmin = PAD, xmax = W - PAD;
+  const ymin = PAD, ymax = H - PAD;
+  const midX = (xmin + xmax) / 2;
+  const midY = (ymin + ymax) / 2;
 
-      // sinusoida
-      oscCtx.strokeStyle='#159447'; oscCtx.lineWidth=2; oscCtx.beginPath();
-      const STEPS=Math.max(200,(xmax-xmin));
-      for(let i=0;i<=STEPS;i++){
-        const x = xmin + (i/STEPS)*(xmax-xmin);
-        const t = ((x-xmin)/(xmax-xmin))*viewT;
-        const y = midY - A*Math.sin(wang*t + phi);
-        if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
-      }
+  // ----- mriežka -----
+  oscCtx.lineWidth = 1;
+  // jemné čiary
+  oscCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+  for(let x = Math.ceil(xmin/G)*G; x <= xmax; x += G){
+    oscCtx.beginPath(); oscCtx.moveTo(x, ymin); oscCtx.lineTo(x, ymax); oscCtx.stroke();
+  }
+  for(let y = Math.ceil(ymin/G)*G; y <= ymax; y += G){
+    oscCtx.beginPath(); oscCtx.moveTo(xmin, y); oscCtx.lineTo(xmax, y); oscCtx.stroke();
+  }
+  // každá 10. hrubšia
+  oscCtx.strokeStyle = 'rgba(255,255,255,0.12)';
+  const G10 = G * 10;
+  for(let x = Math.ceil(xmin/G10)*G10; x <= xmax; x += G10){
+    oscCtx.beginPath(); oscCtx.moveTo(x, ymin); oscCtx.lineTo(x, ymax); oscCtx.stroke();
+  }
+  for(let y = Math.ceil(ymin/G10)*G10; y <= ymax; y += G10){
+    oscCtx.beginPath(); oscCtx.moveTo(xmin, y); oscCtx.lineTo(xmax, y); oscCtx.stroke();
+  }
+
+  // ----- osi (čierne) -----
+  oscCtx.strokeStyle = '#111';
+  oscCtx.lineWidth = 1.5;
+  oscCtx.beginPath(); oscCtx.moveTo(xmin, midY); oscCtx.lineTo(xmax, midY); oscCtx.stroke(); // horizontálna
+  oscCtx.beginPath(); oscCtx.moveTo(midX, ymin); oscCtx.lineTo(midX, ymax); oscCtx.stroke(); // vertikálna
+
+  // ----- sínusovka -----
+  const T = 1 / state.f;                     // perióda (s)
+  const viewT = 2 * T;                        // zobrazíme ~2 periódy
+  const tToX = t => xmin + (t / viewT) * (xmax - xmin);
+
+  const A = (ymax - ymin) * 0.28;            // menšia amplitúda
+  const phi = deg2rad(state.phi);
+  const w = TAU * state.f;
+
+  oscCtx.strokeStyle = '#159447';
+  oscCtx.lineWidth = 2;
+  oscCtx.beginPath();
+  const STEPS = Math.max(200, Math.floor(xmax - xmin));
+  for(let i=0;i<=STEPS;i++){
+    const x = xmin + (i/STEPS)*(xmax - xmin);
+    const t = ((x - xmin) / (xmax - xmin)) * viewT;
+    const y = midY - A * Math.sin(w*t + phi);
+    if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
+  }
+  oscCtx.stroke();
+
+  // bežiaca bodka
+  const Tms = 1000 / state.f;
+  const tms = state.playing ? state.tAnim : +el.tSlider.value;
+  const t = (tms / 1000) % viewT;
+  const bx = tToX(t);
+  const by = midY - A * Math.sin(w*t + phi);
+  oscCtx.fillStyle = '#0aff6c';
+  oscCtx.beginPath(); oscCtx.arc(bx, by, 4, 0, TAU); oscCtx.fill();
+
+  // popis
+  const uval = u_of_t_ms(tms);
+  oscCtx.fillStyle = 'rgba(255,255,255,0.85)';
+  oscCtx.font = '600 12px system-ui';
+  oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin + 4, ymin + 14);
+
+  oscCtx.restore();
+}
+
       oscCtx.stroke();
 
       // bodka
