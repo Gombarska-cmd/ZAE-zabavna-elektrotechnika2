@@ -307,7 +307,14 @@
       el.answer.value=''; el.feedback.textContent='';
       resizeOsc(); drawOsc(); updateHud();
     }
-
+// Farby a hrúbky pre scope
+const SCOPE_STYLE = {
+  gridFine: 'rgba(255,255,255,0.22)',   // jemná mriežka (svetlá)
+  gridBold: 'rgba(255,255,255,0.38)',   // každá 10.
+  axis:     '#f8fafc',                  // osi (takmer biela)
+  axisW:    2.6,                        // hrúbka osí
+  sineW:    2.4                         // hrúbka krivky
+};
     // u(t) v ms
     function u_of_t_ms(tms){
       const Um=Math.SQRT2*state.U, w=TAU*state.f, t=tms/1000, phi=deg2rad(state.phi);
