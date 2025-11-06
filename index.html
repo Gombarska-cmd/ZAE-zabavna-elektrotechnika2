@@ -321,165 +321,131 @@ const SCOPE_STYLE = {
       return Um*Math.sin(w*t+phi);
     }
 
-    /* ===== Osciloskop ===== */
-    let oscCtx,w,h,DPR=window.devicePixelRatio||1, rafId=null,lastTs=0,audioCtx=null;
-    function resizeOsc(){
-  const DPR = window.devicePixelRatio || 1;
+ /* ===== Osciloskop ===== */
+let oscCtx, w, h, DPR = window.devicePixelRatio || 1, rafId = null, lastTs = 0, audioCtx = null;
+
+function resizeOsc(){
   const r = el.osc.getBoundingClientRect();
   el.osc.width  = Math.floor(r.width  * DPR);
   el.osc.height = Math.floor(r.height * DPR);
   oscCtx = el.osc.getContext('2d');
-  // POZOR: žiadne setTransform tu – škálujeme až pri kreslení
 }
 
-    function drawOsc(){
+const SCOPE_STYLE = {
+  gridFine: 'rgba(255,255,255,0.22)',
+  gridBold: 'rgba(255,255,255,0.38)',
+  axis:     '#f8fafc',
+  axisW:    2.6,
+  sineW:    2.4
+};
+
+function drawOsc(){
   if(!oscCtx) resizeOsc();
 
-  const DPR = window.devicePixelRatio || 1;
-  const Wpx = el.osc.width, Hpx = el.osc.height;
-  const W = Wpx / DPR,      H = Hpx / DPR;
+  const W = el.osc.width / DPR;
+  const H = el.osc.height / DPR;
 
   oscCtx.save();
   oscCtx.scale(DPR, DPR);
   oscCtx.clearRect(0, 0, W, H);
 
-  // --- pracovná plocha vo vnútri scope ---
-  const G   = 20;              // mriežkový krok
-  const PAD = 2 * G;           // okraj = 2 štvorčeky
+  // plátno vo vnútri scope
+  const G = 20, PAD = 2*G;
   const xmin = PAD, xmax = W - PAD;
   const ymin = PAD, ymax = H - PAD;
-  const midX = (xmin + xmax) / 2;
-  const midY = (ymin + ymax) / 2;
+  const midX = (xmin + xmax)/2, midY = (ymin + ymax)/2;
 
-  // --- MRIEŽKA (inverzná = svetlá na tmavom) ---
+  // mriežka (svetlá)
   oscCtx.lineWidth = 1;
   oscCtx.strokeStyle = SCOPE_STYLE.gridFine;
-  // vertikálne jemné
-  for(let x = Math.ceil(xmin/G)*G; x <= xmax; x += G){
-    oscCtx.beginPath(); oscCtx.moveTo(x, ymin); oscCtx.lineTo(x, ymax); oscCtx.stroke();
-  }
-  // horizontálne jemné
-  for(let y = Math.ceil(ymin/G)*G; y <= ymax; y += G){
-    oscCtx.beginPath(); oscCtx.moveTo(xmin, y); oscCtx.lineTo(xmax, y); oscCtx.stroke();
-  }
-  // každá 10. silnejšia
-  const G10 = G * 10;
+  for(let x=Math.ceil(xmin/G)*G; x<=xmax; x+=G){ oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke(); }
+  for(let y=Math.ceil(ymin/G)*G; y<=ymax; y+=G){ oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke(); }
+  const G10 = 10*G;
   oscCtx.lineWidth = 1.4;
   oscCtx.strokeStyle = SCOPE_STYLE.gridBold;
-  for(let x = Math.ceil(xmin/G10)*G10; x <= xmax; x += G10){
-    oscCtx.beginPath(); oscCtx.moveTo(x, ymin); oscCtx.lineTo(x, ymax); oscCtx.stroke();
-  }
-  for(let y = Math.ceil(ymin/G10)*G10; y <= ymax; y += G10){
-    oscCtx.beginPath(); oscCtx.moveTo(xmin, y); oscCtx.lineTo(xmax, y); oscCtx.stroke();
-  }
+  for(let x=Math.ceil(xmin/G10)*G10; x<=xmax; x+=G10){ oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke(); }
+  for(let y=Math.ceil(ymin/G10)*G10; y<=ymax; y+=G10){ oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke(); }
 
-  // --- OSI (výrazné, hrubšie) ---
+  // osi (hrubé, svetlé)
   oscCtx.strokeStyle = SCOPE_STYLE.axis;
   oscCtx.lineWidth = SCOPE_STYLE.axisW;
   oscCtx.lineCap = 'square';
-  // horizontálna
-  oscCtx.beginPath(); oscCtx.moveTo(xmin, midY); oscCtx.lineTo(xmax, midY); oscCtx.stroke();
-  // vertikálna
-  oscCtx.beginPath(); oscCtx.moveTo(midX, ymin); oscCtx.lineTo(midX, ymax); oscCtx.stroke();
+  oscCtx.beginPath(); oscCtx.moveTo(xmin,midY); oscCtx.lineTo(xmax,midY); oscCtx.stroke();
+  oscCtx.beginPath(); oscCtx.moveTo(midX,ymin); oscCtx.lineTo(midX,ymax); oscCtx.stroke();
 
-  // --- Sínus ---
-  const T = 1 / state.f, viewT = 2 * T;
-  const tToX = t => xmin + (t / viewT) * (xmax - xmin);
-  const A = (ymax - ymin) * 0.28;
-  const phi = deg2rad(state.phi), w = TAU * state.f;
+  // sínus
+  const T = 1/state.f, viewT = 2*T;
+  const tToX = t => xmin + (t/viewT)*(xmax-xmin);
+  const A = (ymax-ymin)*0.28;
+  const phi = deg2rad(state.phi), wang = TAU*state.f;
 
-  oscCtx.strokeStyle = '#28a44f';     // o kúsoček svetlejšia zelená
+  oscCtx.strokeStyle = '#28a44f';
   oscCtx.lineWidth = SCOPE_STYLE.sineW;
   oscCtx.beginPath();
-  const STEPS = Math.max(240, Math.floor(xmax - xmin));
+  const STEPS = Math.max(240, Math.floor(xmax-xmin));
   for(let i=0;i<=STEPS;i++){
-    const x = xmin + (i/STEPS)*(xmax - xmin);
-    const t = ((x - xmin) / (xmax - xmin)) * viewT;
-    const y = midY - A * Math.sin(w*t + phi);
+    const x = xmin + (i/STEPS)*(xmax-xmin);
+    const t = ((x - xmin)/(xmax - xmin))*viewT;
+    const y = midY - A*Math.sin(wang*t + phi);
     if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
   }
   oscCtx.stroke();
 
-  // --- bežiaca bodka
-  const Tms = 1000 / state.f;
-  const tms = state.playing ? state.tAnim : +el.tSlider.value;
-  const t   = (tms / 1000) % viewT;
-  const bx  = tToX(t);
-  const by  = midY - A * Math.sin(w*t + phi);
-  oscCtx.fillStyle = '#0aff6c';
-  oscCtx.beginPath(); oscCtx.arc(bx, by, 4, 0, TAU); oscCtx.fill();
-
-  // --- popis
-  const uval = u_of_t_ms(tms);
-  oscCtx.fillStyle = 'rgba(255,255,255,0.92)';
-  oscCtx.font = '600 12px system-ui';
-  oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin + 4, ymin + 14);
-
-  oscCtx.restore();
-}
-
-  oscCtx.stroke();
-
   // bežiaca bodka
-  const Tms = 1000 / state.f;
+  const Tms = 1000/state.f;
   const tms = state.playing ? state.tAnim : +el.tSlider.value;
-  const t = (tms / 1000) % viewT;
+  const t = (tms/1000) % viewT;
   const bx = tToX(t);
-  const by = midY - A * Math.sin(w*t + phi);
+  const by = midY - A*Math.sin(wang*t + phi);
   oscCtx.fillStyle = '#0aff6c';
-  oscCtx.beginPath(); oscCtx.arc(bx, by, 4, 0, TAU); oscCtx.fill();
+  oscCtx.beginPath(); oscCtx.arc(bx,by,4,0,TAU); oscCtx.fill();
 
   // popis
   const uval = u_of_t_ms(tms);
-  oscCtx.fillStyle = 'rgba(255,255,255,0.85)';
+  oscCtx.fillStyle = 'rgba(255,255,255,0.92)';
   oscCtx.font = '600 12px system-ui';
-  oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin + 4, ymin + 14);
+  oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
 
   oscCtx.restore();
 }
 
-      oscCtx.stroke();
+function loop(ts){
+  if(!state.playing){ rafId=null; return; }
+  if(!lastTs) lastTs = ts;
+  const dt = (ts - lastTs)/1000; lastTs = ts;
 
-      // bodka
-      const Tms=1000/state.f;
-      const tms = state.playing ? state.tAnim : +el.tSlider.value;
-      const tt = (tms/1000)%viewT;
-      const xx=tToX(tt), yy=midY - A*Math.sin(wang*tt + phi);
-      oscCtx.fillStyle='#0aff6c'; oscCtx.beginPath(); oscCtx.arc(xx,yy,4,0,TAU); oscCtx.fill();
+  const Tms = 1000/state.f;
+  state.tAnim += dt*1000;
+  if(state.tAnim >= Tms){ state.tAnim -= Tms; beep(); }
 
-      // text
-      const uval=u_of_t_ms(tms);
-      oscCtx.fillStyle='rgba(0,0,0,.75)'; oscCtx.font='600 12px system-ui';
-      oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
-      oscCtx.restore();
-    }
-    function loop(ts){
-      if(!state.playing){ rafId=null; return; }
-      if(!lastTs) lastTs=ts; const dt=(ts-lastTs)/1000; lastTs=ts;
-      const Tms=1000/state.f; state.tAnim+=dt*1000;
-      if(state.tAnim>=Tms){ state.tAnim-=Tms; beep(); }
-      el.tSlider.value=state.tAnim.toFixed(1); el.tRead.textContent=el.tSlider.value+' ms';
-      drawOsc(); rafId=requestAnimationFrame(loop);
-    }
-    el.play.addEventListener('click',()=>{
-      state.playing=!state.playing; el.play.textContent = state.playing?'⏸︎ Pause':'▶︎ Play';
-      el.play.classList.toggle('paused',!state.playing);
-      if(state.playing){ lastTs=0; rafId=requestAnimationFrame(loop); } else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
-    });
-    window.addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
-    el.tSlider.addEventListener('input',e=>{
-      el.tRead.textContent=(+e.target.value).toFixed(1)+' ms';
-      if(!state.playing) state.tAnim=+e.target.value;
-      drawOsc();
-    });
+  el.tSlider.value = state.tAnim.toFixed(1);
+  el.tRead.textContent = el.tSlider.value + ' ms';
+  drawOsc();
+  rafId = requestAnimationFrame(loop);
+}
 
-    // pip
-    function beep(){
-      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='sine'; o.frequency.value=880; g.gain.value=0.04;
-      o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.08);
-    }
+el.play.addEventListener('click', ()=>{
+  state.playing = !state.playing;
+  el.play.textContent = state.playing ? '⏸︎ Pause' : '▶︎ Play';
+  el.play.classList.toggle('paused', !state.playing);
+  if(state.playing){ lastTs=0; rafId=requestAnimationFrame(loop); }
+  else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+});
+window.addEventListener('resize', ()=>{ resizeOsc(); drawOsc(); });
+el.tSlider.addEventListener('input', e=>{
+  el.tRead.textContent = (+e.target.value).toFixed(1)+' ms';
+  if(!state.playing) state.tAnim = +e.target.value;
+  drawOsc();
+});
+
+function beep(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type='sine'; o.frequency.value=880; g.gain.value=0.04;
+  o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.08);
+}
+/* ===== Checker (0,01 V + tolerancia podľa módu) ===== */
+
 
     /* ===== Checker (0,01 V + tolerancia podľa módu) ===== */
     el.check.addEventListener('click',()=>{
