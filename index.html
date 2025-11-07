@@ -632,10 +632,10 @@
       oscCtx.beginPath(); oscCtx.arc(bx,by,4,0,TAU); oscCtx.fill();
 
       // text
-      const uval = u_of_t_ms(tms);
-      oscCtx.fillStyle = 'rgba(249,250,251,0.96)';
-      oscCtx.font = '600 12px system-ui';
-      oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
+     // const uval = u_of_t_ms(tms);
+     // oscCtx.fillStyle = 'rgba(249,250,251,0.96)';
+     // oscCtx.font = '600 12px system-ui';
+     // oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
 
       oscCtx.restore();
     }
