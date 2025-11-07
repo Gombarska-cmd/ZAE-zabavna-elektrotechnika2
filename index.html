@@ -155,15 +155,17 @@
     /* OSCILOSKOP */
    .scope{
       position:absolute;
-      inset:18px 18px 82px 18px; /* hore 18, dole nechávame viac miesta na lištu */
-
-      background:#020817;
+      top:18px;
+      left:18px;
+      right:18px;
+      bottom:82px;              /* rovnaké číslo ako pri .calc */
+      background:#0d0f11;
       border-radius:14px;
       padding:10px;
-      box-shadow:
-        inset 0 0 0 2px #374151,
-        inset 0 0 24px rgba(0,0,0,.9);
+      box-shadow: inset 0 0 0 2px #2a3039,
+              inset 0 0 20px rgba(0,0,0,.6);
     }
+
     #osc{
       width:100%;height:100%;
       display:block;
