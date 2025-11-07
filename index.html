@@ -140,9 +140,10 @@
     .zone.right{left:50%;right:0}
 
     /* OSCILOSKOP */
-    .scope{
+   .scope{
       position:absolute;
-      inset:12px 18px 64px 18px;
+      inset:18px 18px 82px 18px; /* hore 18, dole nechávame viac miesta na lištu */
+
       background:#020817;
       border-radius:14px;
       padding:10px;
@@ -158,7 +159,9 @@
 
     .osc-ui{
       position:absolute;
-      left:18px;right:18px;bottom:12px;
+      left:18px;
+      right:18px;
+      bottom:18px;  /* zarovnáme s answerBoxom vpravo */
       display:flex;gap:16px;align-items:center;
       padding:8px 10px;
       border-radius:10px;
@@ -181,7 +184,10 @@
     /* KALKULAČKA */
     .calc{
       position:absolute;
-      top:18px;left:18px;right:18px;bottom:110px;
+      top:18px;
+      left:18px;
+      right:18px;
+      bottom:82px; /* rovnaká logika ako scope + miesto na answerBox */
       background:rgba(255,255,255,.78);
       border:1px solid rgba(0,0,0,.1);
       border-radius:12px;
@@ -215,12 +221,13 @@
 }
 
     .calc-grid button{
-      padding:8px 10px;
+      padding:11px 0;
       border:1px solid #d4d4d8;
       border-radius:8px;
       background:#f4f4f5;
       cursor:pointer;
       font-weight:600;
+      font-size:16px;
     }
     .calc-grid button.wide{grid-column:span 2;}
     .calc-grid button.ghost{background:#e5e7eb;}
@@ -233,7 +240,9 @@
     /* ODPOVEĎ */
     .answerBox{
       position:absolute;
-      left:18px;right:18px;bottom:18px;
+      left:18px;
+      right:18px;
+      bottom:18px;
       display:flex;align-items:center;gap:12px;flex-wrap:wrap;
       background:rgba(255,255,255,.8);
       border:1px solid rgba(0,0,0,.12);
