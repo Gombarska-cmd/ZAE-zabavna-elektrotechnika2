@@ -871,3 +871,296 @@
   </script>
 </body>
 </html>
+
+
+
+<!-- ========== ÚLOHA 2 – Osciloskop vs Multimeter (drag & drop) ========== -->
+<section id="task2-dd" style="margin-top:18px;">
+  <style>
+    .t2-wrap{display:grid;grid-template-columns: 48% 52%;gap:16px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;padding:16px}
+    .t2-card{background:rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;padding:12px;color:#e5e7eb}
+    .t2-h{font-weight:800;margin:0 0 8px 0}
+    .t2-row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+
+    /* prístroje */
+    .scope, .dmm{position:relative; border-radius:12px; padding:10px;
+      background:#0d0f11; border:1px solid #2a3039; box-shadow: inset 0 0 20px rgba(0,0,0,.6)}
+    .scope-screen{height:160px; border-radius:8px; background:#0a0f12; position:relative; overflow:hidden}
+    .scope-screen::before{ /* mriežka */
+      content:""; position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0 1px, transparent 1px 20px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 1px, transparent 1px 20px);
+      opacity:.55;
+    }
+    .scope-wave{position:absolute; left:0; top:0; right:0; bottom:0}
+    .scope-reading{margin-top:6px; font-weight:700; opacity:.9}
+
+    .dmm-face{height:160px; display:grid; place-items:center; border-radius:8px;
+      background:linear-gradient(#222,#111)}
+    .dmm-reading{font:700 26px/1 monospace; background:#c9f0d8; color:#0b2c15; padding:4px 10px; border-radius:6px; box-shadow: inset 0 0 4px rgba(0,0,0,.25)}
+
+    /* žiarovka s dvomi svorkami */
+    .circuit{position:relative; border-radius:12px; background:var(--cream); padding:14px;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06)}
+    .lamp{width:160px; height:160px; border-radius:50%; margin:30px auto; position:relative;
+      background: radial-gradient(circle at 50% 45%, #ffe69a 0 45%, #ffd24d 46% 58%, #f0b02a 59% 65%, #cc9000 66% 100%)}
+    .lamp.off{filter: grayscale(1) brightness(.7)}
+    .terminal{position:absolute; width:18px; height:18px; border-radius:50%;
+      background:#222; border:2px solid #ddd; cursor:pointer}
+    .tA{left: calc(50% - 9px); top: 12px}
+    .tB{left: calc(50% - 9px); bottom: 12px}
+
+    /* sondy – malé „banániky“ ktoré ťaháme */
+    .probe{display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border-radius:999px;
+      background:#111827; border:1px solid #374151; color:#f8fafc; cursor:grab; user-select:none}
+    .probe:active{cursor:grabbing}
+    .probe.dot{width:10px; height:10px; border-radius:50%}
+    .probe.red  .dot{background:#ef4444}
+    .probe.black .dot{background:#6b7280}
+    .dock{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
+
+    /* drop zóny na prístrojoch */
+    .dropzone{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; min-height:38px;
+      padding:6px; border-radius:8px; border:1px dashed rgba(255,255,255,.35)}
+    .dz-ok{border-color:#22c55e}
+    .dz-bad{border-color:#ef4444}
+
+    /* kartičky u(t) a U */
+    .token{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+      background:#ffffff; color:#111; border:1px solid #cbd5e1; font-weight:700; cursor:grab}
+    .tray{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .hint{font-size:12px; opacity:.8}
+
+    /* malé tlačidlá */
+    .t2-btn{padding:6px 10px; border-radius:8px; border:1px solid #374151; background:#111827; color:#f8fafc; cursor:pointer}
+  </style>
+
+  <div class="t2-wrap">
+    <!-- ĽAVO: prístroje -->
+    <div class="t2-card">
+      <h3 class="t2-h">Meracie prístroje</h3>
+
+      <!-- osciloskop -->
+      <div class="scope" id="t2-scope">
+        <div class="t2-row"><strong>Osciloskop</strong><span class="hint">pripoj obidve sondy na svorky žiarovky</span></div>
+        <div class="scope-screen">
+          <canvas id="t2-wave" class="scope-wave"></canvas>
+        </div>
+        <div class="scope-reading" id="t2-scope-rdg">nepripojené</div>
+        <div class="dock" id="t2-scope-dock">
+          <div class="probe red"   draggable="true" data-probe="scopeA"><span class="dot"></span> červená sonda</div>
+          <div class="probe black" draggable="true" data-probe="scopeB"><span class="dot"></span> čierna sonda</div>
+        </div>
+        <div class="dropzone" id="dz-scope" aria-label="sem potiahni správnu kartičku"></div>
+      </div>
+
+      <!-- multimeter -->
+      <div class="dmm" id="t2-dmm" style="margin-top:12px;">
+        <div class="t2-row"><strong>Multimeter</strong><span class="hint">pripoj šnúry na svorky žiarovky</span></div>
+        <div class="dmm-face"><div class="dmm-reading" id="t2-dmm-rdg">--.- V</div></div>
+        <div class="dock" id="t2-dmm-dock">
+          <div class="probe red"   draggable="true" data-probe="dmmA"><span class="dot"></span> V/Ω</div>
+          <div class="probe black" draggable="true" data-probe="dmmB"><span class="dot"></span> COM</div>
+        </div>
+        <div class="dropzone" id="dz-dmm" aria-label="sem potiahni správnu kartičku"></div>
+      </div>
+
+      <!-- zásobník kartičiek -->
+      <div class="tray" id="t2-tray" style="margin-top:12px;">
+        <div class="token" draggable="true" data-token="u(t)">u(t)</div>
+        <div class="token" draggable="true" data-token="U">U</div>
+      </div>
+    </div>
+
+    <!-- PRAVO: obvod so žiarovkou -->
+    <div class="t2-card">
+      <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
+      <div class="circuit" id="t2-circuit">
+        <div class="lamp off" id="t2-lamp"></div>
+        <!-- svorky -->
+        <div class="terminal tA" data-terminal="A" title="svorka A"></div>
+        <div class="terminal tB" data-terminal="B" title="svorka B"></div>
+        <div style="text-align:center; margin-top:8px;">
+          <button class="t2-btn" id="t2-reset">Reset pripojení</button>
+        </div>
+      </div>
+      <div class="hint">Najprv pripoj sondy k svorkám A a B. Potom potiahni kartičky <strong>u(t)</strong> a <strong>U</strong> na správny prístroj.</div>
+    </div>
+  </div>
+
+  <script>
+    // --- Parametre úlohy ---
+    const Ueff = [40, 60, 110, 230][Math.floor(Math.random()*4)];
+    const f = 50, Um = Math.SQRT2 * Ueff;
+    let scopeConnected = {A:false, B:false}, dmmConnected = {A:false, B:false};
+
+    // --- Drag & drop sondy na svorky ---
+    const terminals = [...document.querySelectorAll('#t2-circuit .terminal')];
+    const probes = [...document.querySelectorAll('#task2-dd .probe')];
+    const connMap = {}; // probeId -> 'A'|'B'
+
+    probes.forEach(p=>{
+      p.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/probe', p.dataset.probe);
+      });
+    });
+    terminals.forEach(t=>{
+      t.addEventListener('dragover', e=>e.preventDefault());
+      t.addEventListener('drop', e=>{
+        e.preventDefault();
+        const pid = e.dataTransfer.getData('text/probe');
+        if(!pid) return;
+        connMap[pid] = t.dataset.terminal;
+
+        // vizuálna odozva
+        t.animate([{transform:'scale(1)'},{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:250});
+
+        // aktualizuj stavy
+        scopeConnected.A = (connMap['scopeA'] === 'A' || connMap['scopeB'] === 'A');
+        scopeConnected.B = (connMap['scopeA'] === 'B' || connMap['scopeB'] === 'B');
+        dmmConnected.A   = (connMap['dmmA']   === 'A' || connMap['dmmB']   === 'A');
+        dmmConnected.B   = (connMap['dmmA']   === 'B' || connMap['dmmB']   === 'B');
+
+        refreshInstruments();
+      });
+    });
+
+    document.getElementById('t2-reset').onclick = ()=>{
+      for(const k in connMap) delete connMap[k];
+      scopeConnected = {A:false,B:false};
+      dmmConnected   = {A:false,B:false};
+      refreshInstruments(true);
+    };
+
+    // --- Osciloskop animácia ---
+    const cvs = document.getElementById('t2-wave');
+    const ctx = cvs.getContext('2d');
+    function resizeScope(){
+      const r = cvs.getBoundingClientRect();
+      const DPR = window.devicePixelRatio||1;
+      cvs.width = Math.floor(r.width*DPR);
+      cvs.height= Math.floor(r.height*DPR);
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    resizeScope(); addEventListener('resize', resizeScope);
+
+    let t0 = performance.now();
+    function drawScope(now){
+      const dt = (now - t0)/1000; t0 = now;
+      const w = cvs.clientWidth, h = cvs.clientHeight;
+      ctx.clearRect(0,0,w,h);
+
+      // nič ak nie je pripojené
+      const ok = scopeConnected.A && scopeConnected.B;
+
+      // osi
+      const PAD=16, xmin=PAD, xmax=w-PAD, ymin=PAD, ymax=h-PAD, midY=(ymin+ymax)/2, midX=(xmin+xmax)/2;
+      ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(xmin,midY); ctx.lineTo(xmax,midY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(midX,ymin); ctx.lineTo(midX,ymax); ctx.stroke();
+
+      if(ok){
+        drawWave(w,h);
+        document.getElementById('t2-scope-rdg').textContent = 'živá vlna…';
+      }else{
+        document.getElementById('t2-scope-rdg').textContent = 'nepripojené';
+      }
+      requestAnimationFrame(drawScope);
+    }
+    function drawWave(w,h){
+      const xmin=16, xmax=w-16, ymin=16, ymax=h-16, midY=(ymin+ymax)/2;
+      const A = (ymax-ymin)*0.35;
+      const TAU = Math.PI*2;
+      const tt = (performance.now()/1000); // čas
+      ctx.strokeStyle='#22c55e'; ctx.lineWidth=2.2;
+      ctx.beginPath();
+      const steps = Math.max(240, Math.floor(xmax-xmin));
+      for(let i=0;i<=steps;i++){
+        const x = xmin + (i/steps)*(xmax-xmin);
+        const t = (i/steps)*2*(1/f); // zobrazené ~2 periódy
+        const y = midY - A * Math.sin(TAU*f*t + tt*2.4); // posuv
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // bežiaca bodka
+      const bx = xmin + ((tt*0.35) % 1)*(xmax-xmin);
+      const by = midY - A * Math.sin(TAU*f*((tt*0.35)%1)*2*(1/f) + tt*2.4);
+      ctx.fillStyle='#a7f3d0'; ctx.beginPath(); ctx.arc(bx,by,3.5,0,TAU); ctx.fill();
+    }
+    requestAnimationFrame(drawScope);
+
+    // --- Multimeter zobrazenie ---
+    function refreshInstruments(reset){
+      const lamp = document.getElementById('t2-lamp');
+      const dmmLbl= document.getElementById('t2-dmm-rdg');
+
+      const sOK = scopeConnected.A && scopeConnected.B;
+      const dOK = dmmConnected.A && dmmConnected.B;
+
+      lamp.classList.toggle('off', !(sOK || dOK));
+
+      if(dOK){
+        dmmLbl.textContent = Ueff.toFixed(1) + ' V';
+      }else{
+        dmmLbl.textContent = '--.- V';
+      }
+      if(reset){
+        // vyprázdni dropzóny
+        document.getElementById('dz-scope').innerHTML='';
+        document.getElementById('dz-dmm').innerHTML='';
+        // vráť kartičky
+        const tray = document.getElementById('t2-tray');
+        [...document.querySelectorAll('#task2-dd .token')].forEach(t=>tray.appendChild(t));
+        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
+        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
+      }
+    }
+
+    // --- Drag & drop kartičiek u(t)/U na prístroje ---
+    const tray = document.getElementById('t2-tray');
+    tray.addEventListener('dragstart', e=>{
+      const t = e.target.closest('.token'); if(!t) return;
+      e.dataTransfer.setData('text/token', t.dataset.token);
+      // malé ID pre presun
+      e.dataTransfer.setData('text/id', t.outerHTML);
+    });
+
+    function dzSetup(id, accept){
+      const dz = document.getElementById(id);
+      dz.addEventListener('dragover', e=>e.preventDefault());
+      dz.addEventListener('drop', e=>{
+        e.preventDefault();
+        const tok = e.dataTransfer.getData('text/token');
+        if(!tok) return;
+        // vlož vizuálne
+        const html = e.dataTransfer.getData('text/id');
+        dz.innerHTML = html;
+
+        // kontrola
+        const ok = (tok === accept);
+        dz.classList.toggle('dz-ok', ok);
+        dz.classList.toggle('dz-bad', !ok);
+
+        // ak sú obidve správne → úspech!
+        const okScope = document.getElementById('dz-scope').classList.contains('dz-ok');
+        const okDmm   = document.getElementById('dz-dmm').classList.contains('dz-ok');
+        if(okScope && okDmm){
+          // malé „bzzzzt“ u Dr. Phasora, ak máš jeho iskru funkciu, môžeš zavolať
+          // successSpark();
+          setTimeout(()=>alert('Správne! Osciloskop → u(t); Multimeter → Uef.'), 120);
+        }
+      });
+    }
+    dzSetup('dz-scope', 'u(t)');
+    dzSetup('dz-dmm',   'U');
+  </script>
+</section>
+<!-- ========== /ÚLOHA 2 ========== -->
+
+
+
+
