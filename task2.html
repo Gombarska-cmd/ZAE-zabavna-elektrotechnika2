@@ -113,31 +113,17 @@
       position:relative;
       z-index:1;
     }
-    .workbench{
-      width:100%;
-      aspect-ratio:16/9;
-      min-height:420px;
-      background:var(--cream);
-      border:1px solid rgba(0,0,0,.12);
-      border-radius:var(--radius);
-      position:relative;
-      overflow:hidden;
-      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
-    }
-    .workbench::before{
-      content:"";position:absolute;inset:0;
-      background:
-        repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 20px),
-        repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 20px),
-        repeating-linear-gradient(0deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px),
-        repeating-linear-gradient(90deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px);
-      opacity:.4;
-      pointer-events:none;
-    }
-
-    .zone{position:absolute;top:0;bottom:0}
-    .zone.left{left:0;right:50%}
-    .zone.right{left:50%;right:0}
+    /* NOVÉ: grid layout */
+  display:grid;
+  grid-template-columns: 56% 44%;     /* pomer ľavá:pravá – pokojne dolaď */
+  grid-template-rows: auto 1fr auto;  /* hore text, stred voľný, dole answer */
+  gap:14px;
+  padding:18px;
+}
+/* všeobecne zruš absolútne pozície vo vnútri gridu */
+.workbench .zone{ position: static; }       /* namiesto absolute */
+.zone.left{ grid-column:1; grid-row:1 / span 3; display:flex; flex-direction:column; gap:14px; }
+.zone.right{ grid-column:2; grid-row:1 / span 3; display:grid; grid-template-rows:auto 1fr auto; gap:14px; }
 
     /* Ľavý stĺpec – prístroje */
     .instruments{
