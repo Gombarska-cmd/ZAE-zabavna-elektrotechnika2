@@ -2,1174 +2,479 @@
 <html lang="sk">
 <head>
   <meta charset="utf-8" />
-  <title>Escape the Phasor – Úloha 1</title>
+  <title>Escape the Phasor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{
-      --metal-1:#4A4E52; --metal-2:#565A60; --metal-3:#2E3135;
-      --cream:#FCF6E6; --grid:#C6FFFF; --grid-10:#9EEFEF;
-      --ok:#22c55e; --fail:#ef4444; --hud:#111827; --hudText:#f9fafb;
-      --radius:14px;
-    }
+    :root{ --metal-1:#4A4E52; --metal-2:#565A60; --metal-3:#2E3135;
+           --cream:#FCF6E6; --grid:#C6FFFF; --grid-10:#9EEFEF;
+           --ok:#22c55e; --fail:#ef4444; --hud:#111827; --hudText:#f9fafb;
+           --radius:14px; }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      background:linear-gradient(180deg,#020817,#111827);
-      color:#e5e7eb;
-    }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+          background:linear-gradient(180deg,#020817,#111827); color:#e5e7eb; }
 
-    /* RÁM */
-    .frame{
-      max-width:1280px;
-      margin:24px auto;
-      padding:16px;
-      background:linear-gradient(135deg,var(--metal-2),var(--metal-3));
-      border:6px solid var(--metal-1);
-      border-radius:18px;
-      box-shadow:0 10px 40px rgba(0,0,0,.4);
-      position:relative;
-    }
-    .frame::before,.frame::after{
-      content:"";
-      position:absolute;
-      width:14px;height:14px;border-radius:50%;
-      background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60% 100%);
-      box-shadow:inset 0 0 2px rgba(0,0,0,.6);
-    }
-    .frame::before{left:10px;top:10px}
-    .frame::after{right:10px;top:10px}
-
-    .row{display:flex;gap:16px}
-    .top{align-items:center;position:relative;z-index:2}
-
-    /* PANELY HORE */
-    .panel{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);
-      padding:12px;
-      backdrop-filter:blur(2px);
-      min-height:120px;
-    }
-    .panel strong{display:block;margin-bottom:4px}
+    /* Rám a horné panely */
+    .frame{ max-width:1280px; margin:24px auto; padding:16px;
+            background:linear-gradient(135deg,var(--metal-2),var(--metal-3));
+            border:6px solid var(--metal-1); border-radius:18px;
+            box-shadow:0 10px 40px rgba(0,0,0,.4); position:relative; }
+    .frame::before,.frame::after{ content:""; position:absolute; width:14px;height:14px; border-radius:50%;
+      background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60% 100%); box-shadow:inset 0 0 2px rgba(0,0,0,.6); }
+    .frame::before{left:10px;top:10px} .frame::after{right:10px;top:10px}
+    .row{display:flex; gap:16px} .top{align-items:center; position:relative; z-index:2}
+    .panel{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+            border-radius:var(--radius); padding:12px; backdrop-filter:blur(2px); min-height:120px; }
+    .panel strong{display:block; margin-bottom:4px}
     .dr,.student{flex:0 0 23%}
-    .task{
-      flex:1;
-      min-height:160px;
-      position:relative;
-      display:flex;
-      flex-direction:column;
-      padding-top:48px;
-    }
-    .task h2{margin:0 0 8px 0;font-size:18px}
-    .task .scroll{overflow:auto;max-height:120px;padding-right:8px}
-
-    /* Bublina Dr. Phasora */
-    .bubble.wide{
-      position:absolute;
-      left:0;right:0;top:-10px;
-      width:calc(100% - 8px);
-      background:#ffffff;
-      color:#111827;
-      border-radius:12px;
-      padding:10px 36px 10px 12px;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-      border:2px solid #6b4ca6;
-      transform:translateY(-100%);
-    }
-    .bubble.wide:after{
-      content:"";
-      position:absolute;
-      bottom:-10px;left:40px;
-      border:10px solid transparent;
-      border-top-color:#ffffff;
-      filter:drop-shadow(0 -2px 0 #6b4ca6);
-    }
-    .bubble .close{
-      position:absolute;right:8px;top:4px;
-      width:24px;height:24px;
-      display:grid;place-items:center;
-      cursor:pointer;
-      border-radius:6px;
-      font-weight:700;
-      color:#6b4ca6;
-    }
+    .task{ flex:1; min-height:160px; position:relative; display:flex; flex-direction:column; padding-top:48px; }
+    .task h2{margin:0 0 8px 0; font-size:18px}
+    .task .scroll{overflow:auto; max-height:120px; padding-right:8px}
+    .bubble.wide{ position:absolute; left:0; right:0; top:-10px; width:calc(100% - 8px);
+      background:#fff; color:#111827; border-radius:12px; padding:10px 36px 10px 12px;
+      box-shadow:0 10px 20px rgba(0,0,0,.25); border:2px solid #6b4ca6; transform:translateY(-100%); }
+    .bubble.wide:after{ content:""; position:absolute; bottom:-10px; left:40px;
+      border:10px solid transparent; border-top-color:#fff; filter:drop-shadow(0 -2px 0 #6b4ca6); }
+    .bubble .close{ position:absolute; right:8px; top:4px; width:24px; height:24px;
+      display:grid; place-items:center; cursor:pointer; border-radius:6px; font-weight:700; color:#6b4ca6; }
     .bubble .close:hover{background:#f2eaff}
+    .locks{display:flex; flex-direction:column; gap:6px; margin-left:auto}
+    .lock{ width:26px; height:26px; border-radius:6px; background:#020817; border:1px solid #374151;
+           display:grid; place-items:center; color:#fbbf24; font-size:16px; box-shadow:inset 0 0 6px rgba(0,0,0,.7) }
 
-    /* ZÁMKY */
-    .locks{
-      display:flex;flex-direction:column;gap:6px;margin-left:auto;
-    }
-    .lock{
-      width:26px;height:26px;border-radius:6px;
-      background:#020817;border:1px solid #374151;
-      display:grid;place-items:center;
-      color:#fbbf24;font-size:16px;
-      box-shadow:inset 0 0 6px rgba(0,0,0,.7);
-    }
-
-    /* PLÁTNO / WORKBENCH */
-    .play{margin-top:16px;position:relative;z-index:1}
-    .workbench{
-      width:100%;
-      aspect-ratio:16/9;
-      min-height:420px;
-      background:var(--cream);
-      border:1px solid rgba(0,0,0,.12);
-      border-radius:var(--radius);
-      position:relative;
-      overflow:hidden;
-      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
-    }
+    /* Spoločné plátno */
+    .play{margin-top:16px; position:relative; z-index:1}
+    .workbench{ width:100%; aspect-ratio:16/9; min-height:420px; background:var(--cream);
+      border:1px solid rgba(0,0,0,.12); border-radius:var(--radius); position:relative; overflow:hidden;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04) }
     @media (max-width:1280px){.workbench{min-height:360px}}
-    .workbench::before{
-      content:"";
-      position:absolute;inset:0;
-      background:
-        repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 20px),
-        repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 20px),
-        repeating-linear-gradient(0deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px),
-        repeating-linear-gradient(90deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px);
-      opacity:.45;
-      pointer-events:none;
-    }
+    .workbench::before{ content:""; position:absolute; inset:0; background:
+      repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 20px),
+      repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 20px),
+      repeating-linear-gradient(0deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px),
+      repeating-linear-gradient(90deg,transparent 0 200px,var(--grid-10) 200px 201px,transparent 201px 400px);
+      opacity:.45; pointer-events:none; }
+    .zone{position:absolute; top:0; bottom:0}
+    .zone.left{left:0; width:50%} .zone.right{right:0; width:50%}
 
-   .zone{
-      position:absolute;
-      top:0;
-      bottom:0;
-    }
+    /* Prepínanie obrazoviek */
+    .task-screen{display:none}
+    .task-screen.active{display:block}
 
-    .zone.left{
-      left:0;
-      width:50%;
-    }
-
-    .zone.right{
-      right:0;
-      width:50%;
-    }
-
-<!-- Úloha 1 -->
-<section id="task1" class="task-screen visible">
-    /* OSCILOSKOP */
-   .scope{
-      position:absolute;
-      top:18px;
-      left:18px;
-      right:18px;
-      bottom:82px;              /* rovnaké číslo ako pri .calc */
-      background:#0d0f11;
-      border-radius:14px;
-      padding:10px;
-      box-shadow: inset 0 0 0 2px #2a3039,
-              inset 0 0 20px rgba(0,0,0,.6);
-    }
-
-    #osc{
-      width:100%;height:100%;
-      display:block;
-      border-radius:10px;
-    }
-
-    .osc-ui{
-      position:absolute;
-      left:18px;
-      right:18px;
-      bottom:18px;  /* zarovnáme s answerBoxom vpravo */
-      display:flex;gap:16px;align-items:center;
-      padding:8px 10px;
-      border-radius:10px;
-      background:rgba(0,0,0,.08);
-      border:1px solid rgba(15,23,42,.3);
-      backdrop-filter:blur(1px);
-      color:#111827;
-    }
-    #playBtn{
-      padding:6px 10px;
-      border-radius:8px;
-      border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
-      cursor:pointer;
-    }
-    #playBtn.paused{opacity:.7}
-    .osc-ui input[type="range"]{width:220px;margin:0 8px}
-
-    /* KALKULAČKA */
-    .calc{
-      position:absolute;
-      top:18px;
-      left:18px;
-      right:18px;
-      bottom:82px; /* rovnaká logika ako scope + miesto na answerBox */
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(0,0,0,.1);
-      border-radius:12px;
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      box-shadow:0 3px 10px rgba(0,0,0,.08);
-      color:#111827;
-    }
-    .calc-top{display:flex;gap:10px;}
-    #calcDisplay{
-      flex:1;
-      padding:8px 10px;
-      border:2px solid #cbd5e1;
-      border-radius:8px;
-      font-size:36px;
-    }
-    #degRad{
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
-      cursor:pointer;
-    }
-    .calc-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr); /* 3 stĺpce numpad + 1 stĺpec funkcií */
-      gap:6px;
-}
-
-    .calc-grid button{
-      padding:16px 0;
-      border:2px solid #d4d4d8;
-      border-radius:12px;
-      background:#f4f4f5;
-      cursor:pointer;
-      font-weight:800;
-      font-size:18px;
-    }
-    .calc-grid button.wide{grid-column:span 2;}
-    .calc-grid button.ghost{background:#e5e7eb;}
-    .calc-grid button.emph{
-      background:#111827;
-      color:#f9fafb;
-      border-color:#111827;
-    }
-
-</section>
-    
-    /* ODPOVEĎ */
-    .answerBox{
-  position:absolute;
-  left:18px;
-  right:18px;
-  bottom:18px;              /* rovnaké ako .osc-ui → jedna línia */
-  background:rgba(255,255,255,.9);
-  border:1px solid rgba(0,0,0,.1);
-  border-radius:12px;
-  padding:10px 12px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  color:#111;
-  box-shadow:0 3px 8px rgba(0,0,0,.06);
-}
-    .answerBox input{
-      width:180px;
-      padding:8px 10px;
-      border-radius:8px;
-      border:1px solid #cbd5e1;
-    }
-    .answerBox button{
-      padding:8px 14px;
-      border-radius:10px;
-      border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
-      cursor:pointer;
-    }
-    .feedback{min-height:1.2em;font-weight:700}
+    /* Úloha 1 – osciloskop + kalkulačka */
+    .scope{ position:absolute; top:18px; left:18px; right:18px; bottom:82px;
+            background:#0d0f11; border-radius:14px; padding:10px;
+            box-shadow:inset 0 0 0 2px #2a3039, inset 0 0 20px rgba(0,0,0,.6) }
+    #osc{ width:100%; height:100%; display:block; border-radius:10px }
+    .osc-ui{ position:absolute; left:18px; right:18px; bottom:18px; display:flex; gap:16px; align-items:center;
+             padding:8px 10px; border-radius:10px; background:rgba(0,0,0,.08);
+             border:1px solid rgba(15,23,42,.3); backdrop-filter:blur(1px); color:#111827 }
+    #playBtn{ padding:6px 10px; border-radius:8px; border:1px solid #111827; background:#111827; color:#f9fafb; cursor:pointer }
+    #playBtn.paused{opacity:.7} .osc-ui input[type="range"]{width:220px; margin:0 8px}
+    .calc{ position:absolute; top:18px; left:18px; right:18px; bottom:82px;
+           background:rgba(255,255,255,.78); border:1px solid rgba(0,0,0,.1);
+           border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:18px;
+           box-shadow:0 3px 10px rgba(0,0,0,.08); color:#111827 }
+    .calc-top{display:flex; gap:10px}
+    #calcDisplay{ flex:1; padding:8px 10px; border:2px solid #cbd5e1; border-radius:8px; font-size:36px }
+    #degRad{ padding:8px 10px; border-radius:10px; border:1px solid #111827; background:#111827; color:#f9fafb; cursor:pointer }
+    .calc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px }
+    .calc-grid button{ padding:16px 0; border:2px solid #d4d4d8; border-radius:12px; background:#f4f4f5; cursor:pointer; font-weight:800; font-size:18px }
+    .calc-grid button.ghost{background:#e5e7eb} .calc-grid button.emph{ background:#111827; color:#f9fafb; border-color:#111827 }
+    .answerBox{ position:absolute; left:18px; right:18px; bottom:18px; background:rgba(255,255,255,.9);
+      border:1px solid rgba(0,0,0,.1); border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:#111;
+      box-shadow:0 3px 8px rgba(0,0,0,.06) }
+    .answerBox input{ width:180px; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1 }
+    .answerBox button{ padding:8px 14px; border-radius:10px; border:1px solid #111827; background:#111827; color:#f9fafb; cursor:pointer }
+    .feedback{min-height:1.2em; font-weight:700}
 
     /* HUD */
-    .hud{
-      margin-top:12px;
-      padding:10px 12px;
-      background:var(--hud);
-      color:var(--hudText);
-      border-radius:var(--radius);
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      position:relative;
-      z-index:3;
-      font-size:14px;
-    }
-    .hud .group{display:flex;gap:14px;align-items:center}
-    .pill{
-      background:#020817;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid #374151;
-    }
-    .hud select{
-      background:#020817;
-      color:#f9fafb;
-      border:1px solid #374151;
-      border-radius:8px;
-      padding:3px 6px;
-    }
+    .hud{ margin-top:12px; padding:10px 12px; background:var(--hud); color:var(--hudText);
+          border-radius:var(--radius); display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; position:relative; z-index:3; font-size:14px }
+    .hud .group{display:flex; gap:14px; align-items:center}
+    .pill{ background:#020817; padding:6px 10px; border-radius:999px; border:1px solid #374151 }
+    .hud select{ background:#020817; color:#f9fafb; border:1px solid #374151; border-radius:8px; padding:3px 6px }
 
-    /* TYPO + EFEKTY */
-    .math var{font-style:italic}
-    .math sub{font-style:normal}
+    /* Efekty */
+    .math var{font-style:italic} .math sub{font-style:normal}
     .phi{font-family:"Cambria Math","STIX Two Math","DejaVu Sans",serif}
-    .shake{animation:shake .35s}
-    .flash{animation:flash .4s}
-    @keyframes shake{
-      0%,100%{transform:translateX(0)}
-      20%{transform:translateX(-6px)}
-      40%{transform:translateX(6px)}
-      60%{transform:translateX(-4px)}
-      80%{transform:translateX(4px)}
-    }
-    @keyframes flash{
-      0%{background:#2b1111}
-      100%{background:transparent}
-    }
+    .shake{animation:shake .35s} .flash{animation:flash .4s}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    @keyframes flash{0%{background:#2b1111}100%{background:transparent}}
+    .spark{ position:absolute; width:160px; height:160px; pointer-events:none; display:none;
+      background: radial-gradient(circle at 50% 50%,#FFD745 0 30%,rgba(255,215,69,.6) 35% 55%,transparent 60%),
+                 conic-gradient(from 0deg,rgba(255,215,69,.9),rgba(243,190,87,.6),rgba(255,237,154,.7),rgba(255,215,69,.9));
+      filter:blur(1px) drop-shadow(0 0 10px rgba(255,215,69,.7)); border-radius:50%;
+      transform:translate(-50%,-50%) scale(.8); animation:spark .6s ease-out forwards }
+    @keyframes spark{ 0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(0deg)}
+                      20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(12deg)}
+                      100%{opacity:0;transform:translate(-50%,-50%) scale(1.1) rotate(22deg)} }
 
-    /* ISKRA */
-    .spark{
-      position:absolute;
-      width:160px;height:160px;
-      pointer-events:none;
-      display:none;
-      background:
-        radial-gradient(circle at 50% 50%,#FFD745 0 30%,rgba(255,215,69,.6) 35% 55%,transparent 60%),
-        conic-gradient(from 0deg,rgba(255,215,69,.9),rgba(243,190,87,.6),rgba(255,237,154,.7),rgba(255,215,69,.9));
-      filter:blur(1px) drop-shadow(0 0 10px rgba(255,215,69,.7));
-      border-radius:50%;
-      transform:translate(-50%,-50%) scale(.8);
-      animation:spark .6s ease-out forwards;
-    }
-    @keyframes spark{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(0deg)}
-      20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(12deg)}
-      100%{opacity:0;transform:translate(-50%,-50%) scale(1.1) rotate(22deg)}
-    }
+    /* Úloha 2 – mini štýly priamo tu pre jednoduchosť */
+    .t2-wrap{display:grid;grid-template-columns:48% 52%;gap:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px}
+    .t2-card{background:rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;color:#e5e7eb}
+    .t2-h{font-weight:800;margin:0 0 8px 0} .t2-row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .scope2,.dmm{position:relative;border-radius:12px;padding:10px;background:#0d0f11;border:1px solid #2a3039;box-shadow:inset 0 0 20px rgba(0,0,0,.6)}
+    .scope-screen{height:160px;border-radius:8px;background:#0a0f12;position:relative;overflow:hidden}
+    .scope-screen::before{content:"";position:absolute;inset:0;background:
+      repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px); opacity:.55}
+    .dmm-face{height:160px;display:grid;place-items:center;border-radius:8px;background:linear-gradient(#222,#111)}
+    .dmm-reading{font:700 26px/1 monospace;background:#c9f0d8;color:#0b2c15;padding:4px 10px;border-radius:6px;box-shadow:inset 0 0 4px rgba(0,0,0,.25)}
+    .circuit{position:relative;border-radius:12px;background:var(--cream);padding:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+    .lamp{width:160px;height:160px;border-radius:50%;margin:30px auto;position:relative;background:
+      radial-gradient(circle at 50% 45%,#ffe69a 0 45%,#ffd24d 46% 58%,#f0b02a 59% 65%,#cc9000 66% 100%)}
+    .lamp.off{filter:grayscale(1) brightness(.7)}
+    .terminal{position:absolute;width:18px;height:18px;border-radius:50%;background:#222;border:2px solid #ddd;cursor:pointer}
+    .tA{left:calc(50% - 9px); top:12px} .tB{left:calc(50% - 9px); bottom:12px}
+    .probe{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:#111827;border:1px solid #374151;color:#f8fafc;cursor:grab;user-select:none}
+    .probe:active{cursor:grabbing} .probe .dot{width:10px;height:10px;border-radius:50%}
+    .probe.red .dot{background:#ef4444} .probe.black .dot{background:#6b7280}
+    .dock{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .dropzone{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;min-height:38px;padding:6px;border-radius:8px;border:1px dashed rgba(255,255,255,.35)}
+    .dz-ok{border-color:#22c55e} .dz-bad{border-color:#ef4444}
+    .token{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#fff;color:#111;border:1px solid #cbd5e1;font-weight:700;cursor:grab}
+    .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .t2-btn{padding:6px 10px;border-radius:8px;border:1px solid #374151;background:#111827;color:#f8fafc;cursor:pointer}
   </style>
 </head>
 <body>
   <main class="frame">
-<div style="margin:10px;">
-  <button onclick="showTask('task1')">Úloha 1</button>
-  <button onclick="showTask('task2')">Úloha 2</button>
-</div>
 
-    <!-- Horný rad -->
+    <!-- prepínač -->
+    <div style="margin-bottom:10px">
+      <button onclick="showTask('task1')">Úloha 1</button>
+      <button onclick="showTask('task2')">Úloha 2</button>
+    </div>
+
+    <!-- horný rad -->
     <section class="row top">
-      <div class="panel dr" id="dr">
-        <strong>Dr. Phasor</strong>
-      </div>
+      <div class="panel dr" id="dr"><strong>Dr. Phasor</strong></div>
 
       <div class="panel task" id="taskPanel">
-        <div class="bubble wide" id="bubble">
-          MUHAHA! Nové zadanie čaká…
-          <div class="close" id="bubbleClose">×</div>
-        </div>
+        <div class="bubble wide" id="bubble">MUHAHA! Nové zadanie čaká… <div class="close" id="bubbleClose">×</div></div>
         <h2>Úloha</h2>
-        <div class="scroll math" id="taskText">
-          <!-- bude prepísané v newTask1() -->
-        </div>
+        <div class="scroll math" id="taskText"></div>
       </div>
 
       <div class="panel student">
         <strong>Študent</strong>
-        <div class="locks" aria-label="Zámky" id="locksCol">
+        <div class="locks" id="locksCol">
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
         </div>
       </div>
     </section>
 
-    <!-- Plátno -->
-    <section class="play">
-      <div class="workbench">
-        <!-- Ľavá zóna: osciloskop -->
-        <div class="zone left">
-          <div class="scope">
-            <canvas id="osc" aria-label="osciloskop"></canvas>
-          </div>
-          <div class="osc-ui">
-            <button id="playBtn" type="button">▶︎ Play</button>
-            <label>Čas <var>t</var>:
-              <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
-              <span id="tReadout">2.0 ms</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Pravá zóna: kalkulačka + odpoveď -->
-        <div class="zone right">
-          <div class="calc">
-            <div class="calc-top">
-              <input id="calcDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" />
-              <button id="degRad">RAD</button>
+    <!-- Úloha 1 -->
+    <section id="task1" class="task-screen active">
+      <section class="play">
+        <div class="workbench">
+          <div class="zone left">
+            <div class="scope"><canvas id="osc" aria-label="osciloskop"></canvas></div>
+            <div class="osc-ui">
+              <button id="playBtn" type="button">▶︎ Play</button>
+              <label>Čas <var>t</var>: <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
+                <span id="tReadout">2.0 ms</span></label>
             </div>
-           <div class="calc-grid">
-  <!-- horný rad -->
-  <button data-fn="pi">π</button>
-  <button data-fn="tenpow">10ⁿ</button>
-  <button data-op="^">^</button>
-  <button data-fn="back">←</button>
-  
-  <!-- druhý rad -->
-  <button data-fn="sqrt">√</button>
-  <button data-fn="sin">sin</button>
-  <button data-fn="cos">cos</button>
-  <button data-fn="tan">tan</button>
-              
-  <!-- tretí rad -->
-  <button data-num="7">7</button>
-  <button data-num="8">8</button>
-  <button data-num="9">9</button>
-  <button data-op="/">÷</button>
-             
-  <!-- štvrtý rad -->
-  <button data-num="4">4</button>
-  <button data-num="5">5</button>
-  <button data-num="6">6</button>
-  <button data-op="*">×</button>
-  
-  <!-- piaty rad -->
-  <button data-num="1">1</button>
-  <button data-num="2">2</button>
-  <button data-num="3">3</button>
-  <button data-op="+">+</button>
- 
-  <!-- šiesty rad -->
-  <button data-op=".">.</button>
-  <button data-num="0">0</button>
-  <button data-fn="clear" class="ghost">C</button>
-  <button data-op="-">−</button>
-              
-  <!-- spodný rad -->
-  <button data-op="(">(</button>
-  <button data-op=")">)</button>
-  <button data-fn="ans" class="ghost">→ Odpoveď</button>
-  <button data-fn="eq" class="emph">=</button>
-</div>
-      </div>
-           <div class="answerBox">
-            <label>Odpoveď: <var>u</var>(<var>t</var>) =
-              <input id="answer" type="number" step="0.01" placeholder="V">
-              <span>V</span>
-            </label>
-            <button id="checkBtn">Skontrolovať</button>
-            <div id="feedback" class="feedback"></div>
+          </div>
+
+          <div class="zone right">
+            <div class="calc">
+              <div class="calc-top">
+                <input id="calcDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" />
+                <button id="degRad">RAD</button>
+              </div>
+              <div class="calc-grid">
+                <!-- horný rad -->
+                <button data-fn="pi">π</button>
+                <button data-fn="tenpow">10ⁿ</button>
+                <button data-op="^">^</button>
+                <button data-fn="back">←</button>
+                <!-- trig / sqrt -->
+                <button data-fn="sqrt">√</button>
+                <button data-fn="sin">sin</button>
+                <button data-fn="cos">cos</button>
+                <button data-fn="tan">tan</button>
+                <!-- numpad -->
+                <button data-num="7">7</button><button data-num="8">8</button><button data-num="9">9</button><button data-op="/">÷</button>
+                <button data-num="4">4</button><button data-num="5">5</button><button data-num="6">6</button><button data-op="*">×</button>
+                <button data-num="1">1</button><button data-num="2">2</button><button data-num="3">3</button><button data-op="+">+</button>
+                <button data-op=".">.</button><button data-num="0">0</button><button data-fn="clear" class="ghost">C</button><button data-op="-">−</button>
+                <button data-op="(">(</button><button data-op=")">)</button><button data-fn="ans" class="ghost">→ Odpoveď</button><button data-fn="eq" class="emph">=</button>
+              </div>
+            </div>
+
+            <div class="answerBox">
+              <label>Odpoveď: <var>u</var>(<var>t</var>) =
+                <input id="answer" type="number" step="0.01" placeholder="V"><span>V</span></label>
+              <button id="checkBtn">Skontrolovať</button>
+              <div id="feedback" class="feedback"></div>
+            </div>
+          </div>
+        </div>
+        <div id="spark" class="spark" aria-hidden="true"></div>
+      </section>
+    </section>
+
+    <!-- Úloha 2 -->
+    <section id="task2" class="task-screen">
+      <div class="t2-wrap" id="t2">
+        <div class="t2-card">
+          <h3 class="t2-h">Meracie prístroje</h3>
+
+          <div class="scope2" id="t2-scope">
+            <div class="t2-row"><strong>Osciloskop</strong><span class="hint">pripoj obidve sondy</span></div>
+            <div class="scope-screen"><canvas id="t2-wave"></canvas></div>
+            <div class="dmm-reading" id="t2-scope-rdg" style="margin-top:6px">nepripojené</div>
+            <div class="dock">
+              <div class="probe red"   draggable="true" data-probe="scopeA"><span class="dot"></span> červená sonda</div>
+              <div class="probe black" draggable="true" data-probe="scopeB"><span class="dot"></span> čierna sonda</div>
+            </div>
+            <div class="dropzone" id="dz-scope"></div>
+          </div>
+
+          <div class="dmm" id="t2-dmm" style="margin-top:12px;">
+            <div class="t2-row"><strong>Multimeter</strong><span class="hint">pripoj šnúry</span></div>
+            <div class="dmm-face"><div class="dmm-reading" id="t2-dmm-rdg">--.- V</div></div>
+            <div class="dock">
+              <div class="probe red"   draggable="true" data-probe="dmmA"><span class="dot"></span> V/Ω</div>
+              <div class="probe black" draggable="true" data-probe="dmmB"><span class="dot"></span> COM</div>
+            </div>
+            <div class="dropzone" id="dz-dmm"></div>
+          </div>
+
+          <div class="tray" id="t2-tray" style="margin-top:12px;">
+            <div class="token" draggable="true" data-token="u(t)">u(t)</div>
+            <div class="token" draggable="true" data-token="U">U</div>
           </div>
         </div>
 
-      <div id="spark" class="spark" aria-hidden="true"></div>
+        <div class="t2-card">
+          <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
+          <div class="circuit" id="t2-circuit">
+            <div class="lamp off" id="t2-lamp"></div>
+            <div class="terminal tA" data-terminal="A" title="svorka A"></div>
+            <div class="terminal tB" data-terminal="B" title="svorka B"></div>
+            <div style="text-align:center; margin-top:8px;">
+              <button class="t2-btn" id="t2-reset">Reset pripojení</button>
+            </div>
+          </div>
+          <div class="hint">Pripoj sondy k svorkám A a B. Potom potiahni kartičky <b>u(t)</b> a <b>U</b> na správny prístroj.</div>
+        </div>
+      </div>
     </section>
 
     <!-- HUD -->
     <section class="hud">
       <div class="group">
         <span class="pill" id="timePill">TIME: 00:00</span>
-        <span class="pill">
-          MODE:
-          <select id="modeSelect" style="margin-left:6px">
-            <option value="EASY" selected>EASY</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="HARD">HARD</option>
-          </select>
-        </span>
+        <span class="pill">MODE: <select id="modeSelect" style="margin-left:6px">
+          <option value="EASY" selected>EASY</option><option value="MEDIUM">MEDIUM</option><option value="HARD">HARD</option></select></span>
         <span class="pill" id="mistakesPill">MISTAKES: 0/2</span>
         <span class="pill" id="locksPill">LOCKS LEFT: 10</span>
       </div>
-      <div class="group">
-        <button class="pill" id="hintBtn">HINT</button>
-      </div>
+      <div class="group"><button class="pill" id="hintBtn">HINT</button></div>
     </section>
   </main>
 
   <script>
-    // bublina
-    document.getElementById('bubbleClose')
-      .addEventListener('click',()=>document.getElementById('bubble').style.display='none');
-
-    /* ===== Stav ===== */
-    const pills = {
-      mistakes: document.getElementById('mistakesPill'),
-      locks: document.getElementById('locksPill'),
-      time: document.getElementById('timePill')
-    };
-
-    const state = {
-      mode:'EASY',
-      mistakes:0,
-      U:230,
-      f:50,
-      phi:10,
-      tGiven:2.0,
-      playing:false,
-      tAnim:2.0
-    };
-
-    const el = {
-      taskText:document.getElementById('taskText'),
-      tSlider:document.getElementById('tSlider'),
-      tRead:document.getElementById('tReadout'),
-      play:document.getElementById('playBtn'),
-      answer:document.getElementById('answer'),
-      check:document.getElementById('checkBtn'),
-      feedback:document.getElementById('feedback'),
-      taskPanel:document.getElementById('taskPanel'),
-      bubble:document.getElementById('bubble'),
-      osc:document.getElementById('osc'),
-      spark:document.getElementById('spark'),
-      locksCol:document.getElementById('locksCol'),
-      modeSelect:document.getElementById('modeSelect')
-    };
-
-    const TAU = Math.PI*2;
-    const deg2rad = d=>d*Math.PI/180;
-    const round2 = x=>Math.round(x*100)/100;
-    const randFrom = a=>a[Math.floor(Math.random()*a.length)];
-    function tolByMode(){
-      return state.mode==='EASY' ? 0.50 :
-             state.mode==='MEDIUM' ? 0.20 : 0.05;
+    // ——— spoločné
+    document.getElementById('bubbleClose').onclick=()=>document.getElementById('bubble').style.display='none';
+    function showTask(id){
+      document.querySelectorAll('.task-screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if(id==='task1'){ resizeOsc(); newTask1(); }
+      if(id==='task2'){ t2_init(); }
     }
 
-    /* ===== Zadanie 1 ===== */
+    // ——— stav / HUD pre úlohu 1
+    const pills={ mistakes:document.getElementById('mistakesPill'), locks:document.getElementById('locksPill'), time:document.getElementById('timePill') };
+    const state={ mode:'EASY', mistakes:0, U:230, f:50, phi:10, tGiven:2.0, playing:false, tAnim:2.0 };
+    const el={ taskText:document.getElementById('taskText'), tSlider:document.getElementById('tSlider'), tRead:document.getElementById('tReadout'),
+      play:document.getElementById('playBtn'), answer:document.getElementById('answer'), check:document.getElementById('checkBtn'),
+      feedback:document.getElementById('feedback'), taskPanel:document.getElementById('taskPanel'), bubble:document.getElementById('bubble'),
+      osc:document.getElementById('osc'), spark:document.getElementById('spark'), locksCol:document.getElementById('locksCol'),
+      modeSelect:document.getElementById('modeSelect') };
+    const TAU=Math.PI*2, deg2rad=d=>d*Math.PI/180, round2=x=>Math.round(x*100)/100, randFrom=a=>a[Math.floor(Math.random()*a.length)];
+    function tolByMode(){ return state.mode==='EASY'?0.50: state.mode==='MEDIUM'?0.20:0.05; }
+
     function newTask1(){
-      state.mistakes = 0;
-      state.U   = randFrom([230,120,100,60]);
-      state.f   = 50;
-      state.phi = randFrom([-30,-15,0,10,15,30]);
-      const Tms = 1000/state.f;
-      state.tGiven = +(Math.random()*Tms).toFixed(1);
-
-      el.taskText.innerHTML =
-        `Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.`+
-        `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>),`+
-        ` kde <var>U</var><sub>m</sub> = √2 · <var>U</var>.`+
-        `<br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, <span class="phi">φ</span> = ${state.phi}°.`;
-
-      el.tSlider.max = Tms.toFixed(1);
-      el.tSlider.value = state.tGiven;
-      el.tRead.textContent = state.tGiven.toFixed(1)+' ms';
-      state.tAnim = state.tGiven;
-
-      el.answer.value = '';
-      el.feedback.textContent = '';
-      drawOsc();
-      updateHud();
+      state.mistakes=0;
+      state.U=randFrom([230,120,100,60]);
+      state.f=50; state.phi=randFrom([-30,-15,0,10,15,30]);
+      const Tms=1000/state.f; state.tGiven=+(Math.random()*Tms).toFixed(1);
+      el.taskText.innerHTML=`Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.
+        <br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>), kde <var>U</var><sub>m</sub> = √2·<var>U</var>.
+        <br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, <span class="phi">φ</span> = ${state.phi}°.`;
+      el.tSlider.max=Tms.toFixed(1); el.tSlider.value=state.tGiven; el.tRead.textContent=state.tGiven.toFixed(1)+' ms'; state.tAnim=state.tGiven;
+      el.answer.value=''; el.feedback.textContent=''; drawOsc(); updateHud();
     }
+    function u_of_t_ms(tms){ const Um=Math.SQRT2*state.U, w=TAU*state.f, t=tms/1000, phi=deg2rad(state.phi); return Um*Math.sin(w*t+phi); }
 
-    function u_of_t_ms(tms){
-      const Um = Math.SQRT2 * state.U;
-      const w  = TAU * state.f;
-      const t  = tms / 1000;
-      const phi = deg2rad(state.phi);
-      return Um * Math.sin(w*t + phi);
-    }
-
-    /* ===== Osciloskop ===== */
-    let oscCtx = null, DPR = window.devicePixelRatio || 1;
-    let rafId = null, lastTs = 0, audioCtx = null;
-
-    function resizeOsc(){
-      const r = el.osc.getBoundingClientRect();
-      el.osc.width  = Math.floor(r.width  * DPR);
-      el.osc.height = Math.floor(r.height * DPR);
-      oscCtx = el.osc.getContext('2d');
-    }
-
-    const SCOPE_STYLE = {
-      gridFine:'rgba(255,255,255,0.22)',
-      gridBold:'rgba(255,255,255,0.38)',
-      axis:'#f9fafb',
-      axisW:2.6,
-      sineW:2.4
-    };
+    // ——— osciloskop
+    let oscCtx=null, DPR=window.devicePixelRatio||1, rafId=null, lastTs=0, audioCtx=null;
+    function resizeOsc(){ const r=el.osc.getBoundingClientRect(); el.osc.width=Math.floor(r.width*DPR); el.osc.height=Math.floor(r.height*DPR); oscCtx=el.osc.getContext('2d'); }
+    const SCOPE_STYLE={ gridFine:'rgba(255,255,255,0.22)', gridBold:'rgba(255,255,255,0.38)', axis:'#f9fafb', axisW:2.6, sineW:2.4 };
 
     function drawOsc(){
       if(!oscCtx) resizeOsc();
-
-      const W = el.osc.width / DPR;
-      const H = el.osc.height / DPR;
-
-      oscCtx.save();
-      oscCtx.scale(DPR, DPR);
-      oscCtx.clearRect(0,0,W,H);
-
-      const G = 20;
-      const PAD = 2*G;
-      const xmin = PAD, xmax = W-PAD;
-      const ymin = PAD, ymax = H-PAD;
-      const midX = (xmin+xmax)/2;
-      const midY = (ymin+ymax)/2;
-
-      // mriežka
-      oscCtx.lineWidth = 1;
-      oscCtx.strokeStyle = SCOPE_STYLE.gridFine;
-      for(let x=Math.ceil(xmin/G)*G; x<=xmax; x+=G){
-        oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke();
-      }
-      for(let y=Math.ceil(ymin/G)*G; y<=ymax; y+=G){
-        oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke();
-      }
-      const G10 = 10*G;
-      oscCtx.lineWidth = 1.4;
-      oscCtx.strokeStyle = SCOPE_STYLE.gridBold;
-      for(let x=Math.ceil(xmin/G10)*G10; x<=xmax; x+=G10){
-        oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke();
-      }
-      for(let y=Math.ceil(ymin/G10)*G10; y<=ymax; y+=G10){
-        oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke();
-      }
-
-      // osi
-      oscCtx.strokeStyle = SCOPE_STYLE.axis;
-      oscCtx.lineWidth = SCOPE_STYLE.axisW;
-      oscCtx.beginPath(); oscCtx.moveTo(xmin,midY); oscCtx.lineTo(xmax,midY); oscCtx.stroke();
-      oscCtx.beginPath(); oscCtx.moveTo(midX,ymin); oscCtx.lineTo(midX,ymax); oscCtx.stroke();
-
-      // sínus
-      const T = 1/state.f;
-      const viewT = 2*T;
-      const tToX = t => xmin + (t/viewT)*(xmax-xmin);
-      const A = (ymax-ymin)*0.28;
-      const phi = deg2rad(state.phi);
-      const w = TAU*state.f;
-
-      oscCtx.strokeStyle = '#22c55e';
-      oscCtx.lineWidth = SCOPE_STYLE.sineW;
-      oscCtx.beginPath();
-      const STEPS = Math.max(240, Math.floor(xmax-xmin));
-      for(let i=0;i<=STEPS;i++){
-        const x = xmin + (i/STEPS)*(xmax-xmin);
-        const t = ((x-xmin)/(xmax-xmin))*viewT;
-        const y = midY - A*Math.sin(w*t + phi);
-        if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
-      }
-      oscCtx.stroke();
-
-      // bodka
-      const Tms = 1000/state.f;
-      const tms = state.playing ? state.tAnim : +el.tSlider.value;
-      const t = (tms/1000) % viewT;
-      const bx = tToX(t);
-      const by = midY - A*Math.sin(w*t + phi);
-      oscCtx.fillStyle = '#a7f3d0';
-      oscCtx.beginPath(); oscCtx.arc(bx,by,4,0,TAU); oscCtx.fill();
-
-      // text
-     // const uval = u_of_t_ms(tms);
-     // oscCtx.fillStyle = 'rgba(249,250,251,0.96)';
-     // oscCtx.font = '600 12px system-ui';
-     // oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
-
-      oscCtx.restore();
+      const W=el.osc.width/DPR, H=el.osc.height/DPR;
+      const ctx=oscCtx; ctx.save(); ctx.scale(DPR,DPR); ctx.clearRect(0,0,W,H);
+      const G=20, PAD=2*G, xmin=PAD, xmax=W-PAD, ymin=PAD, ymax=H-PAD, midX=(xmin+xmax)/2, midY=(ymin+ymax)/2;
+      ctx.lineWidth=1; ctx.strokeStyle=SCOPE_STYLE.gridFine;
+      for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();}
+      for(let y=Math.ceil(ymin/G)*G;y<=ymax;y+=G){ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();}
+      const G10=10*G; ctx.lineWidth=1.4; ctx.strokeStyle=SCOPE_STYLE.gridBold;
+      for(let x=Math.ceil(xmin/G10)*G10;x<=xmax;x+=G10){ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();}
+      for(let y=Math.ceil(ymin/G10)*G10;y<=ymax;y+=G10){ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();}
+      ctx.strokeStyle=SCOPE_STYLE.axis; ctx.lineWidth=SCOPE_STYLE.axisW;
+      ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
+      const T=1/state.f, viewT=2*T, tToX=t=>xmin+(t/viewT)*(xmax-xmin), A=(ymax-ymin)*0.28, phi=deg2rad(state.phi), w=TAU*state.f;
+      ctx.strokeStyle='#22c55e'; ctx.lineWidth=SCOPE_STYLE.sineW; ctx.beginPath();
+      const STEPS=Math.max(240,Math.floor(xmax-xmin));
+      for(let i=0;i<=STEPS;i++){ const x=xmin+(i/STEPS)*(xmax-xmin), t=((x-xmin)/(xmax-xmin))*viewT, y=midY-A*Math.sin(w*t+phi); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+      ctx.stroke();
+      const Tms=1000/state.f, tms=state.playing?state.tAnim:+el.tSlider.value, t=(tms/1000)%viewT, bx=tToX(t), by=midY-A*Math.sin(w*t+phi);
+      ctx.fillStyle='#a7f3d0'; ctx.beginPath(); ctx.arc(bx,by,4,0,TAU); ctx.fill(); ctx.restore();
     }
-
     function loop(ts){
       if(!state.playing){ rafId=null; return; }
-      if(!lastTs) lastTs = ts;
-      const dt = (ts-lastTs)/1000; lastTs = ts;
-
-      const Tms = 1000/state.f;
-      state.tAnim += dt*1000;
-      if(state.tAnim >= Tms){ state.tAnim -= Tms; beep(); }
-
-      el.tSlider.value = state.tAnim.toFixed(1);
-      el.tRead.textContent = el.tSlider.value + ' ms';
-      drawOsc();
-      rafId = requestAnimationFrame(loop);
+      if(!lastTs) lastTs=ts; const dt=(ts-lastTs)/1000; lastTs=ts;
+      const Tms=1000/state.f; state.tAnim+=dt*500;  /* spomalené 2× */
+      if(state.tAnim>=Tms){ state.tAnim-=Tms; beep(); }
+      el.tSlider.value=state.tAnim.toFixed(1); el.tRead.textContent=el.tSlider.value+' ms'; drawOsc(); rafId=requestAnimationFrame(loop);
     }
+    el.play.onclick=()=>{ state.playing=!state.playing; el.play.textContent=state.playing?'⏸︎ Pause':'▶︎ Play'; el.play.classList.toggle('paused',!state.playing);
+      if(state.playing){ lastTs=0; rafId=requestAnimationFrame(loop);} else if(rafId){ cancelAnimationFrame(rafId); rafId=null; } };
+    addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
+    el.tSlider.oninput=e=>{ const v=+e.target.value; el.tRead.textContent=v.toFixed(1)+' ms'; if(!state.playing) state.tAnim=v; drawOsc(); };
+    function beep(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=880; g.gain.value=0.04; o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.08); }
 
-    el.play.addEventListener('click',()=>{
-      state.playing = !state.playing;
-      el.play.textContent = state.playing ? '⏸︎ Pause' : '▶︎ Play';
-      el.play.classList.toggle('paused',!state.playing);
-      if(state.playing){
-        lastTs = 0;
-        rafId = requestAnimationFrame(loop);
-      }else if(rafId){
-        cancelAnimationFrame(rafId); rafId=null;
-      }
-    });
+    function updateHud(){ const left=el.locksCol.querySelectorAll('.lock').length;
+      pills.mistakes.textContent=`MISTAKES: ${state.mistakes}/2`; pills.locks.textContent=`LOCKS LEFT: ${left}`; }
+    function failFeedback(){ el.taskPanel.classList.add('shake','flash'); setTimeout(()=>el.taskPanel.classList.remove('shake','flash'),450); }
+    function showMuhaha(){ el.bubble.style.display='block'; el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
+      document.getElementById('bubbleClose2').onclick=()=>el.bubble.style.display='none'; }
+    function dropOneLock(){ const locks=el.locksCol.querySelectorAll('.lock'); if(locks.length) locks[0].remove(); }
+    function successSpark(){ /* vizuálka pri úspechu – môže zostať prázdna */ }
 
-    window.addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
-    el.tSlider.addEventListener('input',e=>{
-      const v = +e.target.value;
-      el.tRead.textContent = v.toFixed(1)+' ms';
-      if(!state.playing) state.tAnim = v;
-      drawOsc();
-    });
+    el.check.onclick=()=>{ const ans=+el.answer.value; if(Number.isNaN(ans)){ el.feedback.textContent='Zadaj číslo (V).'; el.feedback.style.color='#ef4444'; return; }
+      const correct=round2(u_of_t_ms(state.tGiven)), given=round2(ans), tol=tolByMode();
+      if(Math.abs(given-correct)<=tol){ el.feedback.textContent=`Správne! u(t) ≈ ${correct.toFixed(2)} V 🔓`; el.feedback.style.color='#16a34a'; dropOneLock(); successSpark(); newTask1(); }
+      else{ state.mistakes++; if(state.mode==='EASY'&&state.mistakes===1){ el.feedback.textContent='Nápoveda: U_m = √2·U, ω=2πf, t v sekundách.'; el.feedback.style.color='#b45309'; }
+            else if(state.mistakes>=2){ el.feedback.textContent='MUHAHA! Nové zadanie.'; el.feedback.style.color='#ef4444'; showMuhaha(); newTask1(); }
+            else{ el.feedback.textContent='Skús ešte raz.'; el.feedback.style.color='#ef4444'; } failFeedback(); } updateHud(); };
+    el.modeSelect.onchange=e=>{ state.mode=e.target.value; };
+    const startTs=Date.now(); setInterval(()=>{ const s=Math.floor((Date.now()-startTs)/1000), m=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
+      pills.time.textContent=`TIME: ${m}:${ss}`; },1000);
 
-    function beep(){
-      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type='sine'; o.frequency.value=880;
-      g.gain.value=0.04;
-      o.connect(g).connect(audioCtx.destination);
-      o.start();
-      o.stop(audioCtx.currentTime+0.08);
-    }
-
-    /* ===== Checker ===== */
-    function updateHud(){
-      const left = el.locksCol.querySelectorAll('.lock').length;
-      pills.mistakes.textContent = `MISTAKES: ${state.mistakes}/2`;
-      pills.locks.textContent    = `LOCKS LEFT: ${left}`;
-    }
-
-    function failFeedback(){
-      el.taskPanel.classList.add('shake','flash');
-      setTimeout(()=>el.taskPanel.classList.remove('shake','flash'),450);
-    }
-
-    function showMuhaha(){
-      el.bubble.style.display='block';
-      el.bubble.innerHTML = 'MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
-      document.getElementById('bubbleClose2')
-        .addEventListener('click',()=>el.bubble.style.display='none');
-    }
-
-    function dropOneLock(){
-      const locks = el.locksCol.querySelectorAll('.lock');
-      if(locks.length) locks[0].remove();
-    }
-
-    function successSpark(){
-      const drRect = document.getElementById('dr').getBoundingClientRect();
-      const frameRect = document.querySelector('.frame').getBoundingClientRect();
-      el.spark.style.display='block';
-      el.spark.style.left = (drRect.right - frameRect.left - 20)+'px';
-      el.spark.style.top  = (drRect.top   - frameRect.top  + 30)+'px';
-      setTimeout(()=>{ el.spark.style.display='none'; },650);
-    }
-
-    el.check.addEventListener('click',()=>{
-      const ans = +el.answer.value;
-      if(Number.isNaN(ans)){
-        el.feedback.textContent='Zadaj číslo (V).';
-        el.feedback.style.color=varFailColor();
-        return;
-      }
-      const correct = round2(u_of_t_ms(state.tGiven));
-      const given   = round2(ans);
-      const tol     = tolByMode();
-      if(Math.abs(given - correct) <= tol){
-        el.feedback.textContent = `Správne! u(t) ≈ ${correct.toFixed(2)} V 🔓`;
-        el.feedback.style.color = '#16a34a';
-        dropOneLock();
-        successSpark();
-        newTask1();
-      }else{
-        state.mistakes++;
-        if(state.mode==='EASY' && state.mistakes===1){
-          el.feedback.textContent = 'Nápoveda: U_m = √2·U, ω=2πf, t v sekundách.';
-          el.feedback.style.color = '#b45309';
-        }else if(state.mistakes>=2){
-          el.feedback.textContent = 'MUHAHA! Nové zadanie.';
-          el.feedback.style.color = '#ef4444';
-          showMuhaha();
-          newTask1();
-        }else{
-          el.feedback.textContent = 'Skús ešte raz.';
-          el.feedback.style.color = '#ef4444';
-        }
-        failFeedback();
-      }
-      updateHud();
-    });
-
-    function varFailColor(){return '#ef4444';}
-
-    el.modeSelect.addEventListener('change',e=>{
-      state.mode = e.target.value;
-    });
-
-    // HINT tlačidlo – zatiaľ len jednoduchý text v easy móde
-    document.getElementById('hintBtn').addEventListener('click',()=>{
-      if(state.mode==='HARD'){
-        el.feedback.textContent = 'V HARD móde bez nápovedy 😉';
-        el.feedback.style.color = '#e5e7eb';
-      }else{
-        el.feedback.textContent = 'Použi u(t)=U_m sin(ωt+φ), U_m=√2·U, t preveď na sekundy.';
-        el.feedback.style.color = '#38bdf8';
-      }
-    });
-
-    // časovač
-    const startTs = Date.now();
-    setInterval(()=>{
-      const s = Math.floor((Date.now()-startTs)/1000);
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const ss= String(s%60).padStart(2,'0');
-      pills.time.textContent = `TIME: ${m}:${ss}`;
-    },1000);
-
-    /* ===== Kalkulačka ===== */
-    const calc = {
-      disp: document.getElementById('calcDisplay'),
-      modeBtn: document.getElementById('degRad'),
-      grid: document.querySelector('.calc-grid'),
-      rad: true
-    };
-    calc.modeBtn.addEventListener('click',()=>{
-      calc.rad = !calc.rad;
-      calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
-      calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
-    });
-    function insertToDisplay(s){ calc.disp.value += s; calc.disp.focus(); }
+    // ——— kalkulačka
+    const calc={ disp:document.getElementById('calcDisplay'), modeBtn:document.getElementById('degRad'),
+      grid:document.querySelector('.calc-grid'), rad:true };
+    calc.modeBtn.onclick=()=>{ calc.rad=!calc.rad; calc.modeBtn.textContent=calc.rad?'RAD':'DEG'; calc.modeBtn.title=calc.rad?'Radiány':'Stupne'; };
+    function insertToDisplay(s){ calc.disp.value+=s; calc.disp.focus(); }
     function delOne(){ calc.disp.value = calc.disp.value.slice(0,-1); }
     function clearDisp(){ calc.disp.value=''; }
-    function evalExpr(){
-      let expr = calc.disp.value
-        .replaceAll('^','**')
-        .replaceAll('π',Math.PI.toString())
-        .replaceAll('e',Math.E.toString());
-      const wrapTrig = fn => (calc.rad ? fn : x=>fn(x*Math.PI/180));
-      const scope = {
-        sin:x=>wrapTrig(Math.sin)(x),
-        cos:x=>wrapTrig(Math.cos)(x),
-        tan:x=>wrapTrig(Math.tan)(x),
-        sqrt:Math.sqrt
-      };
-      try{
-        const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
-        const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-        return Number.isFinite(val) ? val : NaN;
-      }catch{ return NaN; }
-    }
+    function evalExpr(){ let expr=calc.disp.value.replaceAll('^','**').replaceAll('π',Math.PI.toString()).replaceAll('e',Math.E.toString());
+      const wrapTrig=fn=>(calc.rad?fn:(x)=>fn(x*Math.PI/180)), scope={ sin:x=>wrapTrig(Math.sin)(x), cos:x=>wrapTrig(Math.cos)(x), tan:x=>wrapTrig(Math.tan)(x), sqrt:Math.sqrt };
+      try{ const f=new Function('sin','cos','tan','sqrt',`return (${expr})`); const val=f(scope.sin,scope.cos,scope.tan,scope.sqrt); return Number.isFinite(val)?val:NaN; }catch{return NaN;} }
     calc.grid.addEventListener('click',e=>{
-      const b = e.target.closest('button'); if(!b) return;
-      const num = b.getAttribute('data-num');
-      const op  = b.getAttribute('data-op');
-      const fn  = b.getAttribute('data-fn');
+      const b=e.target.closest('button'); if(!b) return;
+      const num=b.getAttribute('data-num'), op=b.getAttribute('data-op'), fn=b.getAttribute('data-fn');
       if(num!==null){ insertToDisplay(num); return; }
       if(op!==null){ insertToDisplay(op); return; }
       if(fn==='pi') insertToDisplay('π');
-      else if(fn==='pow10') insertToDisplay('*10^');
+      else if(fn==='tenpow') insertToDisplay('*10^');
       else if(fn==='sin'||fn==='cos'||fn==='tan'||fn==='sqrt') insertToDisplay(fn+'(');
-      else if(fn==='del') delOne();
+      else if(fn==='back') delOne();
       else if(fn==='clear') clearDisp();
-      else if(fn==='eq'){
-        const v = evalExpr();
-        calc.disp.value = Number.isFinite(v) ? v : 'NaN';
-      }else if(fn==='ans'){
-        const v = evalExpr();
-        if(Number.isFinite(v)){
-          document.getElementById('answer').value = round2(v).toFixed(2);
-        }
-      }
+      else if(fn==='eq'){ const v=evalExpr(); calc.disp.value=Number.isFinite(v)?v:'NaN'; }
+      else if(fn==='ans'){ const v=evalExpr(); if(Number.isFinite(v)) document.getElementById('answer').value=round2(v).toFixed(2); }
     });
 
-    /* ===== Štart ===== */
-    function boot(){
-      resizeOsc();
-      newTask1();
+    // ——— Úloha 2 (drôty + DnD)
+    function t2_init(){
+      // Ueff náhodou
+      const Ueff=[40,60,110,230][Math.floor(Math.random()*4)], f=50, Um=Math.SQRT2*Ueff;
+      let scopeConnected={A:false,B:false}, dmmConnected={A:false,B:false}, connMap={};
+      const terminals=[...document.querySelectorAll('#t2 .terminal')];
+      const probes=[...document.querySelectorAll('#t2 .probe')];
+      probes.forEach(p=>p.addEventListener('dragstart',e=>e.dataTransfer.setData('text/probe',p.dataset.probe)));
+      terminals.forEach(t=>{
+        t.addEventListener('dragover',e=>e.preventDefault());
+        t.addEventListener('drop',e=>{
+          e.preventDefault(); const pid=e.dataTransfer.getData('text/probe'); if(!pid) return;
+          connMap[pid]=t.dataset.terminal;
+          scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
+          scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
+          dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmB']  ==='A');
+          dmmConnected.B  =(connMap['dmmA']  ==='B'||connMap['dmmB']  ==='B');
+          refreshInstruments();
+        });
+      });
+      document.getElementById('t2-reset').onclick=()=>{ connMap={}; scopeConnected={A:false,B:false}; dmmConnected={A:false,B:false}; refreshInstruments(true); };
+
+      // osciloskop
+      const cvs=document.getElementById('t2-wave'), ctx=cvs.getContext('2d'); let t0=performance.now();
+      function resizeScope(){ const r=cvs.getBoundingClientRect(), DPR=window.devicePixelRatio||1; cvs.width=Math.floor(r.width*DPR); cvs.height=Math.floor(r.height*DPR); ctx.setTransform(DPR,0,0,DPR,0,0); }
+      resizeScope(); addEventListener('resize',resizeScope);
+      function drawScope(now){
+        const w=cvs.clientWidth,h=cvs.clientHeight; ctx.clearRect(0,0,w,h);
+        const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
+        ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(xmin,midY); ctx.lineTo(xmax,midY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(midX,ymin); ctx.lineTo(midX,ymax); ctx.stroke();
+        const ok=scopeConnected.A&&scopeConnected.B;
+        if(ok){
+          const A=(ymax-ymin)*0.35, steps=Math.max(240,Math.floor(xmax-xmin)), tau=Math.PI*2, tt=performance.now()/1000;
+          ctx.strokeStyle='#22c55e'; ctx.lineWidth=2.2; ctx.beginPath();
+          for(let i=0;i<=steps;i++){ const x=xmin+(i/steps)*(xmax-xmin), t=(i/steps)*2*(1/f), y=midY-A*Math.sin(tau*f*t+tt*2.4); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+          ctx.stroke();
+          document.getElementById('t2-scope-rdg').textContent='živá vlna…';
+        }else{ document.getElementById('t2-scope-rdg').textContent='nepripojené'; }
+        requestAnimationFrame(drawScope);
+      }
+      requestAnimationFrame(drawScope);
+
+      // multimeter + kartičky
+      function refreshInstruments(reset){
+        const lamp=document.getElementById('t2-lamp'), dmmLbl=document.getElementById('t2-dmm-rdg');
+        const sOK=scopeConnected.A&&scopeConnected.B, dOK=dmmConnected.A&&dmmConnected.B;
+        lamp.classList.toggle('off',!(sOK||dOK));
+        dmmLbl.textContent=dOK? `${Ueff.toFixed(1)} V` : '--.- V';
+        if(reset){
+          document.getElementById('dz-scope').innerHTML='';
+          document.getElementById('dz-dmm').innerHTML='';
+          const tray=document.getElementById('t2-tray');
+          document.querySelectorAll('#t2 .token').forEach(t=>tray.appendChild(t));
+          document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
+          document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
+        }
+      }
+      const tray=document.getElementById('t2-tray');
+      tray.addEventListener('dragstart',e=>{
+        const t=e.target.closest('.token'); if(!t) return;
+        e.dataTransfer.setData('text/token',t.dataset.token);
+        e.dataTransfer.setData('text/id',t.outerHTML);
+      });
+      function dzSetup(id, accept){
+        const dz=document.getElementById(id);
+        dz.addEventListener('dragover',e=>e.preventDefault());
+        dz.addEventListener('drop',e=>{
+          e.preventDefault(); const tok=e.dataTransfer.getData('text/token'); if(!tok) return;
+          dz.innerHTML=e.dataTransfer.getData('text/id');
+          const ok=(tok===accept); dz.classList.toggle('dz-ok',ok); dz.classList.toggle('dz-bad',!ok);
+          const okScope=document.getElementById('dz-scope').classList.contains('dz-ok');
+          const okDmm=document.getElementById('dz-dmm').classList.contains('dz-ok');
+          if(okScope&&okDmm){ setTimeout(()=>alert('Správne! Osciloskop → u(t); Multimeter → Uef.'),120); }
+        });
+      }
+      dzSetup('dz-scope','u(t)'); dzSetup('dz-dmm','U');
     }
-    boot();
+
+    // štart
+    (function boot(){ resizeOsc(); newTask1(); })();
   </script>
 </body>
 </html>
-
-
-
-
-<!-- Úloha 2 -->
-<section id="task2" class="task-screen hidden">
-    <style>
-    .t2-wrap{display:grid;grid-template-columns: 48% 52%;gap:16px;
-      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-      border-radius:14px;padding:16px}
-    .t2-card{background:rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;padding:12px;color:#e5e7eb}
-    .t2-h{font-weight:800;margin:0 0 8px 0}
-    .t2-row{display:flex;gap:10px;align-items:center;justify-content:space-between}
-
-    /* prístroje */
-    .scope, .dmm{position:relative; border-radius:12px; padding:10px;
-      background:#0d0f11; border:1px solid #2a3039; box-shadow: inset 0 0 20px rgba(0,0,0,.6)}
-    .scope-screen{height:160px; border-radius:8px; background:#0a0f12; position:relative; overflow:hidden}
-    .scope-screen::before{ /* mriežka */
-      content:""; position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0 1px, transparent 1px 20px),
-        repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 1px, transparent 1px 20px);
-      opacity:.55;
-    }
-    .scope-wave{position:absolute; left:0; top:0; right:0; bottom:0}
-    .scope-reading{margin-top:6px; font-weight:700; opacity:.9}
-
-    .dmm-face{height:160px; display:grid; place-items:center; border-radius:8px;
-      background:linear-gradient(#222,#111)}
-    .dmm-reading{font:700 26px/1 monospace; background:#c9f0d8; color:#0b2c15; padding:4px 10px; border-radius:6px; box-shadow: inset 0 0 4px rgba(0,0,0,.25)}
-
-    /* žiarovka s dvomi svorkami */
-    .circuit{position:relative; border-radius:12px; background:var(--cream); padding:14px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.06)}
-    .lamp{width:160px; height:160px; border-radius:50%; margin:30px auto; position:relative;
-      background: radial-gradient(circle at 50% 45%, #ffe69a 0 45%, #ffd24d 46% 58%, #f0b02a 59% 65%, #cc9000 66% 100%)}
-    .lamp.off{filter: grayscale(1) brightness(.7)}
-    .terminal{position:absolute; width:18px; height:18px; border-radius:50%;
-      background:#222; border:2px solid #ddd; cursor:pointer}
-    .tA{left: calc(50% - 9px); top: 12px}
-    .tB{left: calc(50% - 9px); bottom: 12px}
-
-    /* sondy – malé „banániky“ ktoré ťaháme */
-    .probe{display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border-radius:999px;
-      background:#111827; border:1px solid #374151; color:#f8fafc; cursor:grab; user-select:none}
-    .probe:active{cursor:grabbing}
-    .probe.dot{width:10px; height:10px; border-radius:50%}
-    .probe.red  .dot{background:#ef4444}
-    .probe.black .dot{background:#6b7280}
-    .dock{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
-
-    /* drop zóny na prístrojoch */
-    .dropzone{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; min-height:38px;
-      padding:6px; border-radius:8px; border:1px dashed rgba(255,255,255,.35)}
-    .dz-ok{border-color:#22c55e}
-    .dz-bad{border-color:#ef4444}
-
-    /* kartičky u(t) a U */
-    .token{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
-      background:#ffffff; color:#111; border:1px solid #cbd5e1; font-weight:700; cursor:grab}
-    .tray{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-    .hint{font-size:12px; opacity:.8}
-
-    /* malé tlačidlá */
-    .t2-btn{padding:6px 10px; border-radius:8px; border:1px solid #374151; background:#111827; color:#f8fafc; cursor:pointer}
-  </style>
-
-  <div class="t2-wrap">
-    <!-- ĽAVO: prístroje -->
-    <div class="t2-card">
-      <h3 class="t2-h">Meracie prístroje</h3>
-
-      <!-- osciloskop -->
-      <div class="scope" id="t2-scope">
-        <div class="t2-row"><strong>Osciloskop</strong><span class="hint">pripoj obidve sondy na svorky žiarovky</span></div>
-        <div class="scope-screen">
-          <canvas id="t2-wave" class="scope-wave"></canvas>
-        </div>
-        <div class="scope-reading" id="t2-scope-rdg">nepripojené</div>
-        <div class="dock" id="t2-scope-dock">
-          <div class="probe red"   draggable="true" data-probe="scopeA"><span class="dot"></span> červená sonda</div>
-          <div class="probe black" draggable="true" data-probe="scopeB"><span class="dot"></span> čierna sonda</div>
-        </div>
-        <div class="dropzone" id="dz-scope" aria-label="sem potiahni správnu kartičku"></div>
-      </div>
-
-      <!-- multimeter -->
-      <div class="dmm" id="t2-dmm" style="margin-top:12px;">
-        <div class="t2-row"><strong>Multimeter</strong><span class="hint">pripoj šnúry na svorky žiarovky</span></div>
-        <div class="dmm-face"><div class="dmm-reading" id="t2-dmm-rdg">--.- V</div></div>
-        <div class="dock" id="t2-dmm-dock">
-          <div class="probe red"   draggable="true" data-probe="dmmA"><span class="dot"></span> V/Ω</div>
-          <div class="probe black" draggable="true" data-probe="dmmB"><span class="dot"></span> COM</div>
-        </div>
-        <div class="dropzone" id="dz-dmm" aria-label="sem potiahni správnu kartičku"></div>
-      </div>
-
-      <!-- zásobník kartičiek -->
-      <div class="tray" id="t2-tray" style="margin-top:12px;">
-        <div class="token" draggable="true" data-token="u(t)">u(t)</div>
-        <div class="token" draggable="true" data-token="U">U</div>
-      </div>
-    </div>
-
-    <!-- PRAVO: obvod so žiarovkou -->
-    <div class="t2-card">
-      <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
-      <div class="circuit" id="t2-circuit">
-        <div class="lamp off" id="t2-lamp"></div>
-        <!-- svorky -->
-        <div class="terminal tA" data-terminal="A" title="svorka A"></div>
-        <div class="terminal tB" data-terminal="B" title="svorka B"></div>
-        <div style="text-align:center; margin-top:8px;">
-          <button class="t2-btn" id="t2-reset">Reset pripojení</button>
-        </div>
-      </div>
-      <div class="hint">Najprv pripoj sondy k svorkám A a B. Potom potiahni kartičky <strong>u(t)</strong> a <strong>U</strong> na správny prístroj.</div>
-    </div>
-  </div>
-
-  <script>
-    // --- Parametre úlohy ---
-    const Ueff = [40, 60, 110, 230][Math.floor(Math.random()*4)];
-    const f = 50, Um = Math.SQRT2 * Ueff;
-    let scopeConnected = {A:false, B:false}, dmmConnected = {A:false, B:false};
-
-    // --- Drag & drop sondy na svorky ---
-    const terminals = [...document.querySelectorAll('#t2-circuit .terminal')];
-    const probes = [...document.querySelectorAll('#task2-dd .probe')];
-    const connMap = {}; // probeId -> 'A'|'B'
-
-    probes.forEach(p=>{
-      p.addEventListener('dragstart', e=>{
-        e.dataTransfer.setData('text/probe', p.dataset.probe);
-      });
-    });
-    terminals.forEach(t=>{
-      t.addEventListener('dragover', e=>e.preventDefault());
-      t.addEventListener('drop', e=>{
-        e.preventDefault();
-        const pid = e.dataTransfer.getData('text/probe');
-        if(!pid) return;
-        connMap[pid] = t.dataset.terminal;
-
-        // vizuálna odozva
-        t.animate([{transform:'scale(1)'},{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:250});
-
-        // aktualizuj stavy
-        scopeConnected.A = (connMap['scopeA'] === 'A' || connMap['scopeB'] === 'A');
-        scopeConnected.B = (connMap['scopeA'] === 'B' || connMap['scopeB'] === 'B');
-        dmmConnected.A   = (connMap['dmmA']   === 'A' || connMap['dmmB']   === 'A');
-        dmmConnected.B   = (connMap['dmmA']   === 'B' || connMap['dmmB']   === 'B');
-
-        refreshInstruments();
-      });
-    });
-
-    document.getElementById('t2-reset').onclick = ()=>{
-      for(const k in connMap) delete connMap[k];
-      scopeConnected = {A:false,B:false};
-      dmmConnected   = {A:false,B:false};
-      refreshInstruments(true);
-    };
-
-    // --- Osciloskop animácia ---
-    const cvs = document.getElementById('t2-wave');
-    const ctx = cvs.getContext('2d');
-    function resizeScope(){
-      const r = cvs.getBoundingClientRect();
-      const DPR = window.devicePixelRatio||1;
-      cvs.width = Math.floor(r.width*DPR);
-      cvs.height= Math.floor(r.height*DPR);
-      ctx.setTransform(DPR,0,0,DPR,0,0);
-    }
-    resizeScope(); addEventListener('resize', resizeScope);
-
-    let t0 = performance.now();
-    function drawScope(now){
-      const dt = (now - t0)/1000; t0 = now;
-      const w = cvs.clientWidth, h = cvs.clientHeight;
-      ctx.clearRect(0,0,w,h);
-
-      // nič ak nie je pripojené
-      const ok = scopeConnected.A && scopeConnected.B;
-
-      // osi
-      const PAD=16, xmin=PAD, xmax=w-PAD, ymin=PAD, ymax=h-PAD, midY=(ymin+ymax)/2, midX=(xmin+xmax)/2;
-      ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(xmin,midY); ctx.lineTo(xmax,midY); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(midX,ymin); ctx.lineTo(midX,ymax); ctx.stroke();
-
-      if(ok){
-        drawWave(w,h);
-        document.getElementById('t2-scope-rdg').textContent = 'živá vlna…';
-      }else{
-        document.getElementById('t2-scope-rdg').textContent = 'nepripojené';
-      }
-      requestAnimationFrame(drawScope);
-    }
-    function drawWave(w,h){
-      const xmin=16, xmax=w-16, ymin=16, ymax=h-16, midY=(ymin+ymax)/2;
-      const A = (ymax-ymin)*0.35;
-      const TAU = Math.PI*2;
-      const tt = (performance.now()/1000); // čas
-      ctx.strokeStyle='#22c55e'; ctx.lineWidth=2.2;
-      ctx.beginPath();
-      const steps = Math.max(240, Math.floor(xmax-xmin));
-      for(let i=0;i<=steps;i++){
-        const x = xmin + (i/steps)*(xmax-xmin);
-        const t = (i/steps)*2*(1/f); // zobrazené ~2 periódy
-        const y = midY - A * Math.sin(TAU*f*t + tt*2.4); // posuv
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-      // bežiaca bodka
-      const bx = xmin + ((tt*0.35) % 1)*(xmax-xmin);
-      const by = midY - A * Math.sin(TAU*f*((tt*0.35)%1)*2*(1/f) + tt*2.4);
-      ctx.fillStyle='#a7f3d0'; ctx.beginPath(); ctx.arc(bx,by,3.5,0,TAU); ctx.fill();
-    }
-    requestAnimationFrame(drawScope);
-
-    // --- Multimeter zobrazenie ---
-    function refreshInstruments(reset){
-      const lamp = document.getElementById('t2-lamp');
-      const dmmLbl= document.getElementById('t2-dmm-rdg');
-
-      const sOK = scopeConnected.A && scopeConnected.B;
-      const dOK = dmmConnected.A && dmmConnected.B;
-
-      lamp.classList.toggle('off', !(sOK || dOK));
-
-      if(dOK){
-        dmmLbl.textContent = Ueff.toFixed(1) + ' V';
-      }else{
-        dmmLbl.textContent = '--.- V';
-      }
-      if(reset){
-        // vyprázdni dropzóny
-        document.getElementById('dz-scope').innerHTML='';
-        document.getElementById('dz-dmm').innerHTML='';
-        // vráť kartičky
-        const tray = document.getElementById('t2-tray');
-        [...document.querySelectorAll('#task2-dd .token')].forEach(t=>tray.appendChild(t));
-        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
-        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
-      }
-    }
-
-    // --- Drag & drop kartičiek u(t)/U na prístroje ---
-    const tray = document.getElementById('t2-tray');
-    tray.addEventListener('dragstart', e=>{
-      const t = e.target.closest('.token'); if(!t) return;
-      e.dataTransfer.setData('text/token', t.dataset.token);
-      // malé ID pre presun
-      e.dataTransfer.setData('text/id', t.outerHTML);
-    });
-
-    function dzSetup(id, accept){
-      const dz = document.getElementById(id);
-      dz.addEventListener('dragover', e=>e.preventDefault());
-      dz.addEventListener('drop', e=>{
-        e.preventDefault();
-        const tok = e.dataTransfer.getData('text/token');
-        if(!tok) return;
-        // vlož vizuálne
-        const html = e.dataTransfer.getData('text/id');
-        dz.innerHTML = html;
-
-        // kontrola
-        const ok = (tok === accept);
-        dz.classList.toggle('dz-ok', ok);
-        dz.classList.toggle('dz-bad', !ok);
-
-        // ak sú obidve správne → úspech!
-        const okScope = document.getElementById('dz-scope').classList.contains('dz-ok');
-        const okDmm   = document.getElementById('dz-dmm').classList.contains('dz-ok');
-        if(okScope && okDmm){
-          // malé „bzzzzt“ u Dr. Phasora, ak máš jeho iskru funkciu, môžeš zavolať
-          // successSpark();
-          setTimeout(()=>alert('Správne! Osciloskop → u(t); Multimeter → Uef.'), 120);
-        }
-      });
-    }
-    dzSetup('dz-scope', 'u(t)');
-    dzSetup('dz-dmm',   'U');
-  </script>
-</section>
-<!-- ========== /ÚLOHA 2 ========== -->
-
-
-
-
