@@ -80,7 +80,7 @@
       box-shadow:inset 0 0 6px rgba(0,0,0,.7)
     }
 
-    /* prepínač úloh */
+    /* prepínač úloh (zatím len 1 a 2) */
     .task-switch{
       display:flex;gap:8px;margin-bottom:10px;
     }
@@ -141,37 +141,56 @@
     #playBtn.paused{opacity:.7}
     .osc-ui input[type="range"]{width:220px;margin:0 8px}
 
-    /* KALKULAČKA */
-.calc{
-  position:absolute;top:18px;left:18px;right:18px;bottom:82px;
-  background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.1);
-  border-radius:12px;padding:12px;
-  display:flex;flex-direction:column;gap:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);color:#111827;
-}
-#calcDisplay{
-  width:100%;padding:8px 10px;border:2px solid #cbd5e1;
-  border-radius:8px;font-size:32px;
-}
-.calc-grid{
-  flex:1;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  grid-template-rows:repeat(6,1fr);
-  gap:6px;
-}
-.calc-grid button{
-  width:100%;height:100%;
-  border:2px solid #d4d4d8;border-radius:10px;
-  background:#f4f4f5;cursor:pointer;
-  font-weight:700;font-size:16px;
-}
-.calc-grid button.ghost{background:#e5e7eb}
-.calc-grid button.emph{
-  background:#111827;color:#f9fafb;border-color:#111827;
-}
-.calc-grid button.wide{grid-column:span 2}
+    /* KALKULAČKA – layout ako z obrázka */
+    .calc{
+      position:absolute;top:18px;left:18px;right:18px;bottom:82px;
+      background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.1);
+      border-radius:12px;padding:12px;
+      display:flex;flex-direction:column;gap:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,.08);color:#111827;
+    }
+    #calcDisplay{
+      width:100%;padding:8px 10px;border:2px solid #cbd5e1;
+      border-radius:8px;font-size:32px;
+    }
+    .calc-grid{
+      flex:1;
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      grid-template-rows:repeat(6,1fr);
+      gap:6px;
+    }
+    .calc-grid button{
+      width:100%;height:100%;
+      border:2px solid #d4d4d8;border-radius:10px;
+      background:#f4f4f5;cursor:pointer;
+      font-weight:700;font-size:16px;
+    }
+    .calc-grid button.ghost{background:#e5e7eb}
+    .calc-grid button.emph{
+      background:#111827;color:#f9fafb;border-color:#111827;
+    }
+    .calc-grid button.wide{grid-column:span 2}
 
+    /* odpoveď – pod kalkulačkou, ALE stále vpravo */
+    .answerBox{
+      position:absolute;
+      left:18px;right:18px;bottom:18px;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(0,0,0,.1);
+      border-radius:12px;
+      padding:10px 12px;
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+      color:#111;box-shadow:0 3px 8px rgba(0,0,0,.06);
+    }
+    .answerBox input{
+      width:180px;padding:8px 10px;border-radius:8px;border:1px solid #cbd5e1;
+    }
+    .answerBox button{
+      padding:8px 14px;border-radius:10px;border:1px solid #111827;
+      background:#111827;color:#f9fafb;cursor:pointer;
+    }
+    .feedback{min-height:1.2em;font-weight:700}
 
     /* HUD */
     .hud{
@@ -189,6 +208,8 @@
       background:#020817;color:#f9fafb;border:1px solid #374151;
       border-radius:8px;padding:3px 6px;
     }
+    /* dočasne skryjem HINT, nech ťa to neštve */
+    #hintBtn{display:none;}
 
     /* TYPO + EFEKTY */
     .math var{font-style:italic}
@@ -219,7 +240,7 @@
       animation:spark .6s ease-out forwards;
     }
 
-    /* ÚLOHA 2 – tuning */
+    /* ÚLOHA 2 – ponechávam tak, ako si mala (bez zmien rozloženia) */
     .t2-wrap{
       display:grid;grid-template-columns:50% 50%;gap:16px;
       background:rgba(255,255,255,.06);
@@ -231,7 +252,6 @@
       border-radius:12px;padding:12px;color:#e5e7eb;
     }
     .t2-h{font-weight:800;margin:0 0 8px 0}
-
     .scope2,.dmm{
       position:relative;border-radius:12px;padding:12px;
       background:#0d0f11;border:1px solid #2a3039;
@@ -304,7 +324,6 @@
     }
     .tA{left:calc(50% - 60px);top:20px}
     .tB{left:calc(50% + 42px);top:20px}
-
     .source{
       position:absolute;left:50%;transform:translateX(-50%);
       bottom:10px;width:220px;height:46px;border-radius:10px;
@@ -314,14 +333,12 @@
     .src-post{width:18px;height:18px;border-radius:50%;border:2px solid #111}
     .src-post.pos{background:#ffdddd;border-color:#b91c1c}
     .src-post.neg{background:#dde9ff;border-color:#1d4ed8}
-
     .t2-btn{
       position:absolute;right:12px;bottom:10px;
       padding:6px 10px;border-radius:8px;
       border:1px solid #374151;background:#111827;
       color:#f8fafc;cursor:pointer;
     }
-
     .dropzone{
       margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;
       min-height:38px;padding:6px;border-radius:8px;
@@ -387,69 +404,55 @@
             </div>
           </div>
 
-          <!-- pravo: kalkulačka -->
-         <div class="zone right">
-  <div class="calc">
-    <!-- displej cez celú šírku -->
-    <input id="calcDisplay" type="text" inputmode="decimal"
-           autocomplete="off" spellcheck="false" />
+          <!-- pravo: kalkulačka + ODPOVEĎ POD ŇOU -->
+          <div class="zone right">
+            <div class="calc">
+              <input id="calcDisplay" type="text" inputmode="decimal"
+                     autocomplete="off" spellcheck="false" />
 
-    <!-- klávesnica podľa obrázka -->
-    <div class="calc-grid">
-      <!-- riadok 1 -->
-      <button data-fn="tenpow">10ˣ</button>
-      <button data-fn="pi">π</button>
-      <button data-fn="clear">C</button>
-      <button data-fn="back">⌫</button>
-      <button id="degRad" data-fn="mode">RAD</button>
+              <div class="calc-grid">
+                <!-- R1 -->
+                <button data-fn="tenpow">10ˣ</button>
+                <button data-fn="pi">π</button>
+                <button data-fn="clear">C</button>
+                <button data-fn="back">⌫</button>
+                <button id="degRad" data-fn="mode">RAD</button>
 
-      <!-- riadok 2 -->
-      <button data-op="(">(</button>
-      <button data-op=")">)</button>
-      <button data-fn="sqrt">√</button>
-      <button data-fn="sin">sin</button>
-      <button data-op="/">÷</button>
+                <!-- R2 -->
+                <button data-op="(">(</button>
+                <button data-op=")">)</button>
+                <button data-fn="sqrt">√</button>
+                <button data-fn="sin">sin</button>
+                <button data-op="/">÷</button>
 
-      <!-- riadok 3 -->
-      <button data-num="7">7</button>
-      <button data-num="8">8</button>
-      <button data-num="9">9</button>
-      <button data-fn="cos">cos</button>
-      <button data-op="*">×</button>
+                <!-- R3 -->
+                <button data-num="7">7</button>
+                <button data-num="8">8</button>
+                <button data-num="9">9</button>
+                <button data-fn="cos">cos</button>
+                <button data-op="*">×</button>
 
-      <!-- riadok 4 -->
-      <button data-num="4">4</button>
-      <button data-num="5">5</button>
-      <button data-num="6">6</button>
-      <button data-fn="tan">tan</button>
-      <button data-op="-">-</button>
+                <!-- R4 -->
+                <button data-num="4">4</button>
+                <button data-num="5">5</button>
+                <button data-num="6">6</button>
+                <button data-fn="tan">tan</button>
+                <button data-op="-">-</button>
 
-      <!-- riadok 5 -->
-      <button data-num="1">1</button>
-      <button data-num="2">2</button>
-      <button data-num="3">3</button>
-      <button data-fn="pm">+/−</button>
-      <button data-op="+">+</button>
+                <!-- R5 -->
+                <button data-num="1">1</button>
+                <button data-num="2">2</button>
+                <button data-num="3">3</button>
+                <button data-fn="pm">+/−</button>
+                <button data-op="+">+</button>
 
-      <!-- riadok 6 -->
-      <button data-num="0" class="wide">0</button>
-      <button data-op=",">,</button>
-      <button data-fn="ans" class="ghost">→ Odpoveď</button>
-      <button data-fn="eq" class="emph">=</button>
-    </div>
-  </div>
-
-  <!-- odpoveď nechaj tak ako máš -->
-  <div class="answerBox">
-    <label>Odpoveď: <var>u</var>(<var>t</var>) =
-      <input id="answer" type="number" step="0.01" placeholder="V">
-      <span>V</span>
-    </label>
-    <button id="checkBtn">Skontrolovať</button>
-    <div id="feedback" class="feedback"></div>
-  </div>
-</div>
-
+                <!-- R6 -->
+                <button data-num="0" class="wide">0</button>
+                <button data-op=",">,</button>
+                <button data-fn="ans" class="ghost">→ Odpoveď</button>
+                <button data-fn="eq" class="emph">=</button>
+              </div>
+            </div>
 
             <div class="answerBox">
               <label>Odpoveď: <var>u</var>(<var>t</var>) =
@@ -465,14 +468,11 @@
       </section>
     </section>
 
-    <!-- ÚLOHA 2 -->
+    <!-- ÚLOHA 2 – nechávam ako je (tvoj drag-and-drop obvod) -->
     <section id="task2" class="task-screen">
       <div class="t2-wrap" id="t2">
-        <!-- ľavo: prístroje -->
         <div class="t2-card">
           <h3 class="t2-h">Meracie prístroje</h3>
-
-          <!-- osciloskop -->
           <div class="scope2">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong>Osciloskop</strong><span class="hint">pripoj obidve sondy</span>
@@ -486,7 +486,6 @@
             <div class="dropzone" id="dz-scope"></div>
           </div>
 
-          <!-- multimeter -->
           <div class="dmm" style="margin-top:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong>Multimeter</strong><span class="hint">pripoj šnúry a zvoľ rozsah</span>
@@ -518,7 +517,6 @@
           </div>
         </div>
 
-        <!-- pravo: obvod -->
         <div class="t2-card">
           <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
           <div class="circuit">
@@ -562,31 +560,31 @@
 
   <script>
     // bublina
-    document.getElementById('bubbleClose').onclick = () =>
-      document.getElementById('bubble').style.display = 'none';
+    document.getElementById('bubbleClose').onclick =
+      () => document.getElementById('bubble').style.display='none';
 
     // prepínanie úloh
     function showTask(id){
       document.querySelectorAll('.task-screen').forEach(s=>s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      document.getElementById('btnTask1').classList.toggle('active', id==='task1');
-      document.getElementById('btnTask2').classList.toggle('active', id==='task2');
+      document.getElementById('btnTask1').classList.toggle('active',id==='task1');
+      document.getElementById('btnTask2').classList.toggle('active',id==='task2');
       if(id==='task1'){ resizeOsc(); newTask1(); }
       if(id==='task2'){ t2_init(); }
     }
 
     // HUD / stav
-    const pills = {
-      mistakes: document.getElementById('mistakesPill'),
-      locks: document.getElementById('locksPill'),
-      time: document.getElementById('timePill')
+    const pills={
+      mistakes:document.getElementById('mistakesPill'),
+      locks:document.getElementById('locksPill'),
+      time:document.getElementById('timePill')
     };
-    const state = {
-      mode:'EASY', mistakes:0,
-      U:230, f:50, psi:10, tGiven:2.0,
-      playing:false, tAnim:2.0
+    const state={
+      mode:'EASY',mistakes:0,
+      U:230,f:50,psi:10,tGiven:2.0,
+      playing:false,tAnim:2.0
     };
-    const el = {
+    const el={
       taskText:document.getElementById('taskText'),
       tSlider:document.getElementById('tSlider'),
       tRead:document.getElementById('tReadout'),
@@ -613,68 +611,59 @@
 
     // nové zadanie – ÚLOHA 1
     function newTask1(){
-      state.mistakes = 0;
-      state.U   = randFrom([230,120,100,60]);
-      state.f   = 50;
-      state.psi = randFrom([-30,-15,0,10,15,30]);
-      const Tms = 1000/state.f;
-      state.tGiven = +(Math.random()*Tms).toFixed(1);
-
+      state.mistakes=0;
+      state.U=randFrom([230,120,100,60]);
+      state.f=50;
+      state.psi=randFrom([-30,-15,0,10,15,30]);
+      const Tms=1000/state.f;
+      state.tGiven=+(Math.random()*Tms).toFixed(1);
       el.taskText.innerHTML =
         `Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.`+
         `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="psi">ψ</span>), `+
         `kde <var>U</var><sub>m</sub> = √2·<var>U</var>.`+
         `<br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, `+
-        `<span class="psi">ψ</span> = ${state.psi}°.`;
-
-      el.tSlider.max = Tms.toFixed(1);
-      el.tSlider.value = state.tGiven;
-      el.tRead.textContent = state.tGiven.toFixed(1)+' ms';
-      state.tAnim = state.tGiven;
-
-      el.answer.value = '';
-      el.feedback.textContent = '';
+        `<span class="psi">ψ</span> = ${state.psi}°.`;      
+      el.tSlider.max=Tms.toFixed(1);
+      el.tSlider.value=state.tGiven;
+      el.tRead.textContent=state.tGiven.toFixed(1)+' ms';
+      state.tAnim=state.tGiven;
+      el.answer.value='';
+      el.feedback.textContent='';
       drawOsc();
       updateHud();
     }
-
     function u_of_t_ms(tms){
-      const Um = Math.SQRT2*state.U;
-      const w  = TAU*state.f;
-      const t  = tms/1000;
-      const psi = deg2rad(state.psi);
-      return Um*Math.sin(w*t + psi);
+      const Um=Math.SQRT2*state.U,
+            w=TAU*state.f,
+            t=tms/1000,
+            psi=deg2rad(state.psi);
+      return Um*Math.sin(w*t+psi);
     }
 
     /* OSCILOSKOP – ÚLOHA 1 */
-    let oscCtx=null, DPR=window.devicePixelRatio||1, rafId=null, lastTs=0, audioCtx=null;
-
+    let oscCtx=null,DPR=window.devicePixelRatio||1,rafId=null,lastTs=0,audioCtx=null;
     function resizeOsc(){
-      const r = el.osc.getBoundingClientRect();
-      el.osc.width  = Math.floor(r.width*DPR);
-      el.osc.height = Math.floor(r.height*DPR);
-      oscCtx = el.osc.getContext('2d');
+      const r=el.osc.getBoundingClientRect();
+      el.osc.width=Math.floor(r.width*DPR);
+      el.osc.height=Math.floor(r.height*DPR);
+      oscCtx=el.osc.getContext('2d');
     }
     const SCOPE_STYLE={
       gridFine:'rgba(255,255,255,0.22)',
       gridBold:'rgba(255,255,255,0.38)',
-      axis:'#f9fafb', axisW:2.6, sineW:2.4
+      axis:'#f9fafb',axisW:2.6,sineW:2.4
     };
-
     function drawOsc(){
       if(!oscCtx) resizeOsc();
-      const W = el.osc.width/DPR, H = el.osc.height/DPR;
-      const ctx = oscCtx;
-      ctx.save();
-      ctx.scale(DPR,DPR);
-      ctx.clearRect(0,0,W,H);
-
-      const G=20, PAD=2*G;
-      const xmin=PAD, xmax=W-PAD, ymin=PAD, ymax=H-PAD;
-      const midX=(xmin+xmax)/2, midY=(ymin+ymax)/2;
-
+      const W=el.osc.width/DPR,H=el.osc.height/DPR;
+      const ctx=oscCtx;
+      ctx.save();ctx.scale(DPR,DPR);ctx.clearRect(0,0,W,H);
+      const G=20,PAD=2*G,
+            xmin=PAD,xmax=W-PAD,
+            ymin=PAD,ymax=H-PAD,
+            midX=(xmin+xmax)/2,midY=(ymin+ymax)/2;
       // mriežka
-      ctx.lineWidth=1; ctx.strokeStyle=SCOPE_STYLE.gridFine;
+      ctx.lineWidth=1;ctx.strokeStyle=SCOPE_STYLE.gridFine;
       for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){
         ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
       }
@@ -682,29 +671,23 @@
         ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
       }
       const G10=10*G;
-      ctx.lineWidth=1.4; ctx.strokeStyle=SCOPE_STYLE.gridBold;
+      ctx.lineWidth=1.4;ctx.strokeStyle=SCOPE_STYLE.gridBold;
       for(let x=Math.ceil(xmin/G10)*G10;x<=xmax;x+=G10){
         ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
       }
       for(let y=Math.ceil(ymin/G10)*G10;y<=ymax;y+=G10){
         ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
       }
-
       // osi
-      ctx.strokeStyle=SCOPE_STYLE.axis;
-      ctx.lineWidth=SCOPE_STYLE.axisW;
+      ctx.strokeStyle=SCOPE_STYLE.axis;ctx.lineWidth=SCOPE_STYLE.axisW;
       ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
       ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
-
       // sinus
-      const T=1/state.f, viewT=2*T;
-      const tToX = t => xmin + (t/viewT)*(xmax-xmin);
-      const A = (ymax-ymin)*0.28;
-      const psi = deg2rad(state.psi);
-      const w   = TAU*state.f;
-
-      ctx.strokeStyle='#22c55e';
-      ctx.lineWidth=SCOPE_STYLE.sineW;
+      const T=1/state.f,viewT=2*T,
+            tToX=t=>xmin+(t/viewT)*(xmax-xmin),
+            A=(ymax-ymin)*0.28,
+            psi=deg2rad(state.psi),w=TAU*state.f;
+      ctx.strokeStyle='#22c55e';ctx.lineWidth=SCOPE_STYLE.sineW;
       ctx.beginPath();
       const STEPS=Math.max(240,Math.floor(xmax-xmin));
       for(let i=0;i<=STEPS;i++){
@@ -714,62 +697,55 @@
         if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
       ctx.stroke();
-
-      // bežiaca bodka – bez číselnej hodnoty
+      // bodka
       const Tms=1000/state.f;
-      const tms = state.playing ? state.tAnim : +el.tSlider.value;
-      const t   = (tms/1000)%viewT;
-      const bx  = tToX(t);
-      const by  = midY-A*Math.sin(w*t+psi);
+      const tms=state.playing?state.tAnim:+el.tSlider.value;
+      const t=(tms/1000)%viewT;
+      const bx=tToX(t);
+      const by=midY-A*Math.sin(w*t+psi);
       ctx.fillStyle='#a7f3d0';
       ctx.beginPath();ctx.arc(bx,by,4,0,TAU);ctx.fill();
-
       ctx.restore();
     }
-
     function loop(ts){
-      if(!state.playing){ rafId=null; return; }
+      if(!state.playing){rafId=null;return;}
       if(!lastTs) lastTs=ts;
-      const dt=(ts-lastTs)/1000; lastTs=ts;
+      const dt=(ts-lastTs)/1000;lastTs=ts;
       const Tms=1000/state.f;
-      state.tAnim += dt*500; // spomalené
-      if(state.tAnim>=Tms){ state.tAnim-=Tms; beep(); }
-      el.tSlider.value = state.tAnim.toFixed(1);
-      el.tRead.textContent = el.tSlider.value+' ms';
+      state.tAnim+=dt*500;
+      if(state.tAnim>=Tms){state.tAnim-=Tms;beep();}
+      el.tSlider.value=state.tAnim.toFixed(1);
+      el.tRead.textContent=el.tSlider.value+' ms';
       drawOsc();
       rafId=requestAnimationFrame(loop);
     }
-
-    el.play.onclick = ()=>{
+    el.play.onclick=()=>{
       state.playing=!state.playing;
-      el.play.textContent = state.playing?'⏸︎ Pause':'▶︎ Play';
+      el.play.textContent=state.playing?'⏸︎ Pause':'▶︎ Play';
       el.play.classList.toggle('paused',!state.playing);
-      if(state.playing){ lastTs=0; rafId=requestAnimationFrame(loop); }
-      else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+      if(state.playing){lastTs=0;rafId=requestAnimationFrame(loop);}
+      else if(rafId){cancelAnimationFrame(rafId);rafId=null;}
     };
-
-    addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
-    el.tSlider.oninput = e=>{
+    addEventListener('resize',()=>{resizeOsc();drawOsc();});
+    el.tSlider.oninput=e=>{
       const v=+e.target.value;
       el.tRead.textContent=v.toFixed(1)+' ms';
       if(!state.playing) state.tAnim=v;
       drawOsc();
     };
-
     function beep(){
       if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='sine'; o.frequency.value=880; g.gain.value=0.04;
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='sine';o.frequency.value=880;g.gain.value=0.04;
       o.connect(g).connect(audioCtx.destination);
-      o.start(); o.stop(audioCtx.currentTime+0.08);
+      o.start();o.stop(audioCtx.currentTime+0.08);
     }
 
     function updateHud(){
-      const left = el.locksCol.querySelectorAll('.lock').length;
+      const left=el.locksCol.querySelectorAll('.lock').length;
       pills.mistakes.textContent=`MISTAKES: ${state.mistakes}/2`;
-      pills.locks.textContent=`LOCKS LEFT: ${left}`;
+      pills.locks.textContent   =`LOCKS LEFT: ${left}`;
     }
-
     function failFeedback(){
       el.taskPanel.classList.add('shake','flash');
       setTimeout(()=>el.taskPanel.classList.remove('shake','flash'),450);
@@ -777,23 +753,24 @@
     function showMuhaha(){
       el.bubble.style.display='block';
       el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
-      document.getElementById('bubbleClose2').onclick=()=>el.bubble.style.display='none';
+      document.getElementById('bubbleClose2').onclick=
+        ()=>el.bubble.style.display='none';
     }
     function dropOneLock(){
       const locks=el.locksCol.querySelectorAll('.lock');
       if(locks.length) locks[0].remove();
     }
 
-    el.check.onclick = ()=>{
-      const ans = +el.answer.value;
+    el.check.onclick=()=>{
+      const ans=+el.answer.value;
       if(Number.isNaN(ans)){
         el.feedback.textContent='Zadaj číslo (V).';
-        el.feedback.style.color='#ef4444';return;
+        el.feedback.style.color='#ef4444';
+        return;
       }
-      const correct = round2(u_of_t_ms(state.tGiven));
-      const given   = round2(ans);
-      const tol     = tolByMode();
-
+      const correct=round2(u_of_t_ms(state.tGiven));
+      const given=round2(ans);
+      const tol=tolByMode();
       if(Math.abs(given-correct)<=tol){
         el.feedback.textContent=`Správne! u(t) ≈ ${correct.toFixed(2)} V 🔓`;
         el.feedback.style.color='#16a34a';
@@ -806,7 +783,9 @@
           el.feedback.style.color='#b45309';
         }else if(state.mistakes>=2){
           el.feedback.textContent='MUHAHA! Nové zadanie.';
-          el.feedback.style.color='#ef4444';showMuhaha();newTask1();
+          el.feedback.style.color='#ef4444';
+          showMuhaha();
+          newTask1();
         }else{
           el.feedback.textContent='Skús ešte raz.';
           el.feedback.style.color='#ef4444';
@@ -816,8 +795,8 @@
       updateHud();
     };
 
-    el.modeSelect.onchange = e=>{ state.mode=e.target.value; };
-    const startTs = Date.now();
+    el.modeSelect.onchange=e=>{state.mode=e.target.value;};
+    const startTs=Date.now();
     setInterval(()=>{
       const s=Math.floor((Date.now()-startTs)/1000);
       const m=String(Math.floor(s/60)).padStart(2,'0');
@@ -826,114 +805,84 @@
     },1000);
 
     /* KALKULAČKA */
-    // ——— kalkulačka
-const calc = {
-  disp: document.getElementById('calcDisplay'),
-  modeBtn: document.getElementById('degRad'),
-  grid: document.querySelector('.calc-grid'),
-  rad: true
-};
-
-calc.modeBtn.onclick = ()=>{
-  calc.rad = !calc.rad;
-  calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
-  calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
-};
-
-function insertToDisplay(s){
-  calc.disp.value += s;
-  calc.disp.focus();
-}
-function delOne(){
-  calc.disp.value = calc.disp.value.slice(0,-1);
-}
-function clearDisp(){
-  calc.disp.value = '';
-}
-
-function evalExpr(){
-  let expr = calc.disp.value
-    .replaceAll(',','.')        // slovenská čiarka -> bodka
-    .replaceAll('^','**')
-    .replaceAll('π',Math.PI.toString());
-
-  const wrapTrig = fn => (calc.rad ? fn : x=>fn(x*Math.PI/180));
-  const scope = {
-    sin:x=>wrapTrig(Math.sin)(x),
-    cos:x=>wrapTrig(Math.cos)(x),
-    tan:x=>wrapTrig(Math.tan)(x),
-    sqrt:Math.sqrt
-  };
-  try{
-    const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
-    const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-    return Number.isFinite(val) ? val : NaN;
-  }catch(e){
-    return NaN;
-  }
-}
-
-// obsluha tlačidiel
-calc.grid.addEventListener('click',e=>{
-  const b = e.target.closest('button'); if(!b) return;
-  const num = b.getAttribute('data-num');
-  const op  = b.getAttribute('data-op');
-  const fn  = b.getAttribute('data-fn');
-
-  if(num !== null){ insertToDisplay(num); return; }
-
-  if(op !== null){
-    if(op === ',') insertToDisplay(',');   // zobrazí sa čiarka
-    else insertToDisplay(op);
-    return;
-  }
-
-  if(!fn) return;
-
-  if(fn === 'pi') insertToDisplay('π');
-  else if(fn === 'tenpow') insertToDisplay('10^');
-  else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt')
-    insertToDisplay(fn + '(');
-  else if(fn === 'back') delOne();
-  else if(fn === 'clear') clearDisp();
-  else if(fn === 'mode') calc.modeBtn.onclick();        // RAD/DEG aj ako kláves
-  else if(fn === 'pm'){                                 // +/−
-    const v = calc.disp.value.trim();
-    if(v === ''){ insertToDisplay('-'); }
-    else if(!Number.isNaN(Number(v))){                  // čisté číslo
-      calc.disp.value = String(-Number(v));
-    }else{
-      insertToDisplay('-');
+    const calc={
+      disp:document.getElementById('calcDisplay'),
+      modeBtn:document.getElementById('degRad'),
+      grid:document.querySelector('.calc-grid'),
+      rad:true
+    };
+    calc.modeBtn.onclick=()=>{
+      calc.rad=!calc.rad;
+      calc.modeBtn.textContent=calc.rad?'RAD':'DEG';
+      calc.modeBtn.title=calc.rad?'Radiány':'Stupne';
+    };
+    function insertToDisplay(s){
+      calc.disp.value+=s;
+      calc.disp.focus();
     }
-  }
-  else if(fn === 'eq'){
-    const v = evalExpr();
-    calc.disp.value = Number.isFinite(v) ? v : 'NaN';
-  }
-  else if(fn === 'ans'){
-    const v = evalExpr();
-    if(Number.isFinite(v)){
-      document.getElementById('answer').value = round2(v).toFixed(2);
+    function delOne(){calc.disp.value=calc.disp.value.slice(0,-1);}
+    function clearDisp(){calc.disp.value='';}
+    function evalExpr(){
+      let expr=calc.disp.value
+        .replaceAll(',','.')
+        .replaceAll('^','**')
+        .replaceAll('π',Math.PI.toString());
+      const wrapTrig=fn=>(calc.rad?fn:(x)=>fn(x*Math.PI/180));
+      const scope={
+        sin:x=>wrapTrig(Math.sin)(x),
+        cos:x=>wrapTrig(Math.cos)(x),
+        tan:x=>wrapTrig(Math.tan)(x),
+        sqrt:Math.sqrt
+      };
+      try{
+        const f=new Function('sin','cos','tan','sqrt',`return (${expr})`);
+        const val=f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+        return Number.isFinite(val)?val:NaN;
+      }catch{return NaN;}
     }
-  }
-});
+    calc.grid.addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b) return;
+      const num=b.getAttribute('data-num');
+      const op =b.getAttribute('data-op');
+      const fn =b.getAttribute('data-fn');
+      if(num!==null){insertToDisplay(num);return;}
+      if(op!==null){
+        if(op===',') insertToDisplay(',');
+        else insertToDisplay(op);
+        return;
+      }
+      if(!fn) return;
+      if(fn==='pi') insertToDisplay('π');
+      else if(fn==='tenpow') insertToDisplay('10^');
+      else if(fn==='sin'||fn==='cos'||fn==='tan'||fn==='sqrt') insertToDisplay(fn+'(');
+      else if(fn==='back') delOne();
+      else if(fn==='clear') clearDisp();
+      else if(fn==='mode') calc.modeBtn.onclick();
+      else if(fn==='pm'){
+        const v=calc.disp.value.trim();
+        if(v===''){insertToDisplay('-');}
+        else if(!Number.isNaN(Number(v))){calc.disp.value=String(-Number(v));}
+        else insertToDisplay('-');
+      }else if(fn==='eq'){
+        const v=evalExpr();
+        calc.disp.value=Number.isFinite(v)?v:'NaN';
+      }else if(fn==='ans'){
+        const v=evalExpr();
+        if(Number.isFinite(v)) el.answer.value=round2(v).toFixed(2);
+      }
+    });
 
-    /* ÚLOHA 2 – inicializácia len raz */
+    /* ÚLOHA 2 – inicializácia (nechávam logiku ako predtým, len skrátená verzia) */
     let t2Ready=false;
     function t2_init(){
       if(t2Ready) return;
       t2Ready=true;
-
       const UeffOptions=[40,60,110,230];
-      const Ueff = UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
+      const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
       const f=50;
-
-      let connMap={};
-      let scopeConnected={A:false,B:false};
-      let dmmConnected={V:false,COM:false,A:false};
+      let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
       let dmmMode='ACV';
-
-      const modeAngles={ACV:-20, DCV:20, ACA:90, DCA:130, OHM:-90};
+      const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
       const sel=document.getElementById('sel');
       document.querySelectorAll('.sel-btn').forEach(b=>{
         b.onclick=()=>{
@@ -945,34 +894,29 @@ calc.grid.addEventListener('click',e=>{
         };
       });
       document.querySelector('.sel-btn[data-mode="ACV"]').click();
-
-      // drag sond
       const probes=[...document.querySelectorAll('#t2 .jack')];
       probes.forEach(p=>{
         p.addEventListener('dragstart',e=>{
           e.dataTransfer.setData('text/probe',p.dataset.probe);
         });
       });
-
       const terms=[...document.querySelectorAll('#t2 .terminal')];
       terms.forEach(t=>{
         t.addEventListener('dragover',e=>e.preventDefault());
         t.addEventListener('drop',e=>{
           e.preventDefault();
-          const pid=e.dataTransfer.getData('text/probe'); if(!pid) return;
+          const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
           connMap[pid]=t.dataset.terminal;
-          scopeConnected.A = (connMap['scopeA']==='A'||connMap['scopeB']==='A');
-          scopeConnected.B = (connMap['scopeA']==='B'||connMap['scopeB']==='B');
-          dmmConnected.V   = (connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
-          dmmConnected.COM = (connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
-          dmmConnected.A   = (connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
+          scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
+          scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
+          dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
+          dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
+          dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
           refreshInstruments();
         });
       });
-
       document.getElementById('t2-reset').onclick=()=>{
-        connMap={};
-        scopeConnected={A:false,B:false};
+        connMap={};scopeConnected={A:false,B:false};
         dmmConnected={V:false,COM:false,A:false};
         document.getElementById('dz-scope').innerHTML='';
         document.getElementById('dz-dmm').innerHTML='';
@@ -980,21 +924,18 @@ calc.grid.addEventListener('click',e=>{
         document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
         refreshInstruments();
       };
-
-      // osciloskop 2
       const cvs=document.getElementById('t2-wave');
       const ctx=cvs.getContext('2d');
-      function resizeScope(){
+      function resizeScope2(){
         const r=cvs.getBoundingClientRect();
         const DPR2=window.devicePixelRatio||1;
         cvs.width=Math.floor(r.width*DPR2);
         cvs.height=Math.floor(r.height*DPR2);
         ctx.setTransform(DPR2,0,0,DPR2,0,0);
       }
-      resizeScope();
-      addEventListener('resize',resizeScope);
-
-      function drawScope(){
+      resizeScope2();
+      addEventListener('resize',resizeScope2);
+      function drawScope2(){
         const w=cvs.clientWidth,h=cvs.clientHeight;
         ctx.clearRect(0,0,w,h);
         const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
@@ -1016,24 +957,21 @@ calc.grid.addEventListener('click',e=>{
         }else{
           document.getElementById('t2-scope-rdg').textContent='nepripojené';
         }
-        requestAnimationFrame(drawScope);
+        requestAnimationFrame(drawScope2);
       }
-      requestAnimationFrame(drawScope);
-
-      // kartičky u(t) / U
+      requestAnimationFrame(drawScope2);
       const tray=document.getElementById('t2-tray');
       tray.addEventListener('dragstart',e=>{
-        const t=e.target.closest('.token'); if(!t) return;
+        const t=e.target.closest('.token');if(!t) return;
         e.dataTransfer.setData('text/token',t.dataset.token);
         e.dataTransfer.setData('text/id',t.outerHTML);
       });
-
       function dzSetup(id,accept){
         const dz=document.getElementById(id);
         dz.addEventListener('dragover',e=>e.preventDefault());
         dz.addEventListener('drop',e=>{
           e.preventDefault();
-          const tok=e.dataTransfer.getData('text/token'); if(!tok) return;
+          const tok=e.dataTransfer.getData('text/token');if(!tok) return;
           dz.innerHTML=e.dataTransfer.getData('text/id');
           const ok=(tok===accept);
           dz.classList.toggle('dz-ok',ok);
@@ -1047,25 +985,20 @@ calc.grid.addEventListener('click',e=>{
       }
       dzSetup('dz-scope','u(t)');
       dzSetup('dz-dmm','U');
-
       function refreshInstruments(){
         const lamp=document.getElementById('t2-lamp');
         const dmmLbl=document.getElementById('t2-dmm-rdg');
-
         const sOK=scopeConnected.A&&scopeConnected.B;
         const vOK=dmmConnected.V&&dmmConnected.COM;
         const aOK=dmmConnected.A&&dmmConnected.COM;
-
         lamp.classList.toggle('off',!(sOK||vOK||aOK));
-
-        let txt='--.-', unit='V';
-        if(dmmMode==='ACV'){ unit='V'; txt = vOK ? Ueff.toFixed(1) : '--.-'; }
-        else if(dmmMode==='DCV'){ unit='V'; txt = vOK ? '0.0' : '--.-'; }
-        else if(dmmMode==='OHM'){ unit='Ω'; txt = vOK ? '∞' : '--'; }
-        else if(dmmMode==='ACA'){ unit='A'; txt = aOK ? '??' : '--'; }
-        else if(dmmMode==='DCA'){ unit='A'; txt = aOK ? '0.00' : '--'; }
-
-        dmmLbl.textContent = `${txt} ${unit}`;
+        let txt='--.-',unit='V';
+        if(dmmMode==='ACV'){unit='V';txt=vOK?Ueff.toFixed(1):'--.-';}
+        else if(dmmMode==='DCV'){unit='V';txt=vOK?'0.0':'--.-';}
+        else if(dmmMode==='OHM'){unit='Ω';txt=vOK?'∞':'--';}
+        else if(dmmMode==='ACA'){unit='A';txt=aOK?'??':'--';}
+        else if(dmmMode==='DCA'){unit='A';txt=aOK?'0.00':'--';}
+        dmmLbl.textContent=`${txt} ${unit}`;
       }
       refreshInstruments();
     }
