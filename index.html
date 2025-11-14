@@ -2,7 +2,7 @@
 <html lang="sk">
 <head>
   <meta charset="utf-8" />
-  <title>Escape the Phasor – Úloha 1</title>
+  <title>Escape the Phasor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
@@ -31,9 +31,7 @@
       position:relative;
     }
     .frame::before,.frame::after{
-      content:"";
-      position:absolute;
-      width:14px;height:14px;border-radius:50%;
+      content:""; position:absolute; width:14px;height:14px;border-radius:50%;
       background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60% 100%);
       box-shadow:inset 0 0 2px rgba(0,0,0,.6);
     }
@@ -43,7 +41,6 @@
     .row{display:flex;gap:16px}
     .top{align-items:center;position:relative;z-index:2}
 
-    /* PANELY HORE */
     .panel{
       background:rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.08);
@@ -65,42 +62,29 @@
     .task h2{margin:0 0 8px 0;font-size:18px}
     .task .scroll{overflow:auto;max-height:120px;padding-right:8px}
 
-    /* Bublina Dr. Phasora */
+    /* Phasor bublina */
     .bubble.wide{
-      position:absolute;
-      left:0;right:0;top:-10px;
-      width:calc(100% - 8px);
-      background:#ffffff;
-      color:#111827;
-      border-radius:12px;
+      position:absolute;left:0;right:0;top:-10px;width:calc(100% - 8px);
+      background:#fff;color:#111827;border-radius:12px;
       padding:10px 36px 10px 12px;
       box-shadow:0 10px 20px rgba(0,0,0,.25);
       border:2px solid #6b4ca6;
       transform:translateY(-100%);
     }
     .bubble.wide:after{
-      content:"";
-      position:absolute;
-      bottom:-10px;left:40px;
-      border:10px solid transparent;
-      border-top-color:#ffffff;
+      content:"";position:absolute;bottom:-10px;left:40px;
+      border:10px solid transparent;border-top-color:#fff;
       filter:drop-shadow(0 -2px 0 #6b4ca6);
     }
     .bubble .close{
-      position:absolute;right:8px;top:4px;
-      width:24px;height:24px;
-      display:grid;place-items:center;
-      cursor:pointer;
-      border-radius:6px;
-      font-weight:700;
-      color:#6b4ca6;
+      position:absolute;right:8px;top:4px;width:24px;height:24px;
+      display:grid;place-items:center;cursor:pointer;
+      border-radius:6px;font-weight:700;color:#6b4ca6;
     }
     .bubble .close:hover{background:#f2eaff}
 
-    /* ZÁMKY */
-    .locks{
-      display:flex;flex-direction:column;gap:6px;margin-left:auto;
-    }
+    /* Zámky */
+    .locks{display:flex;flex-direction:column;gap:6px;margin-left:auto}
     .lock{
       width:26px;height:26px;border-radius:6px;
       background:#020817;border:1px solid #374151;
@@ -109,23 +93,19 @@
       box-shadow:inset 0 0 6px rgba(0,0,0,.7);
     }
 
-    /* PLÁTNO / WORKBENCH */
+    /* Spoločné plátno */
     .play{margin-top:16px;position:relative;z-index:1}
     .workbench{
-      width:100%;
-      aspect-ratio:16/9;
-      min-height:420px;
+      width:100%;aspect-ratio:16/9;min-height:420px;
       background:var(--cream);
       border:1px solid rgba(0,0,0,.12);
       border-radius:var(--radius);
-      position:relative;
-      overflow:hidden;
+      position:relative;overflow:hidden;
       box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
     }
     @media (max-width:1280px){.workbench{min-height:360px}}
     .workbench::before{
-      content:"";
-      position:absolute;inset:0;
+      content:"";position:absolute;inset:0;
       background:
         repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 20px),
         repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 20px),
@@ -134,161 +114,118 @@
       opacity:.45;
       pointer-events:none;
     }
-
     .zone{position:absolute;top:0;bottom:0}
-    .zone.left{left:0;right:50%}
-    .zone.right{left:50%;right:0}
+    .zone.left{left:0;width:50%}
+    .zone.right{right:0;width:50%}
 
-    /* OSCILOSKOP */
+    /* prepínanie úloh */
+    .task-screen{display:none}
+    .task-screen.active{display:block}
+
+    /* ÚLOHA 1 – osciloskop + kalkulačka */
     .scope{
-      position:absolute;
-      inset:12px 18px 64px 18px;
-      background:#020817;
-      border-radius:14px;
-      padding:10px;
-      box-shadow:
-        inset 0 0 0 2px #374151,
-        inset 0 0 24px rgba(0,0,0,.9);
+      position:absolute;top:18px;left:18px;right:18px;bottom:82px;
+      background:#0d0f11;border-radius:14px;padding:10px;
+      box-shadow:inset 0 0 0 2px #2a3039, inset 0 0 20px rgba(0,0,0,.6);
     }
-    #osc{
-      width:100%;height:100%;
-      display:block;
-      border-radius:10px;
-    }
-
+    #osc{width:100%;height:100%;display:block;border-radius:10px}
     .osc-ui{
-      position:absolute;
-      left:18px;right:18px;bottom:12px;
+      position:absolute;left:18px;right:18px;bottom:18px;
       display:flex;gap:16px;align-items:center;
-      padding:8px 10px;
-      border-radius:10px;
+      padding:8px 10px;border-radius:10px;
       background:rgba(0,0,0,.08);
       border:1px solid rgba(15,23,42,.3);
       backdrop-filter:blur(1px);
       color:#111827;
     }
     #playBtn{
-      padding:6px 10px;
-      border-radius:8px;
+      padding:6px 10px;border-radius:8px;
       border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
+      background:#111827;color:#f9fafb;
       cursor:pointer;
     }
     #playBtn.paused{opacity:.7}
     .osc-ui input[type="range"]{width:220px;margin:0 8px}
 
-    /* KALKULAČKA */
     .calc{
-      position:absolute;
-      top:18px;left:18px;right:18px;bottom:110px;
+      position:absolute;top:18px;left:18px;right:18px;bottom:82px;
       background:rgba(255,255,255,.78);
       border:1px solid rgba(0,0,0,.1);
       border-radius:12px;
       padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
+      display:flex;flex-direction:column;gap:18px;
       box-shadow:0 3px 10px rgba(0,0,0,.08);
       color:#111827;
     }
-    .calc-top{display:flex;gap:8px;}
+    .calc-top{display:flex;gap:10px}
     #calcDisplay{
-      flex:1;
-      padding:8px 10px;
-      border:1px solid #cbd5e1;
-      border-radius:8px;
-      font-size:16px;
+      flex:1;padding:8px 10px;
+      border:2px solid #cbd5e1;border-radius:8px;
+      font-size:24px;
     }
     #degRad{
-      padding:8px 10px;
-      border-radius:8px;
+      padding:8px 10px;border-radius:10px;
       border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
+      background:#111827;color:#f9fafb;
       cursor:pointer;
     }
-    .calc-grid{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:6px;
-    }
+    .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
     .calc-grid button{
-      padding:8px 10px;
-      border:1px solid #d4d4d8;
-      border-radius:8px;
+      padding:12px 0;
+      border:2px solid #d4d4d8;
+      border-radius:12px;
       background:#f4f4f5;
       cursor:pointer;
-      font-weight:600;
+      font-weight:700;
+      font-size:16px;
     }
-    .calc-grid button.wide{grid-column:span 2;}
-    .calc-grid button.ghost{background:#e5e7eb;}
+    .calc-grid button.ghost{background:#e5e7eb}
     .calc-grid button.emph{
-      background:#111827;
-      color:#f9fafb;
-      border-color:#111827;
+      background:#111827;color:#f9fafb;border-color:#111827;
     }
 
-    /* ODPOVEĎ */
     .answerBox{
-      position:absolute;
-      left:18px;right:18px;bottom:18px;
-      display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-      background:rgba(255,255,255,.8);
-      border:1px solid rgba(0,0,0,.12);
+      position:absolute;left:18px;right:18px;bottom:18px;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(0,0,0,.1);
       border-radius:12px;
-      padding:12px;
-      color:#111827;
-      box-shadow:0 3px 10px rgba(0,0,0,.08);
+      padding:10px 12px;
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+      color:#111;
+      box-shadow:0 3px 8px rgba(0,0,0,.06);
     }
     .answerBox input{
-      width:140px;
-      padding:6px 8px;
-      border-radius:8px;
-      border:1px solid #cbd5e1;
+      width:180px;padding:8px 10px;
+      border-radius:8px;border:1px solid #cbd5e1;
     }
     .answerBox button{
-      padding:8px 14px;
-      border-radius:10px;
+      padding:8px 14px;border-radius:10px;
       border:1px solid #111827;
-      background:#111827;
-      color:#f9fafb;
+      background:#111827;color:#f9fafb;
       cursor:pointer;
     }
     .feedback{min-height:1.2em;font-weight:700}
 
     /* HUD */
     .hud{
-      margin-top:12px;
-      padding:10px 12px;
-      background:var(--hud);
-      color:var(--hudText);
+      margin-top:12px;padding:10px 12px;
+      background:var(--hud);color:var(--hudText);
       border-radius:var(--radius);
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      position:relative;
-      z-index:3;
-      font-size:14px;
+      display:flex;flex-wrap:wrap;gap:10px;
+      align-items:center;justify-content:space-between;
+      position:relative;z-index:3;font-size:14px;
     }
     .hud .group{display:flex;gap:14px;align-items:center}
     .pill{
-      background:#020817;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid #374151;
+      background:#020817;padding:6px 10px;
+      border-radius:999px;border:1px solid #374151;
     }
     .hud select{
-      background:#020817;
-      color:#f9fafb;
-      border:1px solid #374151;
-      border-radius:8px;
-      padding:3px 6px;
+      background:#020817;color:#f9fafb;
+      border:1px solid #374151;border-radius:8px;padding:3px 6px;
     }
 
-    /* TYPO + EFEKTY */
+    /* TYPO + efekty */
     .math var{font-style:italic}
     .math sub{font-style:normal}
     .phi{font-family:"Cambria Math","STIX Two Math","DejaVu Sans",serif}
@@ -306,12 +243,10 @@
       100%{background:transparent}
     }
 
-    /* ISKRA */
+    /* ISKRA – nechávam definovanú, ale nepoužívame ju teraz */
     .spark{
-      position:absolute;
-      width:160px;height:160px;
-      pointer-events:none;
-      display:none;
+      position:absolute;width:160px;height:160px;
+      pointer-events:none;display:none;
       background:
         radial-gradient(circle at 50% 50%,#FFD745 0 30%,rgba(255,215,69,.6) 35% 55%,transparent 60%),
         conic-gradient(from 0deg,rgba(255,215,69,.9),rgba(243,190,87,.6),rgba(255,237,154,.7),rgba(255,215,69,.9));
@@ -320,20 +255,181 @@
       transform:translate(-50%,-50%) scale(.8);
       animation:spark .6s ease-out forwards;
     }
-    @keyframes spark{
-      0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(0deg)}
-      20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(12deg)}
-      100%{opacity:0;transform:translate(-50%,-50%) scale(1.1) rotate(22deg)}
+
+    /* ÚLOHA 2 – layout */
+    .t2-wrap{
+      display:grid;
+      grid-template-columns:50% 50%;
+      gap:16px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:16px;
     }
+    .t2-card{
+      background:rgba(0,0,0,.15);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:12px;
+    }
+    .t2-h{font-weight:800;margin:0 0 8px 0}
+
+    .scope2,.dmm{
+      position:relative;
+      border-radius:12px;
+      padding:12px;
+      background:#0d0f11;
+      border:1px solid #2a3039;
+      box-shadow:inset 0 0 20px rgba(0,0,0,.6);
+      margin-bottom:10px;
+    }
+    .scope-screen{
+      height:170px;border-radius:8px;
+      background:#0a0f12;position:relative;overflow:hidden;
+    }
+    .scope-screen::before{
+      content:"";position:absolute;inset:0;
+      background:
+        repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px),
+        repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px);
+      opacity:.55;
+    }
+    #t2-wave{width:100%;height:100%}
+
+    .dmm-face{
+      height:170px;
+      display:grid;grid-template-columns:1fr 140px;
+      gap:12px;align-items:center;
+    }
+    .dmm-reading{
+      font:700 32px/1.1 monospace;
+      background:#c9f0d8;color:#0b2c15;
+      padding:8px 12px;border-radius:8px;
+      box-shadow:inset 0 0 4px rgba(0,0,0,.25);
+      text-align:center;
+    }
+    .selector{
+      width:120px;height:120px;border-radius:50%;
+      margin:auto;
+      background:radial-gradient(#444 0 38%,#26292f 40% 100%);
+      position:relative;
+      border:2px solid #1f2430;
+      box-shadow:inset 0 8px 18px rgba(0,0,0,.35);
+    }
+    .selector::after{
+      content:"";position:absolute;left:50%;top:50%;
+      width:6px;height:38px;background:#e5e7eb;border-radius:3px;
+      transform-origin:50% 90%;
+      transform:translate(-50%,-90%) rotate(var(--angle,-20deg));
+    }
+    .sel-row{
+      display:flex;justify-content:space-between;
+      font-size:12px;color:#cbd5e1;margin-top:6px;
+    }
+    .sel-btn{
+      padding:4px 6px;border:1px solid #3a4150;
+      border-radius:6px;background:#161b25;
+      color:#e5e7eb;cursor:pointer;
+    }
+    .sel-btn.active{outline:2px solid #22c55e}
+
+    .jacks{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .jack{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 8px;border-radius:999px;
+      background:#111827;border:1px solid #374151;
+      color:#f8fafc;cursor:grab;
+      user-select:none;
+      font-size:12px;
+    }
+    .jack:active{cursor:grabbing}
+    .jack .dot{width:10px;height:10px;border-radius:50%}
+    .jack.red .dot{background:#ef4444}
+    .jack.black .dot{background:#6b7280}
+    .jack.amper .dot{background:#f59e0b}
+
+    .circuit{
+      position:relative;
+      border-radius:12px;
+      background:var(--cream);
+      padding:14px 14px 52px 14px;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .lamp{
+      width:130px;height:130px;border-radius:50%;
+      margin:14px auto 8px;
+      background:
+        radial-gradient(circle at 50% 45%,#ffe69a 0 45%,#ffd24d 46% 58%,#f0b02a 59% 65%,#cc9000 66% 100%);
+    }
+    .lamp.off{filter:grayscale(1) brightness(.75)}
+    .terminal{
+      position:absolute;width:18px;height:18px;border-radius:50%;
+      background:#222;border:2px solid #ddd;cursor:pointer;
+    }
+    .tA{left:calc(50% - 60px);top:20px}
+    .tB{left:calc(50% + 42px);top:20px}
+
+    .source{
+      position:absolute;left:50%;transform:translateX(-50%);
+      bottom:10px;width:220px;height:46px;
+      border-radius:10px;
+      background:#e8eef6;
+      border:2px solid #93a3b8;
+      display:flex;align-items:center;justify-content:space-around;
+      font-weight:700;color:#334155;
+    }
+    .src-post{
+      width:18px;height:18px;border-radius:50%;border:2px solid #111;
+    }
+    .src-post.pos{background:#ffdddd;border-color:#b91c1c}
+    .src-post.neg{background:#dde9ff;border-color:#1d4ed8}
+
+    .t2-btn{
+      position:absolute;right:12px;bottom:10px;
+      padding:6px 10px;border-radius:8px;
+      border:1px solid #374151;
+      background:#111827;color:#f8fafc;
+      cursor:pointer;
+    }
+
+    .dropzone{
+      margin-top:8px;
+      display:flex;gap:8px;flex-wrap:wrap;
+      min-height:38px;
+      padding:6px;border-radius:8px;
+      border:1px dashed rgba(255,255,255,.35);
+      font-size:13px;
+    }
+    .dz-ok{border-color:#22c55e}
+    .dz-bad{border-color:#ef4444}
+
+    .token{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:999px;
+      background:#fff;color:#111;
+      border:1px solid #cbd5e1;
+      font-weight:700;
+      cursor:grab;
+      user-select:none;
+    }
+    .token:active{cursor:grabbing}
+    .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+    .hint{font-size:12px;opacity:.9}
   </style>
 </head>
 <body>
   <main class="frame">
+
+    <!-- prepínač úloh -->
+    <div style="margin-bottom:10px">
+      <button onclick="showTask('task1')">Úloha 1</button>
+      <button onclick="showTask('task2')">Úloha 2</button>
+    </div>
+
     <!-- Horný rad -->
     <section class="row top">
-      <div class="panel dr" id="dr">
-        <strong>Dr. Phasor</strong>
-      </div>
+      <div class="panel dr" id="dr"><strong>Dr. Phasor</strong></div>
 
       <div class="panel task" id="taskPanel">
         <div class="bubble wide" id="bubble">
@@ -341,93 +437,162 @@
           <div class="close" id="bubbleClose">×</div>
         </div>
         <h2>Úloha</h2>
-        <div class="scroll math" id="taskText">
-          <!-- bude prepísané v newTask1() -->
-        </div>
+        <div class="scroll math" id="taskText"></div>
       </div>
 
       <div class="panel student">
         <strong>Študent</strong>
-        <div class="locks" aria-label="Zámky" id="locksCol">
+        <div class="locks" id="locksCol">
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
           <div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div><div class="lock">🔒</div>
         </div>
       </div>
     </section>
 
-    <!-- Plátno -->
-    <section class="play">
-      <div class="workbench">
-        <!-- Ľavá zóna: osciloskop -->
-        <div class="zone left">
-          <div class="scope">
-            <canvas id="osc" aria-label="osciloskop"></canvas>
+    <!-- ÚLOHA 1 -->
+    <section id="task1" class="task-screen active">
+      <section class="play">
+        <div class="workbench">
+          <!-- ľavá zóna – osciloskop -->
+          <div class="zone left">
+            <div class="scope">
+              <canvas id="osc" aria-label="osciloskop"></canvas>
+            </div>
+            <div class="osc-ui">
+              <button id="playBtn" type="button">▶︎ Play</button>
+              <label>Čas <var>t</var>:
+                <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
+                <span id="tReadout">2.0 ms</span>
+              </label>
+            </div>
           </div>
-          <div class="osc-ui">
-            <button id="playBtn" type="button">▶︎ Play</button>
-            <label>Čas <var>t</var>:
-              <input id="tSlider" type="range" min="0" max="20" step="0.1" value="2">
-              <span id="tReadout">2.0 ms</span>
-            </label>
+
+          <!-- pravá zóna – kalkulačka -->
+          <div class="zone right">
+            <div class="calc">
+              <div class="calc-top">
+                <input id="calcDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" />
+                <button id="degRad">RAD</button>
+              </div>
+              <div class="calc-grid">
+                <!-- rad 1 -->
+                <button data-fn="pi">π</button>
+                <button data-fn="tenpow">10ⁿ</button>
+                <button data-op="^">^</button>
+                <button data-fn="back">←</button>
+                <!-- rad 2 -->
+                <button data-fn="sqrt">√</button>
+                <button data-fn="sin">sin</button>
+                <button data-fn="cos">cos</button>
+                <button data-fn="tan">tan</button>
+                <!-- rad 3 -->
+                <button data-num="7">7</button><button data-num="8">8</button><button data-num="9">9</button><button data-op="/">÷</button>
+                <!-- rad 4 -->
+                <button data-num="4">4</button><button data-num="5">5</button><button data-num="6">6</button><button data-op="*">×</button>
+                <!-- rad 5 -->
+                <button data-num="1">1</button><button data-num="2">2</button><button data-num="3">3</button><button data-op="+">+</button>
+                <!-- rad 6 -->
+                <button data-op=".">.</button><button data-num="0">0</button><button data-fn="clear" class="ghost">C</button><button data-op="-">−</button>
+                <!-- rad 7 -->
+                <button data-op="(">(</button><button data-op=")">)</button>
+                <button data-fn="ans" class="ghost">→ Odpoveď</button>
+                <button data-fn="eq" class="emph">=</button>
+              </div>
+            </div>
+
+            <div class="answerBox">
+              <label>Odpoveď: <var>u</var>(<var>t</var>) =
+                <input id="answer" type="number" step="0.01" placeholder="V">
+                <span>V</span>
+              </label>
+              <button id="checkBtn">Skontrolovať</button>
+              <div id="feedback" class="feedback"></div>
+            </div>
           </div>
         </div>
 
-        <!-- Pravá zóna: kalkulačka + odpoveď -->
-        <div class="zone right">
-          <div class="calc">
-            <div class="calc-top">
-              <input id="calcDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" />
-              <button id="degRad">RAD</button>
+        <div id="spark" class="spark" aria-hidden="true"></div>
+      </section>
+    </section>
+
+    <!-- ÚLOHA 2 -->
+    <section id="task2" class="task-screen">
+      <div class="t2-wrap" id="t2">
+        <!-- ľavá strana – prístroje -->
+        <div class="t2-card">
+          <h3 class="t2-h">Meracie prístroje</h3>
+
+          <!-- osciloskop -->
+          <div class="scope2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <strong>Osciloskop</strong>
+              <span class="hint">pripoj obidve sondy</span>
             </div>
-            <div class="calc-grid">
-              <button data-fn="pi">π</button>
-              <button data-fn="e">e</button>
-              <button data-op="^">^</button>
-              <button data-op="(">(</button>
-              <button data-op=")">)</button>
-
-              <button data-fn="sin">sin</button>
-              <button data-fn="cos">cos</button>
-              <button data-fn="tan">tan</button>
-              <button data-fn="sqrt">√</button>
-              <button data-op="/">÷</button>
-
-              <button data-num="7">7</button>
-              <button data-num="8">8</button>
-              <button data-num="9">9</button>
-              <button data-op="*">×</button>
-              <button data-op="-">−</button>
-
-              <button data-num="4">4</button>
-              <button data-num="5">5</button>
-              <button data-num="6">6</button>
-              <button data-op="+">+</button>
-              <button data-fn="del">DEL</button>
-
-              <button data-num="1">1</button>
-              <button data-num="2">2</button>
-              <button data-num="3">3</button>
-              <button data-num="0" class="wide">0</button>
-              <button data-op=".">.</button>
-
-              <button data-fn="clear" class="ghost">C</button>
-              <button data-fn="ans"   class="ghost">→ Odpoveď</button>
-              <button data-fn="eq"    class="emph">=</button>
+            <div class="scope-screen">
+              <canvas id="t2-wave"></canvas>
             </div>
+            <div class="dmm-reading" id="t2-scope-rdg" style="margin-top:8px">nepripojené</div>
+            <div class="jacks">
+              <div class="jack red"   draggable="true" data-probe="scopeA"><span class="dot"></span> červená sonda</div>
+              <div class="jack black" draggable="true" data-probe="scopeB"><span class="dot"></span> čierna sonda</div>
+            </div>
+            <div class="dropzone" id="dz-scope"></div>
           </div>
 
-          <div class="answerBox">
-            <label>Odpoveď: <var>u</var>(<var>t</var>) =
-              <input id="answer" type="number" step="0.01" placeholder="V">
-              <span>V</span>
-            </label>
-            <button id="checkBtn">Skontrolovať</button>
-            <div id="feedback" class="feedback"></div>
+          <!-- multimeter -->
+          <div class="dmm">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <strong>Multimeter</strong>
+              <span class="hint">pripoj šnúry a zvoľ rozsah</span>
+            </div>
+            <div class="dmm-face">
+              <div class="dmm-reading" id="t2-dmm-rdg">--.- V</div>
+              <div>
+                <div class="selector" id="sel" style="--angle:-20deg"></div>
+                <div class="sel-row">
+                  <button class="sel-btn" data-mode="ACV">V~</button>
+                  <button class="sel-btn" data-mode="DCV">V⎓</button>
+                  <button class="sel-btn" data-mode="ACA">A~</button>
+                  <button class="sel-btn" data-mode="DCA">A⎓</button>
+                  <button class="sel-btn" data-mode="OHM">Ω</button>
+                </div>
+              </div>
+            </div>
+            <div class="jacks">
+              <div class="jack red"   draggable="true" data-probe="dmmV"><span class="dot"></span> V/Ω</div>
+              <div class="jack black" draggable="true" data-probe="dmmCOM"><span class="dot"></span> COM</div>
+              <div class="jack amper" draggable="true" data-probe="dmmA"><span class="dot"></span> A</div>
+            </div>
+            <div class="dropzone" id="dz-dmm"></div>
+
+            <div class="tray" id="t2-tray">
+              <div class="token" draggable="true" data-token="u(t)">u(t)</div>
+              <div class="token" draggable="true" data-token="U">U</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- pravá strana – obvod -->
+        <div class="t2-card">
+          <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
+          <div class="circuit" id="t2-circuit">
+            <div class="lamp off" id="t2-lamp"></div>
+            <div class="terminal tA" data-terminal="A" title="svorka A"></div>
+            <div class="terminal tB" data-terminal="B" title="svorka B"></div>
+
+            <div class="source">
+              <div class="src-post pos" title="+ zdroj"></div>
+              <div>DC SOURCE</div>
+              <div class="src-post neg" title="− zdroj"></div>
+            </div>
+
+            <button class="t2-btn" id="t2-reset">Reset pripojení</button>
+          </div>
+          <div class="hint" style="margin-top:8px">
+            Pripoj sondy k svorkám <b>A</b> a <b>B</b>. Potom potiahni kartičky <b>u(t)</b> a <b>U</b> na správny prístroj.
           </div>
         </div>
       </div>
-
-      <div id="spark" class="spark" aria-hidden="true"></div>
     </section>
 
     <!-- HUD -->
@@ -449,14 +614,22 @@
         <button class="pill" id="hintBtn">HINT</button>
       </div>
     </section>
+
   </main>
 
   <script>
-    // bublina
-    document.getElementById('bubbleClose')
-      .addEventListener('click',()=>document.getElementById('bubble').style.display='none');
+    // --- spoločné ---
+    document.getElementById('bubbleClose').onclick =
+      () => document.getElementById('bubble').style.display = 'none';
 
-    /* ===== Stav ===== */
+    function showTask(id){
+      document.querySelectorAll('.task-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if(id === 'task1'){ resizeOsc(); newTask1(); }
+      if(id === 'task2'){ t2_init(); }
+    }
+
+    // --- ÚLOHA 1 – stav / HUD ---
     const pills = {
       mistakes: document.getElementById('mistakesPill'),
       locks: document.getElementById('locksPill'),
@@ -464,14 +637,9 @@
     };
 
     const state = {
-      mode:'EASY',
-      mistakes:0,
-      U:230,
-      f:50,
-      phi:10,
-      tGiven:2.0,
-      playing:false,
-      tAnim:2.0
+      mode:'EASY', mistakes:0,
+      U:230, f:50, phi:10, tGiven:2.0,
+      playing:false, tAnim:2.0
     };
 
     const el = {
@@ -490,28 +658,26 @@
       modeSelect:document.getElementById('modeSelect')
     };
 
-    const TAU = Math.PI*2;
-    const deg2rad = d=>d*Math.PI/180;
-    const round2 = x=>Math.round(x*100)/100;
-    const randFrom = a=>a[Math.floor(Math.random()*a.length)];
+    const TAU=Math.PI*2;
+    const deg2rad=d=>d*Math.PI/180;
+    const round2=x=>Math.round(x*100)/100;
+    const randFrom=a=>a[Math.floor(Math.random()*a.length)];
     function tolByMode(){
-      return state.mode==='EASY' ? 0.50 :
-             state.mode==='MEDIUM' ? 0.20 : 0.05;
+      return state.mode==='EASY'?0.50:
+             state.mode==='MEDIUM'?0.20:0.05;
     }
 
-    /* ===== Zadanie 1 ===== */
     function newTask1(){
-      state.mistakes = 0;
-      state.U   = randFrom([230,120,100,60]);
-      state.f   = 50;
+      state.mistakes=0;
+      state.U = randFrom([230,120,100,60]);
+      state.f = 50;
       state.phi = randFrom([-30,-15,0,10,15,30]);
       const Tms = 1000/state.f;
       state.tGiven = +(Math.random()*Tms).toFixed(1);
 
       el.taskText.innerHTML =
         `Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.`+
-        `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>),`+
-        ` kde <var>U</var><sub>m</sub> = √2 · <var>U</var>.`+
+        `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="phi">φ</span>), kde <var>U</var><sub>m</sub> = √2·<var>U</var>.`+
         `<br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, <span class="phi">φ</span> = ${state.phi}°.`;
 
       el.tSlider.max = Tms.toFixed(1);
@@ -519,28 +685,27 @@
       el.tRead.textContent = state.tGiven.toFixed(1)+' ms';
       state.tAnim = state.tGiven;
 
-      el.answer.value = '';
-      el.feedback.textContent = '';
+      el.answer.value='';
+      el.feedback.textContent='';
       drawOsc();
       updateHud();
     }
 
     function u_of_t_ms(tms){
-      const Um = Math.SQRT2 * state.U;
-      const w  = TAU * state.f;
-      const t  = tms / 1000;
+      const Um=Math.SQRT2*state.U;
+      const w = TAU*state.f;
+      const t = tms/1000;
       const phi = deg2rad(state.phi);
-      return Um * Math.sin(w*t + phi);
+      return Um*Math.sin(w*t+phi);
     }
 
-    /* ===== Osciloskop ===== */
-    let oscCtx = null, DPR = window.devicePixelRatio || 1;
-    let rafId = null, lastTs = 0, audioCtx = null;
+    // --- osciloskop 1 ---
+    let oscCtx=null, DPR=window.devicePixelRatio||1, rafId=null, lastTs=0, audioCtx=null;
 
     function resizeOsc(){
       const r = el.osc.getBoundingClientRect();
-      el.osc.width  = Math.floor(r.width  * DPR);
-      el.osc.height = Math.floor(r.height * DPR);
+      el.osc.width  = Math.floor(r.width*DPR);
+      el.osc.height = Math.floor(r.height*DPR);
       oscCtx = el.osc.getContext('2d');
     }
 
@@ -554,131 +719,119 @@
 
     function drawOsc(){
       if(!oscCtx) resizeOsc();
-
       const W = el.osc.width / DPR;
       const H = el.osc.height / DPR;
+      const ctx = oscCtx;
 
-      oscCtx.save();
-      oscCtx.scale(DPR, DPR);
-      oscCtx.clearRect(0,0,W,H);
+      ctx.save();
+      ctx.scale(DPR,DPR);
+      ctx.clearRect(0,0,W,H);
 
-      const G = 20;
-      const PAD = 2*G;
-      const xmin = PAD, xmax = W-PAD;
-      const ymin = PAD, ymax = H-PAD;
-      const midX = (xmin+xmax)/2;
-      const midY = (ymin+ymax)/2;
+      const G=20, PAD=2*G;
+      const xmin=PAD, xmax=W-PAD;
+      const ymin=PAD, ymax=H-PAD;
+      const midX=(xmin+xmax)/2;
+      const midY=(ymin+ymax)/2;
 
       // mriežka
-      oscCtx.lineWidth = 1;
-      oscCtx.strokeStyle = SCOPE_STYLE.gridFine;
-      for(let x=Math.ceil(xmin/G)*G; x<=xmax; x+=G){
-        oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke();
+      ctx.lineWidth=1;
+      ctx.strokeStyle=SCOPE_STYLE.gridFine;
+      for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){
+        ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
       }
-      for(let y=Math.ceil(ymin/G)*G; y<=ymax; y+=G){
-        oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke();
+      for(let y=Math.ceil(ymin/G)*G;y<=ymax;y+=G){
+        ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
       }
       const G10 = 10*G;
-      oscCtx.lineWidth = 1.4;
-      oscCtx.strokeStyle = SCOPE_STYLE.gridBold;
-      for(let x=Math.ceil(xmin/G10)*G10; x<=xmax; x+=G10){
-        oscCtx.beginPath(); oscCtx.moveTo(x,ymin); oscCtx.lineTo(x,ymax); oscCtx.stroke();
+      ctx.lineWidth=1.4;
+      ctx.strokeStyle=SCOPE_STYLE.gridBold;
+      for(let x=Math.ceil(xmin/G10)*G10;x<=xmax;x+=G10){
+        ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
       }
-      for(let y=Math.ceil(ymin/G10)*G10; y<=ymax; y+=G10){
-        oscCtx.beginPath(); oscCtx.moveTo(xmin,y); oscCtx.lineTo(xmax,y); oscCtx.stroke();
+      for(let y=Math.ceil(ymin/G10)*G10;y<=ymax;y+=G10){
+        ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
       }
 
       // osi
-      oscCtx.strokeStyle = SCOPE_STYLE.axis;
-      oscCtx.lineWidth = SCOPE_STYLE.axisW;
-      oscCtx.beginPath(); oscCtx.moveTo(xmin,midY); oscCtx.lineTo(xmax,midY); oscCtx.stroke();
-      oscCtx.beginPath(); oscCtx.moveTo(midX,ymin); oscCtx.lineTo(midX,ymax); oscCtx.stroke();
+      ctx.strokeStyle=SCOPE_STYLE.axis;
+      ctx.lineWidth=SCOPE_STYLE.axisW;
+      ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
 
       // sínus
-      const T = 1/state.f;
-      const viewT = 2*T;
+      const T = 1/state.f, viewT = 2*T;
       const tToX = t => xmin + (t/viewT)*(xmax-xmin);
       const A = (ymax-ymin)*0.28;
       const phi = deg2rad(state.phi);
       const w = TAU*state.f;
 
-      oscCtx.strokeStyle = '#22c55e';
-      oscCtx.lineWidth = SCOPE_STYLE.sineW;
-      oscCtx.beginPath();
-      const STEPS = Math.max(240, Math.floor(xmax-xmin));
+      ctx.strokeStyle='#22c55e';
+      ctx.lineWidth=SCOPE_STYLE.sineW;
+      ctx.beginPath();
+      const STEPS=Math.max(240,Math.floor(xmax-xmin));
       for(let i=0;i<=STEPS;i++){
         const x = xmin + (i/STEPS)*(xmax-xmin);
         const t = ((x-xmin)/(xmax-xmin))*viewT;
-        const y = midY - A*Math.sin(w*t + phi);
-        if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
+        const y = midY - A*Math.sin(w*t+phi);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
-      oscCtx.stroke();
+      ctx.stroke();
 
-      // bodka
+      // bežiaca bodka
       const Tms = 1000/state.f;
       const tms = state.playing ? state.tAnim : +el.tSlider.value;
-      const t = (tms/1000) % viewT;
+      const t = (tms/1000)%viewT;
       const bx = tToX(t);
-      const by = midY - A*Math.sin(w*t + phi);
-      oscCtx.fillStyle = '#a7f3d0';
-      oscCtx.beginPath(); oscCtx.arc(bx,by,4,0,TAU); oscCtx.fill();
+      const by = midY - A*Math.sin(w*t+phi);
+      ctx.fillStyle='#a7f3d0';
+      ctx.beginPath();ctx.arc(bx,by,4,0,TAU);ctx.fill();
 
-      // text
-      const uval = u_of_t_ms(tms);
-      oscCtx.fillStyle = 'rgba(249,250,251,0.96)';
-      oscCtx.font = '600 12px system-ui';
-      oscCtx.fillText(`u(${tms.toFixed(1)} ms) ≈ ${round2(uval).toFixed(2)} V`, xmin+4, ymin+14);
-
-      oscCtx.restore();
+      ctx.restore();
     }
 
     function loop(ts){
       if(!state.playing){ rafId=null; return; }
-      if(!lastTs) lastTs = ts;
-      const dt = (ts-lastTs)/1000; lastTs = ts;
-
-      const Tms = 1000/state.f;
-      state.tAnim += dt*1000;
-      if(state.tAnim >= Tms){ state.tAnim -= Tms; beep(); }
-
+      if(!lastTs) lastTs=ts;
+      const dt=(ts-lastTs)/1000;
+      lastTs=ts;
+      const Tms=1000/state.f;
+      state.tAnim += dt*500; // spomalené
+      if(state.tAnim>=Tms){ state.tAnim-=Tms; beep(); }
       el.tSlider.value = state.tAnim.toFixed(1);
-      el.tRead.textContent = el.tSlider.value + ' ms';
+      el.tRead.textContent = el.tSlider.value+' ms';
       drawOsc();
-      rafId = requestAnimationFrame(loop);
+      rafId=requestAnimationFrame(loop);
     }
 
-    el.play.addEventListener('click',()=>{
+    el.play.onclick = () => {
       state.playing = !state.playing;
       el.play.textContent = state.playing ? '⏸︎ Pause' : '▶︎ Play';
       el.play.classList.toggle('paused',!state.playing);
       if(state.playing){
-        lastTs = 0;
-        rafId = requestAnimationFrame(loop);
+        lastTs=0;
+        rafId=requestAnimationFrame(loop);
       }else if(rafId){
         cancelAnimationFrame(rafId); rafId=null;
       }
-    });
+    };
 
-    window.addEventListener('resize',()=>{ resizeOsc(); drawOsc(); });
-    el.tSlider.addEventListener('input',e=>{
+    window.addEventListener('resize', ()=>{ resizeOsc(); drawOsc(); });
+
+    el.tSlider.oninput = e => {
       const v = +e.target.value;
       el.tRead.textContent = v.toFixed(1)+' ms';
       if(!state.playing) state.tAnim = v;
       drawOsc();
-    });
+    };
 
     function beep(){
-      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
-      o.type='sine'; o.frequency.value=880;
-      g.gain.value=0.04;
+      if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=880; g.gain.value=0.04;
       o.connect(g).connect(audioCtx.destination);
-      o.start();
-      o.stop(audioCtx.currentTime+0.08);
+      o.start(); o.stop(audioCtx.currentTime+0.08);
     }
 
-    /* ===== Checker ===== */
     function updateHud(){
       const left = el.locksCol.querySelectorAll('.lock').length;
       pills.mistakes.textContent = `MISTAKES: ${state.mistakes}/2`;
@@ -692,9 +845,9 @@
 
     function showMuhaha(){
       el.bubble.style.display='block';
-      el.bubble.innerHTML = 'MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
-      document.getElementById('bubbleClose2')
-        .addEventListener('click',()=>el.bubble.style.display='none');
+      el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
+      document.getElementById('bubbleClose2').onclick =
+        () => el.bubble.style.display='none';
     }
 
     function dropOneLock(){
@@ -702,35 +855,26 @@
       if(locks.length) locks[0].remove();
     }
 
-    function successSpark(){
-      const drRect = document.getElementById('dr').getBoundingClientRect();
-      const frameRect = document.querySelector('.frame').getBoundingClientRect();
-      el.spark.style.display='block';
-      el.spark.style.left = (drRect.right - frameRect.left - 20)+'px';
-      el.spark.style.top  = (drRect.top   - frameRect.top  + 30)+'px';
-      setTimeout(()=>{ el.spark.style.display='none'; },650);
-    }
-
-    el.check.addEventListener('click',()=>{
+    el.check.onclick = () => {
       const ans = +el.answer.value;
       if(Number.isNaN(ans)){
         el.feedback.textContent='Zadaj číslo (V).';
-        el.feedback.style.color=varFailColor();
+        el.feedback.style.color='#ef4444';
         return;
       }
       const correct = round2(u_of_t_ms(state.tGiven));
       const given   = round2(ans);
-      const tol     = tolByMode();
-      if(Math.abs(given - correct) <= tol){
+      const tol = tolByMode();
+
+      if(Math.abs(given-correct)<=tol){
         el.feedback.textContent = `Správne! u(t) ≈ ${correct.toFixed(2)} V 🔓`;
         el.feedback.style.color = '#16a34a';
         dropOneLock();
-        successSpark();
         newTask1();
       }else{
         state.mistakes++;
         if(state.mode==='EASY' && state.mistakes===1){
-          el.feedback.textContent = 'Nápoveda: U_m = √2·U, ω=2πf, t v sekundách.';
+          el.feedback.textContent = 'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
           el.feedback.style.color = '#b45309';
         }else if(state.mistakes>=2){
           el.feedback.textContent = 'MUHAHA! Nové zadanie.';
@@ -744,55 +888,40 @@
         failFeedback();
       }
       updateHud();
-    });
+    };
 
-    function varFailColor(){return '#ef4444';}
+    el.modeSelect.onchange = e => { state.mode = e.target.value; };
 
-    el.modeSelect.addEventListener('change',e=>{
-      state.mode = e.target.value;
-    });
-
-    // HINT tlačidlo – zatiaľ len jednoduchý text v easy móde
-    document.getElementById('hintBtn').addEventListener('click',()=>{
-      if(state.mode==='HARD'){
-        el.feedback.textContent = 'V HARD móde bez nápovedy 😉';
-        el.feedback.style.color = '#e5e7eb';
-      }else{
-        el.feedback.textContent = 'Použi u(t)=U_m sin(ωt+φ), U_m=√2·U, t preveď na sekundy.';
-        el.feedback.style.color = '#38bdf8';
-      }
-    });
-
-    // časovač
     const startTs = Date.now();
     setInterval(()=>{
-      const s = Math.floor((Date.now()-startTs)/1000);
-      const m = String(Math.floor(s/60)).padStart(2,'0');
-      const ss= String(s%60).padStart(2,'0');
+      const s=Math.floor((Date.now()-startTs)/1000);
+      const m=String(Math.floor(s/60)).padStart(2,'0');
+      const ss=String(s%60).padStart(2,'0');
       pills.time.textContent = `TIME: ${m}:${ss}`;
     },1000);
 
-    /* ===== Kalkulačka ===== */
+    // --- kalkulačka ---
     const calc = {
       disp: document.getElementById('calcDisplay'),
       modeBtn: document.getElementById('degRad'),
       grid: document.querySelector('.calc-grid'),
       rad: true
     };
-    calc.modeBtn.addEventListener('click',()=>{
+
+    calc.modeBtn.onclick = () => {
       calc.rad = !calc.rad;
       calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
       calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
-    });
+    };
+
     function insertToDisplay(s){ calc.disp.value += s; calc.disp.focus(); }
     function delOne(){ calc.disp.value = calc.disp.value.slice(0,-1); }
     function clearDisp(){ calc.disp.value=''; }
+
     function evalExpr(){
-      let expr = calc.disp.value
-        .replaceAll('^','**')
-        .replaceAll('π',Math.PI.toString())
-        .replaceAll('e',Math.E.toString());
-      const wrapTrig = fn => (calc.rad ? fn : x=>fn(x*Math.PI/180));
+      let expr = calc.disp.value.replaceAll('^','**')
+                                .replaceAll('π',String(Math.PI));
+      const wrapTrig = fn => (calc.rad?fn:(x)=>fn(x*Math.PI/180));
       const scope = {
         sin:x=>wrapTrig(Math.sin)(x),
         cos:x=>wrapTrig(Math.cos)(x),
@@ -801,39 +930,238 @@
       };
       try{
         const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
-        const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-        return Number.isFinite(val) ? val : NaN;
+        const v = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+        return Number.isFinite(v)?v:NaN;
       }catch{ return NaN; }
     }
-    calc.grid.addEventListener('click',e=>{
-      const b = e.target.closest('button'); if(!b) return;
-      const num = b.getAttribute('data-num');
-      const op  = b.getAttribute('data-op');
-      const fn  = b.getAttribute('data-fn');
+
+    calc.grid.addEventListener('click', e=>{
+      const b=e.target.closest('button'); if(!b) return;
+      const num=b.getAttribute('data-num');
+      const op =b.getAttribute('data-op');
+      const fn =b.getAttribute('data-fn');
+
       if(num!==null){ insertToDisplay(num); return; }
       if(op!==null){ insertToDisplay(op); return; }
+
       if(fn==='pi') insertToDisplay('π');
-      else if(fn==='e') insertToDisplay('e');
+      else if(fn==='tenpow') insertToDisplay('*10^');
       else if(fn==='sin'||fn==='cos'||fn==='tan'||fn==='sqrt') insertToDisplay(fn+'(');
-      else if(fn==='del') delOne();
+      else if(fn==='back') delOne();
       else if(fn==='clear') clearDisp();
       else if(fn==='eq'){
-        const v = evalExpr();
-        calc.disp.value = Number.isFinite(v) ? v : 'NaN';
-      }else if(fn==='ans'){
-        const v = evalExpr();
-        if(Number.isFinite(v)){
+        const v=evalExpr();
+        calc.disp.value = Number.isFinite(v)?v:'NaN';
+      }
+      else if(fn==='ans'){
+        const v=evalExpr();
+        if(Number.isFinite(v))
           document.getElementById('answer').value = round2(v).toFixed(2);
-        }
       }
     });
 
-    /* ===== Štart ===== */
-    function boot(){
+    // --- ÚLOHA 2 ---
+    let t2Started = false;
+
+    function t2_init(){
+      if(t2Started) return;
+      t2Started = true;
+
+      // náhodný Uef
+      const UeffArr=[40,60,110,230];
+      const Ueff = UeffArr[Math.floor(Math.random()*UeffArr.length)];
+      const f = 50; // Hz
+
+      // pripojenia sond
+      const connections = {
+        scopeA:null, scopeB:null,
+        dmmV:null, dmmCOM:null, dmmA:null
+      };
+
+      let scopeReady=false;
+      let dmmVoltReady=false;
+      let dmmAmpReady=false;
+
+      function recomputeConnections(){
+        const isTerm = (probe,term)=>connections[probe]===term;
+
+        const sA_A = isTerm('scopeA','A') || isTerm('scopeB','A');
+        const sA_B = isTerm('scopeA','B') || isTerm('scopeB','B');
+        scopeReady = sA_A && sA_B;
+
+        const vOn = isTerm('dmmV','A') || isTerm('dmmV','B');
+        const comOn = isTerm('dmmCOM','A') || isTerm('dmmCOM','B');
+        const aOn = isTerm('dmmA','A') || isTerm('dmmA','B');
+
+        dmmVoltReady = vOn && comOn;
+        dmmAmpReady  = aOn && comOn;
+
+        refreshInstruments();
+      }
+
+      // drag sond -> svorky
+      const probes=[...document.querySelectorAll('#t2 .jack')];
+      probes.forEach(p=>{
+        p.addEventListener('dragstart',e=>{
+          e.dataTransfer.setData('text/probe',p.dataset.probe);
+        });
+      });
+
+      const terms=[...document.querySelectorAll('#t2 .terminal')];
+      terms.forEach(t=>{
+        t.addEventListener('dragover',e=>e.preventDefault());
+        t.addEventListener('drop',e=>{
+          e.preventDefault();
+          const pid=e.dataTransfer.getData('text/probe');
+          if(!pid) return;
+          connections[pid]=t.dataset.terminal;
+          recomputeConnections();
+        });
+      });
+
+      // reset pripojení
+      document.getElementById('t2-reset').onclick = () => {
+        connections.scopeA=null; connections.scopeB=null;
+        connections.dmmV=null; connections.dmmCOM=null; connections.dmmA=null;
+
+        document.getElementById('dz-scope').innerHTML='';
+        document.getElementById('dz-dmm').innerHTML='';
+        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
+        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
+
+        recomputeConnections();
+      };
+
+      // multimeter režimy
+      let dmmMode='ACV';
+      const modeAngles={ACV:-20, DCV:20, ACA:90, DCA:130, OHM:-90};
+      const sel = document.getElementById('sel');
+
+      document.querySelectorAll('.sel-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          dmmMode = btn.dataset.mode;
+          sel.style.setProperty('--angle', modeAngles[dmmMode]+'deg');
+          document.querySelectorAll('.sel-btn').forEach(b=>b.classList.toggle('active',b===btn));
+          refreshInstruments();
+        });
+      });
+      // default
+      document.querySelector('.sel-btn[data-mode="ACV"]').click();
+
+      // osciloskop 2
+      const cvs=document.getElementById('t2-wave');
+      const ctx=cvs.getContext('2d');
+      function resizeScope2(){
+        const r=cvs.getBoundingClientRect();
+        const DPR2=window.devicePixelRatio||1;
+        cvs.width = Math.floor(r.width*DPR2);
+        cvs.height= Math.floor(r.height*DPR2);
+        ctx.setTransform(DPR2,0,0,DPR2,0,0);
+      }
+      resizeScope2();
+      window.addEventListener('resize',resizeScope2);
+
+      function drawScope2(time){
+        const w=cvs.clientWidth;
+        const h=cvs.clientHeight;
+        ctx.clearRect(0,0,w,h);
+
+        const PAD=16;
+        const xmin=PAD,xmax=w-PAD;
+        const ymin=PAD,ymax=h-PAD;
+        const midY=(ymin+ymax)/2;
+        const midX=(xmin+xmax)/2;
+
+        // osi
+        ctx.strokeStyle='rgba(255,255,255,.85)';
+        ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
+
+        const scopeLabel=document.getElementById('t2-scope-rdg');
+
+        if(scopeReady){
+          const A=(ymax-ymin)*0.35;
+          const steps=Math.max(240,Math.floor(xmax-xmin));
+          const tau=Math.PI*2;
+          const t0=time/1000;
+
+          ctx.strokeStyle='#22c55e';
+          ctx.lineWidth=2.2;
+          ctx.beginPath();
+          for(let i=0;i<=steps;i++){
+            const x=xmin+(i/steps)*(xmax-xmin);
+            const t=(i/steps)*2*(1/f);
+            const y=midY-A*Math.sin(tau*f*t+t0*2.0);
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          }
+          ctx.stroke();
+          scopeLabel.textContent='živá vlna…';
+        }else{
+          scopeLabel.textContent='nepripojené';
+        }
+
+        requestAnimationFrame(drawScope2);
+      }
+      requestAnimationFrame(drawScope2);
+
+      // kartičky u(t) / U
+      const tray=document.getElementById('t2-tray');
+      tray.addEventListener('dragstart',e=>{
+        const t=e.target.closest('.token'); if(!t) return;
+        e.dataTransfer.setData('text/token',t.dataset.token);
+        e.dataTransfer.setData('text/html',t.outerHTML);
+      });
+
+      function setupDropzone(id, accept){
+        const dz=document.getElementById(id);
+        dz.addEventListener('dragover',e=>e.preventDefault());
+        dz.addEventListener('drop',e=>{
+          e.preventDefault();
+          const tok=e.dataTransfer.getData('text/token');
+          if(!tok) return;
+          dz.innerHTML = e.dataTransfer.getData('text/html');
+          const ok = (tok===accept);
+          dz.classList.toggle('dz-ok',ok);
+          dz.classList.toggle('dz-bad',!ok);
+
+          const okScope = document.getElementById('dz-scope').classList.contains('dz-ok');
+          const okDmm   = document.getElementById('dz-dmm').classList.contains('dz-ok');
+          if(okScope && okDmm){
+            setTimeout(()=>alert('Správne! Osciloskop → u(t); Multimeter → Uef.'),150);
+          }
+        });
+      }
+      setupDropzone('dz-scope','u(t)');
+      setupDropzone('dz-dmm','U');
+
+      // multimeter a žiarovka
+      function refreshInstruments(){
+        const lamp=document.getElementById('t2-lamp');
+        const dmmLbl=document.getElementById('t2-dmm-rdg');
+
+        const somethingConnected = scopeReady || dmmVoltReady || dmmAmpReady;
+        lamp.classList.toggle('off',!somethingConnected);
+
+        let txt='--.-', unit='V';
+        if(dmmMode==='ACV'){ unit='V'; txt = dmmVoltReady ? Ueff.toFixed(1) : '--.-'; }
+        else if(dmmMode==='DCV'){ unit='V'; txt = dmmVoltReady ? '0.0' : '--.-'; }
+        else if(dmmMode==='OHM'){ unit='Ω'; txt = dmmVoltReady ? '∞' : '--'; }
+        else if(dmmMode==='ACA'){ unit='A'; txt = dmmAmpReady ? '??' : '--'; }
+        else if(dmmMode==='DCA'){ unit='A'; txt = dmmAmpReady ? '0.00' : '--'; }
+
+        dmmLbl.textContent = `${txt} ${unit}`;
+      }
+
+      // inicializácia stavu
+      recomputeConnections();
+    }
+
+    // štart – úloha 1
+    (function boot(){
       resizeOsc();
       newTask1();
-    }
-    boot();
+    })();
   </script>
 </body>
 </html>
