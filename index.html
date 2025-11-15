@@ -782,39 +782,73 @@
       if(locks.length) locks[0].remove();
     }
 
-    el.check.onclick=()=>{
-      const ans=+el.answer.value;
-      if(Number.isNaN(ans)){
-        el.feedback.textContent='Zadaj číslo (V).';
-        el.feedback.style.color='#ef4444';
-        return;
-      }
-      const correct=round2(u_of_t_ms(state.tGiven));
-      const given=round2(ans);
-      const tol=tolByMode();
-      if(Math.abs(given-correct)<=tol){
-        el.feedback.textContent=`Správne! u(t) ≈ ${correct.toFixed(2)} V 🔓`;
-        el.feedback.style.color='#16a34a';
-        dropOneLock();
-        newTask1();
-      }else{
-        state.mistakes++;
-        if(state.mode==='EASY' && state.mistakes===1){
-          el.feedback.textContent='Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
-          el.feedback.style.color='#b45309';
-        }else if(state.mistakes>=2){
-          el.feedback.textContent='MUHAHA! Nové zadanie.';
-          el.feedback.style.color='#ef4444';
-          showMuhaha();
-          newTask1();
-        }else{
-          el.feedback.textContent='Skús ešte raz.';
-          el.feedback.style.color='#ef4444';
-        }
-        failFeedback();
-      }
-      updateHud();
-    };
+    el.check.onclick = () => {
+  // 1. načítaj odpoveď – podpor aj čiarku
+  const raw = el.answer.value.trim().replace(',', '.');
+  const ans = parseFloat(raw);
+
+  if (!Number.isFinite(ans)) {
+    el.feedback.textContent = 'Zadaj číslo (V).';
+    el.feedback.style.color = '#ef4444';
+    return;
+  }
+
+  // 2. správna hodnota – rátame pre:
+  //    a) čas z textu zadania (tGiven)
+  //    b) aktuálnu polohu slidera (pre prípad, že študent počítal podľa neho)
+  const correctGiven  = u_of_t_ms(state.tGiven);
+  const currentTms    = +el.tSlider.value;
+  const correctSlider = u_of_t_ms(currentTms);
+
+  // vyber bližšiu z dvoch „správnych“
+  const diffGiven  = Math.abs(ans - correctGiven);
+  const diffSlider = Math.abs(ans - correctSlider);
+  const diff = Math.min(diffGiven, diffSlider);
+  const correct = (diffGiven <= diffSlider) ? correctGiven : correctSlider;
+
+  // 3. tolerancia – základ podľa režimu + malá relatívna
+  const baseTol = tolByMode();          // 0.5 V v EASY
+  const relTol  = Math.abs(correct) * 0.01; // 1 % z hodnoty
+  const tol = Math.max(baseTol, relTol);
+
+  if (diff <= tol) {
+    // ÚSPECH
+    el.feedback.textContent = `Správne! u(t) ≈ ${round2(correct).toFixed(2)} V 🔓`;
+    el.feedback.style.color = '#16a34a';
+    dropOneLock();
+
+    // reset nápovedy v HUD
+    document.getElementById('hintBtn').textContent = 'HINT';
+
+    newTask1();
+  } else {
+    // NEÚSPECH
+    state.mistakes++;
+
+    if (state.mode === 'EASY' && state.mistakes === 1) {
+      // namiesto červenej v answerBox – nápoveda v spodnom HUD (tvoj šedý pás)
+      document.getElementById('hintBtn').textContent =
+        'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
+      el.feedback.textContent = 'Skús ešte raz. Pozri nápovedu dole.';
+      el.feedback.style.color = '#b45309';
+    } else if (state.mistakes >= 2) {
+      el.feedback.textContent = 'MUHAHA! Nové zadanie.';
+      el.feedback.style.color = '#ef4444';
+      showMuhaha();
+      // reset nápovedy v HUD
+      document.getElementById('hintBtn').textContent = 'HINT';
+      newTask1();
+    } else {
+      el.feedback.textContent = 'Skús ešte raz.';
+      el.feedback.style.color = '#ef4444';
+    }
+
+    failFeedback();
+  }
+
+  updateHud();
+};
+
 
     el.modeSelect.onchange=e=>{state.mode=e.target.value;};
     const startTs=Date.now();
