@@ -141,37 +141,52 @@
     #playBtn.paused{opacity:.7}
     .osc-ui input[type="range"]{width:220px;margin:0 8px}
 
-    /* KALKULAČKA – layout ako z obrázka */
-    .calc{
-      position:absolute;top:18px;left:18px;right:18px;bottom:82px;
-      background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.1);
-      border-radius:12px;padding:12px;
-      display:flex;flex-direction:column;gap:12px;
-      box-shadow:0 3px 10px rgba(0,0,0,.08);color:#111827;
-    }
-    #calcDisplay{
-      width:100%;padding:8px 10px;border:2px solid #cbd5e1;
-      border-radius:8px;font-size:32px;
-    }
-    .calc-grid{
-      flex:1;
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      grid-template-rows:repeat(6,1fr);
-      gap:6px;
-    }
-    .calc-grid button{
-      width:100%;height:100%;
-      border:2px solid #d4d4d8;border-radius:10px;
-      background:#f4f4f5;cursor:pointer;
-      font-weight:700;font-size:16px;
-    }
-    .calc-grid button.ghost{background:#e5e7eb}
-    .calc-grid button.emph{
-      background:#111827;color:#f9fafb;border-color:#111827;
-    }
-    .calc-grid button.wide{grid-column:span 2}
-
+    /* KALKULAČKA */
+    /* KALKULAČKA */
+.calc{
+  position:absolute;
+  top:18px;left:18px;right:18px;bottom:82px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(0,0,0,.1);
+  border-radius:12px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  color:#111827;
+}
+#calcDisplay{
+  width:100%;
+  padding:8px 10px;
+  border:2px solid #cbd5e1;
+  border-radius:8px;
+  font-size:32px;
+}
+.calc-grid{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(6,1fr);
+  gap:6px;
+}
+.calc-grid button{
+  width:100%;
+  height:100%;
+  border:2px solid #d4d4d8;
+  border-radius:10px;
+  background:#f4f4f5;
+  cursor:pointer;
+  font-weight:700;
+  font-size:16px;
+}
+.calc-grid button.ghost{background:#e5e7eb}
+.calc-grid button.emph{
+  background:#111827;
+  color:#f9fafb;
+  border-color:#111827;
+}
+.calc-grid button.wide{grid-column:span 2}
     /* odpoveď – pod kalkulačkou, ALE stále vpravo */
     .answerBox{
       position:absolute;
@@ -406,62 +421,68 @@
 
           <!-- pravo: kalkulačka + ODPOVEĎ POD ŇOU -->
           <div class="zone right">
-            <div class="calc">
-              <input id="calcDisplay" type="text" inputmode="decimal"
-                     autocomplete="off" spellcheck="false" />
+            <div class="zone right">
+  <div class="calc">
+    <!-- displej cez celú šírku -->
+    <input id="calcDisplay" type="text" inputmode="decimal"
+           autocomplete="off" spellcheck="false" />
 
-              <div class="calc-grid">
-                <!-- R1 -->
-                <button data-fn="tenpow">10ˣ</button>
-                <button data-fn="pi">π</button>
-                <button data-fn="clear">C</button>
-                <button data-fn="back">⌫</button>
-                <button id="degRad" data-fn="mode">RAD</button>
+    <!-- klávesnica podľa tvojho obrázka -->
+    <div class="calc-grid">
+      <!-- riadok 1 -->
+      <button data-fn="tenpow">10ˣ</button>
+      <button data-fn="pi">π</button>
+      <button data-fn="clear">C</button>
+      <button data-fn="back">⌫</button>
+      <button id="degRad" data-fn="mode">RAD</button>
 
-                <!-- R2 -->
-                <button data-op="(">(</button>
-                <button data-op=")">)</button>
-                <button data-fn="sqrt">√</button>
-                <button data-fn="sin">sin</button>
-                <button data-op="/">÷</button>
+      <!-- riadok 2 -->
+      <button data-op="(">(</button>
+      <button data-op=")">)</button>
+      <button data-fn="sqrt">√</button>
+      <button data-fn="sin">sin</button>
+      <button data-op="/">÷</button>
 
-                <!-- R3 -->
-                <button data-num="7">7</button>
-                <button data-num="8">8</button>
-                <button data-num="9">9</button>
-                <button data-fn="cos">cos</button>
-                <button data-op="*">×</button>
+      <!-- riadok 3 -->
+      <button data-num="7">7</button>
+      <button data-num="8">8</button>
+      <button data-num="9">9</button>
+      <button data-fn="cos">cos</button>
+      <button data-op="*">×</button>
 
-                <!-- R4 -->
-                <button data-num="4">4</button>
-                <button data-num="5">5</button>
-                <button data-num="6">6</button>
-                <button data-fn="tan">tan</button>
-                <button data-op="-">-</button>
+      <!-- riadok 4 -->
+      <button data-num="4">4</button>
+      <button data-num="5">5</button>
+      <button data-num="6">6</button>
+      <button data-fn="tan">tan</button>
+      <button data-op="-">-</button>
 
-                <!-- R5 -->
-                <button data-num="1">1</button>
-                <button data-num="2">2</button>
-                <button data-num="3">3</button>
-                <button data-fn="pm">+/−</button>
-                <button data-op="+">+</button>
+      <!-- riadok 5 -->
+      <button data-num="1">1</button>
+      <button data-num="2">2</button>
+      <button data-num="3">3</button>
+      <button data-fn="pm">+/−</button>
+      <button data-op="+">+</button>
 
-                <!-- R6 -->
-                <button data-num="0" class="wide">0</button>
-                <button data-op=",">,</button>
-                <button data-fn="ans" class="ghost">→ Odpoveď</button>
-                <button data-fn="eq" class="emph">=</button>
-              </div>
-            </div>
+      <!-- riadok 6 -->
+      <button data-num="0" class="wide">0</button>
+      <button data-op=",">,</button>
+      <button data-fn="ans" class="ghost">→ Odpoveď</button>
+      <button data-fn="eq" class="emph">=</button>
+    </div>
+  </div>
 
-            <div class="answerBox">
-              <label>Odpoveď: <var>u</var>(<var>t</var>) =
-                <input id="answer" type="number" step="0.01" placeholder="V">
-                <span>V</span>
-              </label>
-              <button id="checkBtn">Skontrolovať</button>
-              <div id="feedback" class="feedback"></div>
-            </div>
+  <!-- Odpoveď – len raz, pod kalkulačkou -->
+  <div class="answerBox">
+    <label>Odpoveď: <var>u</var>(<var>t</var>) =
+      <input id="answer" type="number" step="0.01" placeholder="V" />
+      <span>V</span>
+    </label>
+    <button id="checkBtn">Skontrolovať</button>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</div>
+
           </div>
         </div>
         <div id="spark" class="spark" aria-hidden="true"></div>
@@ -542,7 +563,7 @@
       <div class="group">
         <span class="pill" id="timePill">TIME: 00:00</span>
         <span class="pill">
-          MODE:
+                  MODE:
           <select id="modeSelect" style="margin-left:6px">
             <option value="EASY" selected>EASY</option>
             <option value="MEDIUM">MEDIUM</option>
@@ -551,6 +572,7 @@
         </span>
         <span class="pill" id="mistakesPill">MISTAKES: 0/2</span>
         <span class="pill" id="locksPill">LOCKS LEFT: 10</span>
+        <span class="pill" id="hintText"></span>
       </div>
       <div class="group">
         <button class="pill" id="hintBtn">HINT</button>
@@ -805,72 +827,123 @@
     },1000);
 
     /* KALKULAČKA */
-    const calc={
-      disp:document.getElementById('calcDisplay'),
-      modeBtn:document.getElementById('degRad'),
-      grid:document.querySelector('.calc-grid'),
-      rad:true
-    };
-    calc.modeBtn.onclick=()=>{
-      calc.rad=!calc.rad;
-      calc.modeBtn.textContent=calc.rad?'RAD':'DEG';
-      calc.modeBtn.title=calc.rad?'Radiány':'Stupne';
-    };
-    function insertToDisplay(s){
-      calc.disp.value+=s;
-      calc.disp.focus();
+    const calc = {
+  disp: document.getElementById('calcDisplay'),
+  modeBtn: document.getElementById('degRad'),
+  grid: document.querySelector('.calc-grid'),
+  rad: true
+};
+
+// prepínač RAD/DEG
+calc.modeBtn.onclick = () => {
+  calc.rad = !calc.rad;
+  calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
+  calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
+};
+
+// pomocné funkcie
+function insertToDisplay(s){
+  calc.disp.value += s;
+  calc.disp.focus();
+}
+function delOne(){
+  calc.disp.value = calc.disp.value.slice(0,-1);
+}
+function clearDisp(){
+  calc.disp.value = '';
+}
+
+// vyhodnotenie výrazu
+function evalExpr(){
+  let expr = calc.disp.value
+    .replace(/,/g,'.')          // slovenská čiarka -> bodka
+    .replace(/\^/g,'**')        // mocnina
+    .replace(/π/g,Math.PI.toString());
+
+  const wrapTrig = fn => (calc.rad ? fn : x => fn(x*Math.PI/180));
+
+  const scope = {
+    sin:x=>wrapTrig(Math.sin)(x),
+    cos:x=>wrapTrig(Math.cos)(x),
+    tan:x=>wrapTrig(Math.tan)(x),
+    sqrt:Math.sqrt
+  };
+
+  try{
+    const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
+    const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+    return Number.isFinite(val) ? val : NaN;
+  }catch(e){
+    return NaN;
+  }
+}
+
+// obsluha kláves
+calc.grid.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  const num = b.getAttribute('data-num');
+  const op  = b.getAttribute('data-op');
+  const fn  = b.getAttribute('data-fn');
+
+  // čísla
+  if(num !== null){
+    insertToDisplay(num);
+    return;
+  }
+
+  // operátory
+  if(op !== null){
+    if(op === ',') insertToDisplay(',');
+    else insertToDisplay(op);
+    return;
+  }
+
+  if(!fn) return;
+
+  // špeciálne funkcie
+  if(fn === 'pi'){
+    insertToDisplay('π');
+  }
+  else if(fn === 'tenpow'){
+    // 10ˣ – automaticky *10^(...) ak je predtým číslo alebo )
+    const s = calc.disp.value;
+    const needsMul = /[0-9)\]]$/.test(s);
+    insertToDisplay((needsMul ? '*10^(' : '10^('));
+  }
+  else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt'){
+    insertToDisplay(fn + '(');
+  }
+  else if(fn === 'back'){
+    delOne();
+  }
+  else if(fn === 'clear'){
+    clearDisp();
+  }
+  else if(fn === 'mode'){
+    calc.modeBtn.onclick(); // RAD/DEG aj z klávesu
+  }
+  else if(fn === 'pm'){
+    // +/− : ak je v poli čisté číslo, zmení znamienko, inak len vloží '-'
+    const v = calc.disp.value.trim();
+    if(v === ''){
+      insertToDisplay('-');
+    }else if(!Number.isNaN(Number(v))){
+      calc.disp.value = String(-Number(v));
+    }else{
+      insertToDisplay('-');
     }
-    function delOne(){calc.disp.value=calc.disp.value.slice(0,-1);}
-    function clearDisp(){calc.disp.value='';}
-    function evalExpr(){
-      let expr=calc.disp.value
-        .replaceAll(',','.')
-        .replaceAll('^','**')
-        .replaceAll('π',Math.PI.toString());
-      const wrapTrig=fn=>(calc.rad?fn:(x)=>fn(x*Math.PI/180));
-      const scope={
-        sin:x=>wrapTrig(Math.sin)(x),
-        cos:x=>wrapTrig(Math.cos)(x),
-        tan:x=>wrapTrig(Math.tan)(x),
-        sqrt:Math.sqrt
-      };
-      try{
-        const f=new Function('sin','cos','tan','sqrt',`return (${expr})`);
-        const val=f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-        return Number.isFinite(val)?val:NaN;
-      }catch{return NaN;}
+  }
+  else if(fn === 'eq'){
+    const v = evalExpr();
+    calc.disp.value = Number.isFinite(v) ? v : 'NaN';
+  }
+  else if(fn === 'ans'){
+    const v = evalExpr();
+    if(Number.isFinite(v)){
+      document.getElementById('answer').value = round2(v).toFixed(2);
     }
-    calc.grid.addEventListener('click',e=>{
-      const b=e.target.closest('button');if(!b) return;
-      const num=b.getAttribute('data-num');
-      const op =b.getAttribute('data-op');
-      const fn =b.getAttribute('data-fn');
-      if(num!==null){insertToDisplay(num);return;}
-      if(op!==null){
-        if(op===',') insertToDisplay(',');
-        else insertToDisplay(op);
-        return;
-      }
-      if(!fn) return;
-      if(fn==='pi') insertToDisplay('π');
-      else if(fn==='tenpow') insertToDisplay('10^');
-      else if(fn==='sin'||fn==='cos'||fn==='tan'||fn==='sqrt') insertToDisplay(fn+'(');
-      else if(fn==='back') delOne();
-      else if(fn==='clear') clearDisp();
-      else if(fn==='mode') calc.modeBtn.onclick();
-      else if(fn==='pm'){
-        const v=calc.disp.value.trim();
-        if(v===''){insertToDisplay('-');}
-        else if(!Number.isNaN(Number(v))){calc.disp.value=String(-Number(v));}
-        else insertToDisplay('-');
-      }else if(fn==='eq'){
-        const v=evalExpr();
-        calc.disp.value=Number.isFinite(v)?v:'NaN';
-      }else if(fn==='ans'){
-        const v=evalExpr();
-        if(Number.isFinite(v)) el.answer.value=round2(v).toFixed(2);
-      }
-    });
+  }
+});
 
     /* ÚLOHA 2 – inicializácia (nechávam logiku ako predtým, len skrátená verzia) */
     let t2Ready=false;
