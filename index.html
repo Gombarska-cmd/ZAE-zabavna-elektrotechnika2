@@ -80,7 +80,7 @@
       box-shadow:inset 0 0 6px rgba(0,0,0,.7)
     }
 
-    /* prepínač úloh (zatím len 1 a 2) */
+    /* prepínač úloh */
     .task-switch{
       display:flex;gap:8px;margin-bottom:10px;
     }
@@ -142,52 +142,52 @@
     .osc-ui input[type="range"]{width:220px;margin:0 8px}
 
     /* KALKULAČKA */
-    /* KALKULAČKA */
-.calc{
-  position:absolute;
-  top:18px;left:18px;right:18px;bottom:82px;
-  background:rgba(255,255,255,.78);
-  border:1px solid rgba(0,0,0,.1);
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
-  color:#111827;
-}
-#calcDisplay{
-  width:100%;
-  padding:8px 10px;
-  border:2px solid #cbd5e1;
-  border-radius:8px;
-  font-size:32px;
-}
-.calc-grid{
-  flex:1;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  grid-template-rows:repeat(6,1fr);
-  gap:6px;
-}
-.calc-grid button{
-  width:100%;
-  height:100%;
-  border:2px solid #d4d4d8;
-  border-radius:10px;
-  background:#f4f4f5;
-  cursor:pointer;
-  font-weight:700;
-  font-size:16px;
-}
-.calc-grid button.ghost{background:#e5e7eb}
-.calc-grid button.emph{
-  background:#111827;
-  color:#f9fafb;
-  border-color:#111827;
-}
-.calc-grid button.wide{grid-column:span 2}
-    /* odpoveď – pod kalkulačkou, ALE stále vpravo */
+    .calc{
+      position:absolute;
+      top:18px;left:18px;right:18px;bottom:82px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(0,0,0,.1);
+      border-radius:12px;
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,.08);
+      color:#111827;
+    }
+    #calcDisplay{
+      width:100%;
+      padding:8px 10px;
+      border:2px solid #cbd5e1;
+      border-radius:8px;
+      font-size:32px;
+    }
+    .calc-grid{
+      flex:1;
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      grid-template-rows:repeat(6,1fr);
+      gap:6px;
+    }
+    .calc-grid button{
+      width:100%;
+      height:100%;
+      border:2px solid #d4d4d8;
+      border-radius:10px;
+      background:#f4f4f5;
+      cursor:pointer;
+      font-weight:700;
+      font-size:16px;
+    }
+    .calc-grid button.ghost{background:#e5e7eb}
+    .calc-grid button.emph{
+      background:#111827;
+      color:#f9fafb;
+      border-color:#111827;
+    }
+    .calc-grid button.wide{grid-column:span 2}
+
+    /* odpoveď */
     .answerBox{
       position:absolute;
       left:18px;right:18px;bottom:18px;
@@ -223,8 +223,7 @@
       background:#020817;color:#f9fafb;border:1px solid #374151;
       border-radius:8px;padding:3px 6px;
     }
-    /* dočasne skryjem HINT, nech ťa to neštve */
-    #hintBtn{display:none;}
+    #hintBtn{display:none;} /* tlačidlo je skryté, používame len hintText */
 
     /* TYPO + EFEKTY */
     .math var{font-style:italic}
@@ -255,7 +254,7 @@
       animation:spark .6s ease-out forwards;
     }
 
-    /* ÚLOHA 2 – ponechávam tak, ako si mala (bez zmien rozloženia) */
+    /* ÚLOHA 2 – nový layout */
     .t2-wrap{
       display:grid;grid-template-columns:50% 50%;gap:16px;
       background:rgba(255,255,255,.06);
@@ -267,6 +266,7 @@
       border-radius:12px;padding:12px;color:#e5e7eb;
     }
     .t2-h{font-weight:800;margin:0 0 8px 0}
+
     .scope2,.dmm{
       position:relative;border-radius:12px;padding:12px;
       background:#0d0f11;border:1px solid #2a3039;
@@ -333,27 +333,40 @@
                  #ffd24d 46% 58%,#f0b02a 59% 65%,#cc9000 66% 100%);
     }
     .lamp.off{filter:grayscale(1) brightness(.75)}
+
     .terminal{
-      position:absolute;width:18px;height:18px;border-radius:50%;
+      position:absolute;width:24px;height:24px;border-radius:50%;
       background:#222;border:2px solid #ddd;cursor:pointer;
+      z-index:4;
     }
-    .tA{left:calc(50% - 60px);top:20px}
-    .tB{left:calc(50% + 42px);top:20px}
+    .tA{left:calc(50% - 70px);top:24px}
+    .tB{left:calc(50% + 46px);top:24px}
+
+    .termLabel{
+      position:absolute;font-weight:700;font-size:13px;color:#111827;
+      top:8px;
+    }
+    .labA{left:calc(50% - 70px);}
+    .labB{left:calc(50% + 50px);}
+
     .source{
       position:absolute;left:50%;transform:translateX(-50%);
-      bottom:10px;width:220px;height:46px;border-radius:10px;
-      background:#e8eef6;border:2px solid #93a3b8;
+      bottom:10px;width:260px;height:60px;border-radius:10px;
+      background:linear-gradient(90deg,#e8eef6 0 60%,#cbd5e1 60% 100%);
+      border:2px solid #93a3b8;
       display:flex;align-items:center;justify-content:space-around;
     }
     .src-post{width:18px;height:18px;border-radius:50%;border:2px solid #111}
     .src-post.pos{background:#ffdddd;border-color:#b91c1c}
     .src-post.neg{background:#dde9ff;border-color:#1d4ed8}
+
     .t2-btn{
       position:absolute;right:12px;bottom:10px;
       padding:6px 10px;border-radius:8px;
       border:1px solid #374151;background:#111827;
       color:#f8fafc;cursor:pointer;
     }
+
     .dropzone{
       margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;
       min-height:38px;padding:6px;border-radius:8px;
@@ -366,8 +379,9 @@
       padding:6px 10px;border-radius:999px;
       background:#fff;color:#111;border:1px solid #cbd5e1;
       font-weight:700;cursor:grab;
+      margin:2px;
     }
-    .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
   </style>
 </head>
 <body>
@@ -419,80 +433,79 @@
             </div>
           </div>
 
-          <!-- pravo: kalkulačka + ODPOVEĎ POD ŇOU -->
+          <!-- pravo: kalkulačka + odpoveď -->
           <div class="zone right">
-  <div class="calc">
-    <!-- displej cez celú šírku -->
-    <input id="calcDisplay" type="text" inputmode="decimal"
-           autocomplete="off" spellcheck="false" />
+            <div class="calc">
+              <input id="calcDisplay" type="text" inputmode="decimal"
+                     autocomplete="off" spellcheck="false" />
 
-    <!-- klávesnica podľa tvojho obrázka -->
-    <div class="calc-grid">
-      <!-- riadok 1 -->
-      <button data-fn="tenpow">10ˣ</button>
-      <button data-fn="pi">π</button>
-      <button data-fn="clear">C</button>
-      <button data-fn="back">⌫</button>
-      <button id="degRad" data-fn="mode">RAD</button>
+              <div class="calc-grid">
+                <!-- riadok 1 -->
+                <button data-fn="tenpow">10ˣ</button>
+                <button data-fn="pi">π</button>
+                <button data-fn="clear">C</button>
+                <button data-fn="back">⌫</button>
+                <button id="degRad" data-fn="mode">RAD</button>
 
-      <!-- riadok 2 -->
-      <button data-op="(">(</button>
-      <button data-op=")">)</button>
-      <button data-fn="sqrt">√</button>
-      <button data-fn="sin">sin</button>
-      <button data-op="/">÷</button>
+                <!-- riadok 2 -->
+                <button data-op="(">(</button>
+                <button data-op=")">)</button>
+                <button data-fn="sqrt">√</button>
+                <button data-fn="sin">sin</button>
+                <button data-op="/">÷</button>
 
-      <!-- riadok 3 -->
-      <button data-num="7">7</button>
-      <button data-num="8">8</button>
-      <button data-num="9">9</button>
-      <button data-fn="cos">cos</button>
-      <button data-op="*">×</button>
+                <!-- riadok 3 -->
+                <button data-num="7">7</button>
+                <button data-num="8">8</button>
+                <button data-num="9">9</button>
+                <button data-fn="cos">cos</button>
+                <button data-op="*">×</button>
 
-      <!-- riadok 4 -->
-      <button data-num="4">4</button>
-      <button data-num="5">5</button>
-      <button data-num="6">6</button>
-      <button data-fn="tan">tan</button>
-      <button data-op="-">-</button>
+                <!-- riadok 4 -->
+                <button data-num="4">4</button>
+                <button data-num="5">5</button>
+                <button data-num="6">6</button>
+                <button data-fn="tan">tan</button>
+                <button data-op="-">-</button>
 
-      <!-- riadok 5 -->
-      <button data-num="1">1</button>
-      <button data-num="2">2</button>
-      <button data-num="3">3</button>
-      <button data-fn="pm">+/−</button>
-      <button data-op="+">+</button>
+                <!-- riadok 5 -->
+                <button data-num="1">1</button>
+                <button data-num="2">2</button>
+                <button data-num="3">3</button>
+                <button data-fn="pm">+/−</button>
+                <button data-op="+">+</button>
 
-      <!-- riadok 6 -->
-      <button data-num="0" class="wide">0</button>
-      <button data-op=",">,</button>
-      <button data-fn="ans" class="ghost">→ Odpoveď</button>
-      <button data-fn="eq" class="emph">=</button>
-    </div>
-  </div>
+                <!-- riadok 6 -->
+                <button data-num="0" class="wide">0</button>
+                <button data-op=",">,</button>
+                <button data-fn="ans" class="ghost">→ Odpoveď</button>
+                <button data-fn="eq" class="emph">=</button>
+              </div>
+            </div>
 
-  <!-- Odpoveď – len raz, pod kalkulačkou -->
-  <div class="answerBox">
-    <label>Odpoveď: <var>u</var>(<var>t</var>) =
-      <input id="answer" type="number" step="0.01" placeholder="V" />
-      <span>V</span>
-    </label>
-    <button id="checkBtn">Skontrolovať</button>
-    <div id="feedback" class="feedback"></div>
-  </div>
-</div>
-
+            <div class="answerBox">
+              <label>Odpoveď: <var>u</var>(<var>t</var>) =
+                <input id="answer" type="number" step="0.01" placeholder="V" />
+                <span>V</span>
+              </label>
+              <button id="checkBtn">Skontrolovať</button>
+              <div id="feedback" class="feedback"></div>
+            </div>
           </div>
         </div>
         <div id="spark" class="spark" aria-hidden="true"></div>
       </section>
     </section>
 
-    <!-- ÚLOHA 2 – nechávam ako je (tvoj drag-and-drop obvod) -->
+    <!-- ÚLOHA 2 – MERANIE U(t), Um, U -->
     <section id="task2" class="task-screen">
       <div class="t2-wrap" id="t2">
+
+        <!-- ĽAVO: MERACIE PRÍSTROJE -->
         <div class="t2-card">
           <h3 class="t2-h">Meracie prístroje</h3>
+
+          <!-- osciloskop -->
           <div class="scope2">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong>Osciloskop</strong><span class="hint">pripoj obidve sondy</span>
@@ -506,6 +519,7 @@
             <div class="dropzone" id="dz-scope"></div>
           </div>
 
+          <!-- multimeter -->
           <div class="dmm" style="margin-top:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong>Multimeter</strong><span class="hint">pripoj šnúry a zvoľ rozsah</span>
@@ -530,30 +544,50 @@
             </div>
             <div class="dropzone" id="dz-dmm"></div>
           </div>
-
-          <div class="tray" id="t2-tray">
-            <div class="token" draggable="true" data-token="u(t)">u(t)</div>
-            <div class="token" draggable="true" data-token="U">U</div>
-          </div>
         </div>
 
+        <!-- PRAVO: KARTIČKY + OBVOD -->
         <div class="t2-card">
-          <h3 class="t2-h">Obvod: zdroj – žiarovka</h3>
+          <h3 class="t2-h">Priraď, čo zobrazuje ktorý prístroj</h3>
+
+          <!-- pole s kartičkami NAD obvodom -->
+          <div class="tray" id="t2-tray">
+            <div class="token" draggable="true" data-token="u(t)">u(t)</div>
+            <div class="token" draggable="true" data-token="Um">U<sub>m</sub></div>
+            <div class="token" draggable="true" data-token="U">U</div>
+          </div>
+          <p class="hint" style="margin-top:4px;margin-bottom:8px">
+            Potiahni kartičky na <b>Osciloskop</b> alebo <b>Multimeter</b>.
+            Osciloskop zobrazuje časový priebeh, multimeter efektívnu hodnotu.
+          </p>
+
+          <h3 class="t2-h" style="margin-top:4px">Obvod: zdroj – žiarovka</h3>
           <div class="circuit">
             <div class="lamp off" id="t2-lamp"></div>
-            <div class="terminal tA" data-terminal="A"></div>
-            <div class="terminal tB" data-terminal="B"></div>
+
+            <!-- svorky + ich popis -->
+            <div class="terminal tA" data-terminal="A" title="svorka A"></div>
+            <div class="terminal tB" data-terminal="B" title="svorka B"></div>
+            <div class="termLabel labA">A</div>
+            <div class="termLabel labB">B</div>
+
             <div class="source">
-              <div class="src-post pos"></div>
-              <div style="font-weight:700;color:#334155">AC SOURCE</div>
-              <div class="src-post neg"></div>
+              <div class="src-post pos" title="+ zdroj"></div>
+              <div style="font-weight:700;color:#334155">LAB AC SOURCE</div>
+              <div class="src-post neg" title="− zdroj"></div>
             </div>
             <button class="t2-btn" id="t2-reset">Reset pripojení</button>
           </div>
-          <div class="hint" style="margin-top:8px">
-            Pripoj sondy k svorkám <b>A</b> a <b>B</b>. Potom potiahni kartičky <b>u(t)</b> a <b>U</b> na správny prístroj.
-          </div>
+
+          <!-- ❤️ TEXT ZADANIA ÚLOHY 2 – TU SI HO UPRAV -->
+          <p class="hint" style="margin-top:8px">
+            Úloha 2 (návrh textu): Pripoj sondy osciloskopu a multimetra na svorky
+            <b>A</b> a <b>B</b>. Potom rozhodni, ktorý prístroj zobrazuje
+            <b>u(t)</b>, ktorý <b>U<sub>m</sub></b> a kde patrí efektívna hodnota
+            <b>U</b>. Kartičky priraď tak, aby aspoň dve boli umiestnené správne.
+          </p>
         </div>
+
       </div>
     </section>
 
@@ -562,7 +596,7 @@
       <div class="group">
         <span class="pill" id="timePill">TIME: 00:00</span>
         <span class="pill">
-                  MODE:
+          MODE:
           <select id="modeSelect" style="margin-left:6px">
             <option value="EASY" selected>EASY</option>
             <option value="MEDIUM">MEDIUM</option>
@@ -591,7 +625,13 @@
       document.getElementById('btnTask1').classList.toggle('active',id==='task1');
       document.getElementById('btnTask2').classList.toggle('active',id==='task2');
       if(id==='task1'){ resizeOsc(); newTask1(); }
-      if(id==='task2'){ t2_init(); }
+      if(id==='task2'){
+        t2_init();
+        document.getElementById('taskText').innerHTML =
+          'Úloha 2: Pripoj sondy osciloskopu a multimetra na svorky <b>A</b> a <b>B</b>. '+
+          'Potom rozhodni, ktorý prístroj meria okamžitú hodnotu <var>u(t)</var> a ktorý '+
+          'efektívnu hodnotu <var>U</var> tak, že správne priradíš kartičky.';
+      }
     }
 
     // HUD / stav
@@ -650,6 +690,7 @@
       state.tAnim=state.tGiven;
       el.answer.value='';
       el.feedback.textContent='';
+      document.getElementById('hintText').textContent='';
       drawOsc();
       updateHud();
     }
@@ -782,73 +823,60 @@
       if(locks.length) locks[0].remove();
     }
 
+    // kontrola odpovede
     el.check.onclick = () => {
-  // 1. načítaj odpoveď – podpor aj čiarku
-  const raw = el.answer.value.trim().replace(',', '.');
-  const ans = parseFloat(raw);
+      const raw = el.answer.value.trim().replace(',', '.');
+      const ans = parseFloat(raw);
 
-  if (!Number.isFinite(ans)) {
-    el.feedback.textContent = 'Zadaj číslo (V).';
-    el.feedback.style.color = '#ef4444';
-    return;
-  }
+      if (!Number.isFinite(ans)) {
+        el.feedback.textContent = 'Zadaj číslo (V).';
+        el.feedback.style.color = '#ef4444';
+        return;
+      }
 
-  // 2. správna hodnota – rátame pre:
-  //    a) čas z textu zadania (tGiven)
-  //    b) aktuálnu polohu slidera (pre prípad, že študent počítal podľa neho)
-  const correctGiven  = u_of_t_ms(state.tGiven);
-  const currentTms    = +el.tSlider.value;
-  const correctSlider = u_of_t_ms(currentTms);
+      const correctGiven  = u_of_t_ms(state.tGiven);
+      const currentTms    = +el.tSlider.value;
+      const correctSlider = u_of_t_ms(currentTms);
 
-  // vyber bližšiu z dvoch „správnych“
-  const diffGiven  = Math.abs(ans - correctGiven);
-  const diffSlider = Math.abs(ans - correctSlider);
-  const diff = Math.min(diffGiven, diffSlider);
-  const correct = (diffGiven <= diffSlider) ? correctGiven : correctSlider;
+      const diffGiven  = Math.abs(ans - correctGiven);
+      const diffSlider = Math.abs(ans - correctSlider);
+      const diff = Math.min(diffGiven, diffSlider);
+      const correct = (diffGiven <= diffSlider) ? correctGiven : correctSlider;
 
-  // 3. tolerancia – základ podľa režimu + malá relatívna
-  const baseTol = tolByMode();          // 0.5 V v EASY
-  const relTol  = Math.abs(correct) * 0.01; // 1 % z hodnoty
-  const tol = Math.max(baseTol, relTol);
+      const baseTol = tolByMode();
+      const relTol  = Math.abs(correct) * 0.01;
+      const tol = Math.max(baseTol, relTol);
 
-  if (diff <= tol) {
-    // ÚSPECH
-    el.feedback.textContent = `Správne! u(t) ≈ ${round2(correct).toFixed(2)} V 🔓`;
-    el.feedback.style.color = '#16a34a';
-    dropOneLock();
+      if (diff <= tol) {
+        el.feedback.textContent = `Správne! u(t) ≈ ${round2(correct).toFixed(2)} V 🔓`;
+        el.feedback.style.color = '#16a34a';
+        dropOneLock();
+        document.getElementById('hintText').textContent='';
+        newTask1();
+      } else {
+        state.mistakes++;
 
-    // reset nápovedy v HUD
-    document.getElementById('hintBtn').textContent = 'HINT';
+        if (state.mode === 'EASY' && state.mistakes === 1) {
+          document.getElementById('hintText').textContent =
+            'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
+          el.feedback.textContent = 'Skús ešte raz. Pozri nápovedu dole.';
+          el.feedback.style.color = '#b45309';
+        } else if (state.mistakes >= 2) {
+          el.feedback.textContent = 'MUHAHA! Nové zadanie.';
+          el.feedback.style.color = '#ef4444';
+          document.getElementById('hintText').textContent='';
+          showMuhaha();
+          newTask1();
+        } else {
+          el.feedback.textContent = 'Skús ešte raz.';
+          el.feedback.style.color = '#ef4444';
+        }
 
-    newTask1();
-  } else {
-    // NEÚSPECH
-    state.mistakes++;
+        failFeedback();
+      }
 
-    if (state.mode === 'EASY' && state.mistakes === 1) {
-      // namiesto červenej v answerBox – nápoveda v spodnom HUD (tvoj šedý pás)
-      document.getElementById('hintBtn').textContent =
-        'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
-      el.feedback.textContent = 'Skús ešte raz. Pozri nápovedu dole.';
-      el.feedback.style.color = '#b45309';
-    } else if (state.mistakes >= 2) {
-      el.feedback.textContent = 'MUHAHA! Nové zadanie.';
-      el.feedback.style.color = '#ef4444';
-      showMuhaha();
-      // reset nápovedy v HUD
-      document.getElementById('hintBtn').textContent = 'HINT';
-      newTask1();
-    } else {
-      el.feedback.textContent = 'Skús ešte raz.';
-      el.feedback.style.color = '#ef4444';
-    }
-
-    failFeedback();
-  }
-
-  updateHud();
-};
-
+      updateHud();
+    };
 
     el.modeSelect.onchange=e=>{state.mode=e.target.value;};
     const startTs=Date.now();
@@ -861,135 +889,131 @@
 
     /* KALKULAČKA */
     const calc = {
-  disp: document.getElementById('calcDisplay'),
-  modeBtn: document.getElementById('degRad'),
-  grid: document.querySelector('.calc-grid'),
-  rad: true
-};
+      disp: document.getElementById('calcDisplay'),
+      modeBtn: document.getElementById('degRad'),
+      grid: document.querySelector('.calc-grid'),
+      rad: true
+    };
 
-// prepínač RAD/DEG
-calc.modeBtn.onclick = () => {
-  calc.rad = !calc.rad;
-  calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
-  calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
-};
+    calc.modeBtn.onclick = () => {
+      calc.rad = !calc.rad;
+      calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
+      calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
+    };
 
-// pomocné funkcie
-function insertToDisplay(s){
-  calc.disp.value += s;
-  calc.disp.focus();
-}
-function delOne(){
-  calc.disp.value = calc.disp.value.slice(0,-1);
-}
-function clearDisp(){
-  calc.disp.value = '';
-}
-
-// vyhodnotenie výrazu
-function evalExpr(){
-  let expr = calc.disp.value
-    .replace(/,/g,'.')          // slovenská čiarka -> bodka
-    .replace(/\^/g,'**')        // mocnina
-    .replace(/π/g,Math.PI.toString());
-
-  const wrapTrig = fn => (calc.rad ? fn : x => fn(x*Math.PI/180));
-
-  const scope = {
-    sin:x=>wrapTrig(Math.sin)(x),
-    cos:x=>wrapTrig(Math.cos)(x),
-    tan:x=>wrapTrig(Math.tan)(x),
-    sqrt:Math.sqrt
-  };
-
-  try{
-    const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
-    const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-    return Number.isFinite(val) ? val : NaN;
-  }catch(e){
-    return NaN;
-  }
-}
-
-// obsluha kláves
-calc.grid.addEventListener('click', e=>{
-  const b = e.target.closest('button'); if(!b) return;
-  const num = b.getAttribute('data-num');
-  const op  = b.getAttribute('data-op');
-  const fn  = b.getAttribute('data-fn');
-
-  // čísla
-  if(num !== null){
-    insertToDisplay(num);
-    return;
-  }
-
-  // operátory
-  if(op !== null){
-    if(op === ',') insertToDisplay(',');
-    else insertToDisplay(op);
-    return;
-  }
-
-  if(!fn) return;
-
-  // špeciálne funkcie
-  if(fn === 'pi'){
-    insertToDisplay('π');
-  }
-  else if(fn === 'tenpow'){
-    // 10ˣ – automaticky *10^(...) ak je predtým číslo alebo )
-    const s = calc.disp.value;
-    const needsMul = /[0-9)\]]$/.test(s);
-    insertToDisplay((needsMul ? '*10^(' : '10^('));
-  }
-  else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt'){
-    insertToDisplay(fn + '(');
-  }
-  else if(fn === 'back'){
-    delOne();
-  }
-  else if(fn === 'clear'){
-    clearDisp();
-  }
-  else if(fn === 'mode'){
-    calc.modeBtn.onclick(); // RAD/DEG aj z klávesu
-  }
-  else if(fn === 'pm'){
-    // +/− : ak je v poli čisté číslo, zmení znamienko, inak len vloží '-'
-    const v = calc.disp.value.trim();
-    if(v === ''){
-      insertToDisplay('-');
-    }else if(!Number.isNaN(Number(v))){
-      calc.disp.value = String(-Number(v));
-    }else{
-      insertToDisplay('-');
+    function insertToDisplay(s){
+      calc.disp.value += s;
+      calc.disp.focus();
     }
-  }
-  else if(fn === 'eq'){
-    const v = evalExpr();
-    calc.disp.value = Number.isFinite(v) ? v : 'NaN';
-  }
-  else if(fn === 'ans'){
-    const v = evalExpr();
-    if(Number.isFinite(v)){
-      document.getElementById('answer').value = round2(v).toFixed(2);
+    function delOne(){
+      calc.disp.value = calc.disp.value.slice(0,-1);
     }
-  }
-});
+    function clearDisp(){
+      calc.disp.value = '';
+    }
 
-    /* ÚLOHA 2 – inicializácia (nechávam logiku ako predtým, len skrátená verzia) */
+    function evalExpr(){
+      let expr = calc.disp.value
+        .replace(/,/g,'.')
+        .replace(/\^/g,'**')
+        .replace(/π/g,Math.PI.toString());
+
+      const wrapTrig = fn => (calc.rad ? fn : x => fn(x*Math.PI/180));
+
+      const scope = {
+        sin:x=>wrapTrig(Math.sin)(x),
+        cos:x=>wrapTrig(Math.cos)(x),
+        tan:x=>wrapTrig(Math.tan)(x),
+        sqrt:Math.sqrt
+      };
+
+      try{
+        const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
+        const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+        return Number.isFinite(val) ? val : NaN;
+      }catch(e){
+        return NaN;
+      }
+    }
+
+    calc.grid.addEventListener('click', e=>{
+      const b = e.target.closest('button'); if(!b) return;
+      const num = b.getAttribute('data-num');
+      const op  = b.getAttribute('data-op');
+      const fn  = b.getAttribute('data-fn');
+
+      if(num !== null){
+        insertToDisplay(num);
+        return;
+      }
+
+      if(op !== null){
+        if(op === ',') insertToDisplay(',');
+        else insertToDisplay(op);
+        return;
+      }
+
+      if(!fn) return;
+
+      if(fn === 'pi'){
+        insertToDisplay('π');
+      }
+      else if(fn === 'tenpow'){
+        const s = calc.disp.value;
+        const needsMul = /[0-9)\]]$/.test(s);
+        insertToDisplay((needsMul ? '*10^(' : '10^('));
+      }
+      else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt'){
+        insertToDisplay(fn + '(');
+      }
+      else if(fn === 'back'){
+        delOne();
+      }
+      else if(fn === 'clear'){
+        clearDisp();
+      }
+      else if(fn === 'mode'){
+        calc.modeBtn.onclick();
+      }
+      else if(fn === 'pm'){
+        const v = calc.disp.value.trim();
+        if(v === ''){
+          insertToDisplay('-');
+        }else if(!Number.isNaN(Number(v))){
+          calc.disp.value = String(-Number(v));
+        }else{
+          insertToDisplay('-');
+        }
+      }
+      else if(fn === 'eq'){
+        const v = evalExpr();
+        calc.disp.value = Number.isFinite(v) ? v : 'NaN';
+      }
+      else if(fn === 'ans'){
+        const v = evalExpr();
+        if(Number.isFinite(v)){
+          document.getElementById('answer').value = round2(v).toFixed(2);
+        }
+      }
+    });
+
+    /* ÚLOHA 2 – inicializácia */
     let t2Ready=false;
     function t2_init(){
       if(t2Ready) return;
       t2Ready=true;
+
       const UeffOptions=[40,60,110,230];
       const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
       const f=50;
+
       let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
       let dmmMode='ACV';
+
       const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
       const sel=document.getElementById('sel');
+
+      // prepínač rozsahu multimetra
       document.querySelectorAll('.sel-btn').forEach(b=>{
         b.onclick=()=>{
           dmmMode=b.dataset.mode;
@@ -1000,12 +1024,15 @@ calc.grid.addEventListener('click', e=>{
         };
       });
       document.querySelector('.sel-btn[data-mode="ACV"]').click();
+
+      // sondy – drag z jackov na svorky A/B
       const probes=[...document.querySelectorAll('#t2 .jack')];
       probes.forEach(p=>{
         p.addEventListener('dragstart',e=>{
           e.dataTransfer.setData('text/probe',p.dataset.probe);
         });
       });
+
       const terms=[...document.querySelectorAll('#t2 .terminal')];
       terms.forEach(t=>{
         t.addEventListener('dragover',e=>e.preventDefault());
@@ -1013,16 +1040,21 @@ calc.grid.addEventListener('click', e=>{
           e.preventDefault();
           const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
           connMap[pid]=t.dataset.terminal;
+
           scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
           scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
           dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
           dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
           dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
+
           refreshInstruments();
         });
       });
+
+      // reset – odpojí sondy aj vyčistí kartičky
       document.getElementById('t2-reset').onclick=()=>{
-        connMap={};scopeConnected={A:false,B:false};
+        connMap={};
+        scopeConnected={A:false,B:false};
         dmmConnected={V:false,COM:false,A:false};
         document.getElementById('dz-scope').innerHTML='';
         document.getElementById('dz-dmm').innerHTML='';
@@ -1030,6 +1062,8 @@ calc.grid.addEventListener('click', e=>{
         document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
         refreshInstruments();
       };
+
+      // osciloskop 2 – animovaná sínusovka
       const cvs=document.getElementById('t2-wave');
       const ctx=cvs.getContext('2d');
       function resizeScope2(){
@@ -1041,6 +1075,7 @@ calc.grid.addEventListener('click', e=>{
       }
       resizeScope2();
       addEventListener('resize',resizeScope2);
+
       function drawScope2(){
         const w=cvs.clientWidth,h=cvs.clientHeight;
         ctx.clearRect(0,0,w,h);
@@ -1066,38 +1101,67 @@ calc.grid.addEventListener('click', e=>{
         requestAnimationFrame(drawScope2);
       }
       requestAnimationFrame(drawScope2);
+
+      // kartičky u(t), Um, U – drag na dropzóny
       const tray=document.getElementById('t2-tray');
       tray.addEventListener('dragstart',e=>{
         const t=e.target.closest('.token');if(!t) return;
         e.dataTransfer.setData('text/token',t.dataset.token);
         e.dataTransfer.setData('text/id',t.outerHTML);
       });
-      function dzSetup(id,accept){
-        const dz=document.getElementById(id);
+
+      const dzScope=document.getElementById('dz-scope');
+      const dzDmm=document.getElementById('dz-dmm');
+
+      function setupDz(dz){
         dz.addEventListener('dragover',e=>e.preventDefault());
         dz.addEventListener('drop',e=>{
           e.preventDefault();
           const tok=e.dataTransfer.getData('text/token');if(!tok) return;
-          dz.innerHTML=e.dataTransfer.getData('text/id');
-          const ok=(tok===accept);
-          dz.classList.toggle('dz-ok',ok);
-          dz.classList.toggle('dz-bad',!ok);
-          const okScope=document.getElementById('dz-scope').classList.contains('dz-ok');
-          const okDmm  =document.getElementById('dz-dmm').classList.contains('dz-ok');
-          if(okScope&&okDmm){
-            setTimeout(()=>alert('Správne! Osciloskop → u(t); Multimeter → Uef.'),150);
-          }
+          const already=[...dz.querySelectorAll('.token')].some(t=>t.dataset.token===tok);
+          if(already) return;
+          const html=e.dataTransfer.getData('text/id');
+          dz.insertAdjacentHTML('beforeend',html);
+          checkAssignments();
         });
       }
-      dzSetup('dz-scope','u(t)');
-      dzSetup('dz-dmm','U');
+      setupDz(dzScope);
+      setupDz(dzDmm);
+
+      function checkAssignments(){
+        const tScope=[...dzScope.querySelectorAll('.token')].map(t=>t.dataset.token);
+        const tDmm  =[...dzDmm.querySelectorAll('.token')].map(t=>t.dataset.token);
+
+        // Osciloskop: aspoň jedna z {u(t), Um}, nesmie tam byť U
+        const scopeOk = tScope.length>0 &&
+                        (tScope.includes('u(t)') || tScope.includes('Um')) &&
+                        !tScope.includes('U');
+
+        // Multimeter: má byť iba U
+        const dmmOk   = tDmm.length>0 &&
+                        tDmm.includes('U') &&
+                        tDmm.every(x=>x==='U');
+
+        dzScope.classList.toggle('dz-ok',scopeOk);
+        dzScope.classList.toggle('dz-bad',tScope.length>0 && !scopeOk);
+        dzDmm.classList.toggle('dz-ok',dmmOk);
+        dzDmm.classList.toggle('dz-bad',tDmm.length>0 && !dmmOk);
+
+        if(scopeOk && dmmOk){
+          setTimeout(()=>alert('Správne! Osciloskop → u(t), U_m; Multimeter → Uef.'),150);
+        }
+      }
+
       function refreshInstruments(){
         const lamp=document.getElementById('t2-lamp');
         const dmmLbl=document.getElementById('t2-dmm-rdg');
+
         const sOK=scopeConnected.A&&scopeConnected.B;
         const vOK=dmmConnected.V&&dmmConnected.COM;
         const aOK=dmmConnected.A&&dmmConnected.COM;
+
         lamp.classList.toggle('off',!(sOK||vOK||aOK));
+
         let txt='--.-',unit='V';
         if(dmmMode==='ACV'){unit='V';txt=vOK?Ueff.toFixed(1):'--.-';}
         else if(dmmMode==='DCV'){unit='V';txt=vOK?'0.0':'--.-';}
