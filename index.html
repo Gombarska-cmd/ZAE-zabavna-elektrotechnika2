@@ -28,7 +28,7 @@
     }
     .frame::before,.frame::after{
       content:"";position:absolute;width:14px;height:14px;border-radius:50%;
-      background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60% 100%);
+      background:radial-gradient(circle at 30% 30%,#d6cba8 0 40%,#867f6a 60 100%);
       box-shadow:inset 0 0 2px rgba(0,0,0,.6)
     }
     .frame::before{left:10px;top:10px}
@@ -141,7 +141,7 @@
     #playBtn.paused{opacity:.7}
     .osc-ui input[type="range"]{width:220px;margin:0 8px}
 
-    /* KALKULAČKA */
+    /* KALKULAČKA – ÚLOHA 1 */
     .calc{
       position:absolute;
       top:18px;left:18px;right:18px;bottom:82px;
@@ -292,7 +292,7 @@
     }
     .selector{
       width:120px;height:120px;border-radius:50%;margin:auto;
-      background:radial-gradient(#444 0 38%,#26292f 40% 100%);
+      background:radial-gradient(#444 0 38%,#26292f 40 100%);
       position:relative;border:2px solid #1f2430;
       box-shadow:inset 0 8px 18px rgba(0,0,0,.35);
     }
@@ -330,7 +330,7 @@
       width:130px;height:130px;border-radius:50%;
       margin:14px auto 8px;
       background:radial-gradient(circle at 50% 45%,#ffe69a 0 45%,
-                 #ffd24d 46% 58%,#f0b02a 59% 65%,#cc9000 66% 100%);
+                 #ffd24d 46 58%,#f0b02a 59 65%,#cc9000 66 100%);
     }
     .lamp.off{filter:grayscale(1) brightness(.75)}
 
@@ -352,7 +352,7 @@
     .source{
       position:absolute;left:50%;transform:translateX(-50%);
       bottom:10px;width:260px;height:60px;border-radius:10px;
-      background:linear-gradient(90deg,#e8eef6 0 60%,#cbd5e1 60% 100%);
+      background:linear-gradient(90deg,#e8eef6 0 60%,#cbd5e1 60 100%);
       border:2px solid #93a3b8;
       display:flex;align-items:center;justify-content:space-around;
     }
@@ -383,22 +383,31 @@
     }
     .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 
-    /* ÚLOHA 3 – graf + fázor */
-    .t3-waveBox{
+    /* ÚLOHA 3 – graf + fázor (nové rozloženie) */
+    .t3-cols{
       position:absolute;
-      inset:18px 52% 18px 18px;
-      background:#0b1120;
+      inset:18px;
+      display:flex;
+      gap:16px;
+    }
+    .t3-waveBox,
+    .t3-phasorBox{
+      flex:1;
+      background:#020617;
       border-radius:14px;
-      padding:10px 10px 24px;
+      padding:10px 12px;
       box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
       color:#e5e7eb;
+      display:flex;
+      flex-direction:column;
     }
     .t3-title{
       font-weight:700;font-size:14px;margin-bottom:4px;
     }
     .t3-plot{
       position:relative;
-      width:100%;height:100%;
+      flex:1;
+      margin-top:4px;
       border-radius:10px;
       background:#020617;
       overflow:hidden;
@@ -411,6 +420,7 @@
       inset:auto 10px 4px 10px;
       display:flex;justify-content:space-between;
       font-size:12px;color:#cbd5e1;
+      pointer-events:none;
     }
     .t3-cursor-v,
     .t3-cursor-h{
@@ -444,29 +454,17 @@
       right:4px;transform:translateY(-50%);
     }
 
-    .t3-phasorBox{
-      position:absolute;
-      inset:18px 18px 18px 52%;
-      background:#020617;
-      border-radius:14px;
-      padding:10px 12px 12px;
-      box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
-      color:#e5e7eb;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
     .t3-phasorBox canvas{
       border-radius:10px;
       background:#020617;
-      flex:1;
+      height:220px;
     }
     .t3-sliders{
       display:flex;
       flex-direction:column;
       gap:6px;
       font-size:13px;
-      margin-top:4px;
+      margin-top:6px;
     }
     .t3-sliders label{
       display:flex;
@@ -478,6 +476,7 @@
       flex:1;
     }
     .t3-sliders input[type="number"]{
+      width:72px;
       padding:4px 6px;
       border-radius:6px;
       border:1px solid #4b5563;
@@ -485,7 +484,7 @@
       color:#e5e7eb;
     }
     .t3-checkBtn{
-      margin-top:4px;
+      margin-top:6px;
       align-self:flex-start;
       padding:6px 12px;
       border-radius:10px;
@@ -498,7 +497,7 @@
     .t3-feedback{
       min-height:1.4em;
       font-weight:700;
-      margin-top:2px;
+      margin-top:4px;
       font-size:13px;
     }
   </style>
@@ -699,7 +698,6 @@
             <button class="t2-btn" id="t2-reset">Reset pripojení</button>
           </div>
 
-          <!-- ❤️ TEXT ZADANIA ÚLOHY 2 – TU SI HO UPRAV -->
           <p class="hint" style="margin-top:8px">
             Úloha 2: Pripoj sondy osciloskopu a multimetra na svorky
             <b>A</b> a <b>B</b>. Potom rozhodni, ktorý prístroj zobrazuje
@@ -715,46 +713,48 @@
     <section id="task3" class="task-screen">
       <section class="play">
         <div class="workbench">
-          <!-- vľavo: časový priebeh -->
-          <div class="t3-waveBox">
-            <div class="t3-title">Časový priebeh u(t)</div>
-            <div class="t3-plot" id="t3-plot">
-              <canvas id="t3-wave"></canvas>
-              <div class="t3-cursor-v" id="t3-cv">
-                <span class="t3-tag" id="t3-cv-tag">ωt = 0°</span>
-              </div>
-              <div class="t3-cursor-h" id="t3-ch">
-                <span class="t3-tag" id="t3-ch-tag">U = 0 V</span>
-              </div>
-              <div class="t3-axes-labels">
-                <span>U [V]</span>
-                <span>ω·t [°]</span>
+          <div class="t3-cols">
+            <!-- vľavo: časový priebeh -->
+            <div class="t3-waveBox">
+              <div class="t3-title">Časový priebeh u(t)</div>
+              <div class="t3-plot" id="t3-plot">
+                <canvas id="t3-wave"></canvas>
+                <div class="t3-cursor-v" id="t3-cv">
+                  <span class="t3-tag" id="t3-cv-tag">ωt ≈ 0°</span>
+                </div>
+                <div class="t3-cursor-h" id="t3-ch">
+                  <span class="t3-tag" id="t3-ch-tag">U ≈ 0 V</span>
+                </div>
+                <div class="t3-axes-labels">
+                  <span>U [V]</span>
+                  <span>ω·t [°]</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- vpravo: fázor -->
-          <div class="t3-phasorBox">
-            <div class="t3-title">Fázor napätia</div>
-            <canvas id="t3-phasor"></canvas>
+            <!-- vpravo: fázor -->
+            <div class="t3-phasorBox">
+              <div class="t3-title">Fázor napätia</div>
+              <canvas id="t3-phasor"></canvas>
 
-            <div class="t3-sliders">
-              <label>
-                U<sub>m</sub>:
-                <input type="range" id="t3-Um" min="10" max="150" step="1">
-                <input type="number" id="t3-Um-num" step="1">
-                <span>V</span>
-              </label>
-              <label>
-                <span class="psi">ψ</span><sub>u</sub>:
-                <input type="range" id="t3-psi" min="-90" max="90" step="1">
-                <input type="number" id="t3-psi-num" step="1">
-                <span>°</span>
-              </label>
+              <div class="t3-sliders">
+                <label>
+                  U<sub>m</sub>:
+                  <input type="range" id="t3-Um" min="10" max="150" step="1">
+                  <input type="number" id="t3-Um-num" step="1" placeholder="V">
+                  <span>V</span>
+                </label>
+                <label>
+                  <span class="psi">ψ</span><sub>u</sub>:
+                  <input type="range" id="t3-psi" min="-90" max="90" step="1">
+                  <input type="number" id="t3-psi-num" step="1" placeholder="°">
+                  <span>°</span>
+                </label>
+              </div>
+
+              <button id="t3-check" class="t3-checkBtn">Skontrolovať</button>
+              <div id="t3-feedback" class="t3-feedback"></div>
             </div>
-
-            <button id="t3-check" class="t3-checkBtn">Skontrolovať</button>
-            <div id="t3-feedback" class="t3-feedback"></div>
           </div>
         </div>
       </section>
@@ -1359,14 +1359,18 @@
       ymax:120
     };
     let t3WaveCtx=null,t3PhCtx=null;
+    let t3WaveCanvas=null,t3PhCanvas=null,t3PlotBox=null;
+
+    let t3WaveDraw = ()=>{};
+    let t3PhasorDraw = ()=>{};
 
     function t3_init(){
       if(t3Ready) return;
       t3Ready=true;
 
-      const waveCanvas=document.getElementById('t3-wave');
-      const phCanvas=document.getElementById('t3-phasor');
-      const plotBox=document.getElementById('t3-plot');
+      t3WaveCanvas=document.getElementById('t3-wave');
+      t3PhCanvas=document.getElementById('t3-phasor');
+      t3PlotBox=document.getElementById('t3-plot');
       const cv=document.getElementById('t3-cv');
       const ch=document.getElementById('t3-ch');
       const cvTag=document.getElementById('t3-cv-tag');
@@ -1377,34 +1381,31 @@
       const psiSlider=document.getElementById('t3-psi');
       const psiNum=document.getElementById('t3-psi-num');
 
-      // canvas setup
       function resizeT3Canvases(){
-        const r=plotBox.getBoundingClientRect();
+        // wave
+        const r=t3PlotBox.getBoundingClientRect();
         const DPR3=window.devicePixelRatio||1;
-        waveCanvas.width=Math.floor(r.width*DPR3);
-        waveCanvas.height=Math.floor(r.height*DPR3);
-        t3WaveCtx=waveCanvas.getContext('2d');
+        t3WaveCanvas.width=Math.floor(r.width*DPR3);
+        t3WaveCanvas.height=Math.floor(r.height*DPR3);
+        t3WaveCtx=t3WaveCanvas.getContext('2d');
         t3WaveCtx.setTransform(DPR3,0,0,DPR3,0,0);
 
-        const r2=document.querySelector('.t3-phasorBox').getBoundingClientRect();
+        // phasor – fixná výška
+        const parentRect=t3PhCanvas.parentElement.getBoundingClientRect();
         const DPR4=window.devicePixelRatio||1;
-        phCanvas.width=Math.floor(r2.width*DPR4);
-        phCanvas.height=Math.floor((r2.height-90)*DPR4);
-        t3PhCtx=phCanvas.getContext('2d');
+        t3PhCanvas.width=Math.floor(parentRect.width*DPR4);
+        t3PhCanvas.height=Math.floor(220*DPR4);
+        t3PhCtx=t3PhCanvas.getContext('2d');
         t3PhCtx.setTransform(DPR4,0,0,DPR4,0,0);
 
         drawT3Wave();
         drawT3Phasor();
       }
-      resizeT3Canvases();
-      addEventListener('resize',resizeT3Canvases);
-
-      // mapovanie pre graf: x = 0..360°, y ~ U
       function drawT3Wave(){
         if(!t3WaveCtx) return;
         const ctx=t3WaveCtx;
-        const w=waveCanvas.clientWidth;
-        const h=waveCanvas.clientHeight;
+        const w=t3WaveCanvas.clientWidth;
+        const h=t3WaveCanvas.clientHeight;
         ctx.clearRect(0,0,w,h);
 
         const PADX=40, PADY=20;
@@ -1412,44 +1413,54 @@
         const ymin=PADY,ymax=h-PADY;
         const midY=(ymin+ymax)/2;
 
-        // mriežka
+        // rozsah uhlov: od -90° do 630° (2 periódy + kus pred nulou)
+        const phiMin=-90, phiMax=630;
+        const span=phiMax-phiMin;
+
+        // mriežka – vertikálne každých 90°
         ctx.strokeStyle='rgba(148,163,184,.25)';
         ctx.lineWidth=1;
-        for(let x=0;x<=360;x+=30){
-          const px=xmin + (x/360)*(xmax-xmin);
+        for(let xDeg=-90;xDeg<=630;xDeg+=90){
+          const px=xmin + ((xDeg-phiMin)/span)*(xmax-xmin);
           ctx.beginPath();ctx.moveTo(px,ymin);ctx.lineTo(px,ymax);ctx.stroke();
         }
+        // horizontálne línie po 20 V
         const yStep=20;
         for(let y=-100;y<=100;y+=yStep){
           const py=midY - (y/(t3State.ymax))*((ymax-ymin)/2);
           ctx.beginPath();ctx.moveTo(xmin,py);ctx.lineTo(xmax,py);ctx.stroke();
         }
 
-        // osi
+        // osi – U=0 a ωt=0
+        ctx.setLineDash([]);
         ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1.6;
-        ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke(); // U=0
-        ctx.beginPath();ctx.moveTo(xmin,ymin);ctx.lineTo(xmin,ymax);ctx.stroke(); // začiatok
+        // U=0
+        ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+        // ωt=0
+        const x0=xmin + ((0-phiMin)/span)*(xmax-xmin);
+        ctx.beginPath();ctx.moveTo(x0,ymin);ctx.lineTo(x0,ymax);ctx.stroke();
 
         // sínusovka: u = Um*sin(φ+ψ)
+        ctx.setLineDash([4,4]);
         ctx.strokeStyle='#22c55e';ctx.lineWidth=2;
         ctx.beginPath();
-        const steps=360;
+        const steps=span;
         for(let i=0;i<=steps;i++){
-          const phi=i; // stupne
+          const phi=phiMin + (i/steps)*span;
           const rad=deg2rad(phi + t3State.psi);
           const u=t3State.Um*Math.sin(rad);
-          const x=xmin + (phi/360)*(xmax-xmin);
+          const x=xmin + ((phi-phiMin)/span)*(xmax-xmin);
           const y=midY - (u/(t3State.ymax))*((ymax-ymin)/2);
           if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         }
         ctx.stroke();
+        ctx.setLineDash([]);
       }
-
       function drawT3Phasor(){
         if(!t3PhCtx) return;
         const ctx=t3PhCtx;
-        const w=document.getElementById('t3-phasor').clientWidth;
-        const h=document.getElementById('t3-phasor').clientHeight;
+        const w=t3PhCanvas.clientWidth;
+        const h=t3PhCanvas.clientHeight;
         ctx.clearRect(0,0,w,h);
 
         const cx=w/2, cy=h/2;
@@ -1461,11 +1472,19 @@
         ctx.beginPath();ctx.moveTo(10,cy);ctx.lineTo(w-10,cy);ctx.stroke();
         ctx.beginPath();ctx.moveTo(cx,10);ctx.lineTo(cx,h-10);ctx.stroke();
 
+        // označenie Re, Im
+        ctx.fillStyle='rgba(209,213,219,.9)';
+        ctx.font='12px system-ui';
+        ctx.fillText('Re', w-26, cy-6);
+        ctx.fillText('Im', cx+6, 18);
+
         // kružnica pre referenciu amplitúdy (max 150 V)
         ctx.strokeStyle='rgba(55,65,81,.8)';
         ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.stroke();
 
         // fázor – podľa nastavených sliderov
+        const UmSlider=document.getElementById('t3-Um');
+        const psiSlider=document.getElementById('t3-psi');
         const UmUser=+UmSlider.value||0;
         const psiUser=deg2rad(+psiSlider.value||0);
         const scale=R/150; // 150 V -> R
@@ -1489,18 +1508,18 @@
         ctx.moveTo(ex,ey);ctx.lineTo(ax1,ay1);ctx.lineTo(ax2,ay2);ctx.closePath();ctx.fill();
       }
 
+      resizeT3Canvases();
+      addEventListener('resize',resizeT3Canvases);
+
       // kurzory – interaktivita
       let dragging=null;
-      plotBox.addEventListener('pointerdown',e=>{
-        const rect=plotBox.getBoundingClientRect();
-        const x=e.clientX-rect.left;
-        const y=e.clientY-rect.top;
+      t3PlotBox.addEventListener('pointerdown',e=>{
+        const rect=t3PlotBox.getBoundingClientRect();
         const cvRect=cv.getBoundingClientRect();
         const chRect=ch.getBoundingClientRect();
 
-        // jednoduchý hit test
-        const nearV=Math.abs(e.clientX - cvRect.left)<10;
-        const nearH=Math.abs(e.clientY - chRect.top)<10;
+        const nearV=Math.abs(e.clientX - (cvRect.left+cvRect.width/2))<10;
+        const nearH=Math.abs(e.clientY - (chRect.top+chRect.height/2))<10;
 
         if(nearV) dragging='v';
         else if(nearH) dragging='h';
@@ -1508,7 +1527,7 @@
       window.addEventListener('pointerup',()=>dragging=null);
       window.addEventListener('pointermove',e=>{
         if(!dragging) return;
-        const rect=plotBox.getBoundingClientRect();
+        const rect=t3PlotBox.getBoundingClientRect();
         let x=e.clientX-rect.left;
         let y=e.clientY-rect.top;
         const w=rect.width,h=rect.height;
@@ -1517,12 +1536,14 @@
         const xmin=PADX,xmax=w-10;
         const ymin=PADY,ymax=h-PADY;
         const midY=(ymin+ymax)/2;
+        const phiMin=-90, phiMax=630;
+        const span=phiMax-phiMin;
 
         if(dragging==='v'){
           if(x<xmin) x=xmin;
           if(x>xmax) x=xmax;
           cv.style.left=`${x}px`;
-          const phi=360*(x-xmin)/(xmax-xmin);
+          const phi=phiMin + ( (x-xmin)/(xmax-xmin) )*span;
           cvTag.textContent=`ωt ≈ ${phi.toFixed(0)}°`;
         }else if(dragging==='h'){
           if(y<ymin) y=ymin;
@@ -1540,6 +1561,7 @@
           if(onChange) onChange();
         });
         n.addEventListener('input',()=>{
+          if(n.value==='') return;
           r.value=n.value;
           if(onChange) onChange();
         });
@@ -1547,46 +1569,64 @@
       linkRangeAndNum(UmSlider,UmNum,drawT3Phasor);
       linkRangeAndNum(psiSlider,psiNum,drawT3Phasor);
 
-      // uložím referencie na funkcie do closure
-      t3WaveCtxDraw = drawT3Wave;
+      // expose kresliace funkcie
+      t3WaveDraw = drawT3Wave;
       t3PhasorDraw = drawT3Phasor;
     }
-
-    // pomocné "globálne" handle pre kreslenie v newTask3
-    let t3WaveCtxDraw = ()=>{};
-    let t3PhasorDraw = ()=>{};
 
     function newTask3(){
       state.mistakes=0;
       // náhodné zadanie
       t3State.Um = randFrom([40,60,80,100,120]);
       t3State.psi = randFrom([-60,-45,-30,-15,0,15,30,45,60]);
-      t3State.ymax = t3State.Um*1.2;
+      t3State.ymax = t3State.Um*1.4;
 
-      // text zadania
       el.taskText.innerHTML =
         'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
         'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
         '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
         'Potom nastav fázor napravo tak, aby zodpovedal signálu.';
 
-      // inicializácia sliderov
       const UmSlider=document.getElementById('t3-Um');
       const UmNum=document.getElementById('t3-Um-num');
       const psiSlider=document.getElementById('t3-psi');
       const psiNum=document.getElementById('t3-psi-num');
 
+      // sliderom dáme „rozumné“ východzie hodnoty, ale políčka necháme prázdne
       UmSlider.value = t3State.Um;
-      UmNum.value    = t3State.Um;
       psiSlider.value = t3State.psi;
-      psiNum.value    = t3State.psi;
+      UmNum.value = '';
+      psiNum.value = '';
 
-      // reset feedbacku
       document.getElementById('t3-feedback').textContent='';
 
-      // prekresli graf a fázor
-      t3WaveCtxDraw();
+      // kreslenie
+      t3WaveDraw();
       t3PhasorDraw();
+
+      // kurzory nastavíme na priesečník osí (ωt=0, U=0)
+      const plotBox=document.getElementById('t3-plot');
+      const rect=plotBox.getBoundingClientRect();
+      const cv=document.getElementById('t3-cv');
+      const ch=document.getElementById('t3-ch');
+      const cvTag=document.getElementById('t3-cv-tag');
+      const chTag=document.getElementById('t3-ch-tag');
+
+      const w=rect.width,h=rect.height;
+      const PADX=40, PADY=20;
+      const xmin=PADX,xmax=w-10;
+      const ymin=PADY,ymax=h-PADY;
+      const midY=(ymin+ymax)/2;
+      const phiMin=-90, phiMax=630;
+      const span=phiMax-phiMin;
+
+      const x0=xmin + ((0-phiMin)/span)*(xmax-xmin);
+      cv.style.left=`${x0}px`;
+      cvTag.textContent='ωt ≈ 0°';
+
+      const y0=midY;
+      ch.style.top=`${y0}px`;
+      chTag.textContent='U ≈ 0.0 V';
 
       updateHud();
     }
@@ -1617,7 +1657,7 @@
         return;
       }
 
-      // niečo je zle – chyby
+      // chyby
       state.mistakes++;
 
       if(!angOk && ampOk){
