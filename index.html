@@ -1584,28 +1584,27 @@ const T3_F = 50; // Hz – horizontálna os je ωt [°] pre f = 50 Hz
       t3PhasorDraw = drawT3Phasor;
     }
 
-   function newTask3(){
+ function newTask3(){
   state.mistakes = 0;
 
-  // náhodné zadanie – amplitúda a fáza (ψu nikdy nie je 0°, vždy násobok 5°)
-  t3State.Um  = randFrom([40,50,60,70,80,100,120,140]);
+  // náhodné zadanie – ψu nikdy nie je 0°, vždy násobok 5°
+  t3State.Um  = randFrom(T3_UM_CHOICES);
   t3State.psi = randFrom(T3_PSI_CHOICES);
-  t3State.ymax = t3State.Um * 1.4; // trochu rezervy, aby vlna nešla "do stien"
+  t3State.ymax = t3State.Um * 1.4;
 
-  // text zadania – explicitne spomenutá frekvencia 50 Hz
   el.taskText.innerHTML =
     'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
-    'Z grafu časového priebehu u(t) pri frekvencii <b>f = 50&nbsp;Hz</b> '+
-    'pomocou posuvných kurzorov vyčítaj amplitúdu '+
+    'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
     '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
-    'Potom nastav fázor napravo tak, aby zodpovedal signálu (os <b>ωt</b> je v stupňoch).';
+    'Potom nastav fázor napravo tak, aby zodpovedal signálu. '+
+    '(Predpokladaj frekvenciu <var>f</var> = ' + T3_F + ' Hz.)';
 
   const UmSlider = document.getElementById('t3-Um');
   const UmNum    = document.getElementById('t3-Um-num');
   const psiSlider= document.getElementById('t3-psi');
   const psiNum   = document.getElementById('t3-psi-num');
 
-  // východiskové hodnoty pre študenta – nič nie je "napovedané"
+  // východiskové hodnoty pre študenta: 0 V a 0°
   UmSlider.value  = 0;
   psiSlider.value = 0;
   UmNum.value  = '';
@@ -1615,11 +1614,12 @@ const T3_F = 50; // Hz – horizontálna os je ωt [°] pre f = 50 Hz
   fb.textContent = '';
   fb.style.color = '#e5e7eb';
 
-  // prekresliť časový priebeh a fázor
-  t3WaveDraw();    // kreslí z t3State.Um a t3State.psi
-  t3PhasorDraw();  // fázor podľa sliderov – zatiaľ nulový vektor
+  // prekresliť časový priebeh (už používa t3State.Um a t3State.psi)
+  t3WaveDraw();
+  // fázor z nulových sliderov – vektor dĺžky 0
+  t3PhasorDraw();
 
-  // kurzory nastavíme na priesečník osí (ωt = 0°, U = 0 V)
+  // kurzory nastavíme na priesečník osí (ωt = 0, U = 0)
   const plotBox=document.getElementById('t3-plot');
   const rect=plotBox.getBoundingClientRect();
   const cv=document.getElementById('t3-cv');
@@ -1635,18 +1635,17 @@ const T3_F = 50; // Hz – horizontálna os je ωt [°] pre f = 50 Hz
   const phiMin=-90, phiMax=630;
   const span=phiMax-phiMin;
 
-  // x-ová súradnica pre ωt = 0°
   const x0 = xmin + ((0 - phiMin) / span) * (xmax - xmin);
   cv.style.left = `${x0}px`;
   cvTag.textContent = 'ωt ≈ 0°';
 
-  // y-ová súradnica pre U = 0 V
   const y0 = midY;
   ch.style.top = `${y0}px`;
   chTag.textContent = 'U ≈ 0.0 V';
 
   updateHud();
 }
+
 
 
     // kontrola – ÚLOHA 3
