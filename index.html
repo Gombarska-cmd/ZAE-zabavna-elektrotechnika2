@@ -709,56 +709,66 @@
       </div>
     </section>
 
-    <!-- ÚLOHA 3 – Fázory v reálnom čase -->
     <section id="task3" class="task-screen">
-      <section class="play">
-        <div class="workbench">
-          <div class="t3-cols">
-            <!-- vľavo: časový priebeh -->
-            <div class="t3-waveBox">
-              <div class="t3-title">Časový priebeh u(t)</div>
-              <div class="t3-plot" id="t3-plot">
-                <canvas id="t3-wave"></canvas>
-                <div class="t3-cursor-v" id="t3-cv">
-                  <span class="t3-tag" id="t3-cv-tag">ωt ≈ 0°</span>
-                </div>
-                <div class="t3-cursor-h" id="t3-ch">
-                  <span class="t3-tag" id="t3-ch-tag">U ≈ 0 V</span>
-                </div>
-                <div class="t3-axes-labels">
-                  <span>U [V]</span>
-                  <span>ω·t [°]</span>
-                </div>
-              </div>
+  <section class="play">
+    <div class="workbench">
+      <div class="t3-cols">
+
+        <!-- ĽAVO – SÍNUS -->
+        <div class="t3-waveBox">
+          <div class="t3-title">Časový priebeh u(t)</div>
+
+          <div class="t3-plot" id="t3-plot">
+            <canvas id="t3-wave"></canvas>
+
+            <div class="t3-cursor-v" id="t3-cv">
+              <span class="t3-tag" id="t3-cv-tag">ωt ≈ 0°</span>
             </div>
 
-            <!-- vpravo: fázor -->
-            <div class="t3-phasorBox">
-              <div class="t3-title">Fázor napätia</div>
-              <canvas id="t3-phasor"></canvas>
+            <div class="t3-cursor-h" id="t3-ch">
+              <span class="t3-tag" id="t3-ch-tag">U ≈ 0 V</span>
+            </div>
 
-              <div class="t3-sliders">
-                <label>
-                  U<sub>m</sub>:
-                  <input type="range" id="t3-Um" min="10" max="150" step="1">
-                  <input type="number" id="t3-Um-num" step="1" placeholder="V">
-                  <span>V</span>
-                </label>
-                <label>
-                  <span class="psi">ψ</span><sub>u</sub>:
-                  <input type="range" id="t3-psi" min="-90" max="90" step="1">
-                  <input type="number" id="t3-psi-num" step="1" placeholder="°">
-                  <span>°</span>
-                </label>
-              </div>
-
-              <button id="t3-check" class="t3-checkBtn">Skontrolovať</button>
-              <div id="t3-feedback" class="t3-feedback"></div>
+            <div class="t3-axes-labels">
+              <span>U [V]</span>
+              <span>ω·t [°]</span>
             </div>
           </div>
         </div>
-      </section>
-    </section>
+
+        <!-- PRAVO – FÁZOR -->
+        <div class="t3-phasorBox">
+          <div class="t3-title">Fázor napätia</div>
+          <canvas id="t3-phasor"></canvas>
+
+          <div class="t3-sliders">
+
+            <div><b>Vpíš odpoveď:</b></div>
+
+            <label>
+              U<sub>m</sub>:
+              <input type="number" id="t3-Um-num" step="1" value="0">
+              <span>V</span>
+            </label>
+
+            <label>
+              ψ<sub>u</sub>:
+              <input type="number" id="t3-psi-num" step="1" value="0">
+              <span>°</span>
+            </label>
+          </div>
+
+          <button id="t3-check" class="t3-checkBtn" style="align-self:flex-end;">
+            Skontrolovať
+          </button>
+
+          <div id="t3-feedback" class="t3-feedback"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</section>
 
     <!-- HUD -->
     <section class="hud">
@@ -1361,56 +1371,150 @@ const T3_F = 50; // Hz – horizontálna os je ωt [°] pre f = 50 Hz
     }
 
     /* ÚLOHA 3 – fázory v reálnom čase */
-    let t3Ready=false;
-    const t3State={
-      Um:80,
-      psi:20,
-      ymin:-120,
-      ymax:120
-    };
-    let t3WaveCtx=null,t3PhCtx=null;
-    let t3WaveCanvas=null,t3PhCanvas=null,t3PlotBox=null;
+    let t3State = {
+  Um: 80,
+  psi: 0,
+  ymin: -120,
+  ymax: 120
+};
 
-    let t3WaveDraw = ()=>{};
-    let t3PhasorDraw = ()=>{};
+const T3_PSI_CHOICES = (() => {
+  const arr = [];
+  for(let p = 5; p <= 85; p += 5){
+    arr.push(p, -p);
+  }
+  return arr;
+})();
 
-    function t3_init(){
-      if(t3Ready) return;
-      t3Ready=true;
+function newTask3(){
+  t3State.Um = randFrom([40,60,80,100,120]);
+  t3State.psi = randFrom(T3_PSI_CHOICES);
 
-      t3WaveCanvas=document.getElementById('t3-wave');
-      t3PhCanvas=document.getElementById('t3-phasor');
-      t3PlotBox=document.getElementById('t3-plot');
-      const cv=document.getElementById('t3-cv');
-      const ch=document.getElementById('t3-ch');
-      const cvTag=document.getElementById('t3-cv-tag');
-      const chTag=document.getElementById('t3-ch-tag');
+  document.getElementById('t3-Um-num').value = 0;
+  document.getElementById('t3-psi-num').value = 0;
 
-      const UmSlider=document.getElementById('t3-Um');
-      const UmNum=document.getElementById('t3-Um-num');
-      const psiSlider=document.getElementById('t3-psi');
-      const psiNum=document.getElementById('t3-psi-num');
+  document.getElementById('taskText').innerHTML =
+    'Z grafu urči U<sub>m</sub> a ψ<sub>u</sub>.';
 
-      function resizeT3Canvases(){
-        // wave
-        const r=t3PlotBox.getBoundingClientRect();
-        const DPR3=window.devicePixelRatio||1;
-        t3WaveCanvas.width=Math.floor(r.width*DPR3);
-        t3WaveCanvas.height=Math.floor(r.height*DPR3);
-        t3WaveCtx=t3WaveCanvas.getContext('2d');
-        t3WaveCtx.setTransform(DPR3,0,0,DPR3,0,0);
+  drawT3Wave();
+  drawT3Phasor();
+}
 
-        // phasor – fixná výška
-        const parentRect=t3PhCanvas.parentElement.getBoundingClientRect();
-        const DPR4=window.devicePixelRatio||1;
-        t3PhCanvas.width=Math.floor(parentRect.width*DPR4);
-        t3PhCanvas.height=Math.floor(220*DPR4);
-        t3PhCtx=t3PhCanvas.getContext('2d');
-        t3PhCtx.setTransform(DPR4,0,0,DPR4,0,0);
+function drawT3Wave(){
+  const c = document.getElementById('t3-wave');
+  const ctx = c.getContext('2d');
+  const box = document.getElementById('t3-plot');
 
-        drawT3Wave();
-        drawT3Phasor();
-      }
+  const r = box.getBoundingClientRect();
+  const DPR = devicePixelRatio || 1;
+  c.width = r.width*DPR;
+  c.height = r.height*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  const w = r.width;
+  const h = r.height;
+
+  const phiMin = -90;
+  const phiMax = 630;
+
+  ctx.clearRect(0,0,w,h);
+
+  const midY = h/2;
+  const span = phiMax - phiMin;
+
+  // osi
+  ctx.strokeStyle='#fff';
+  ctx.lineWidth=2;
+
+  const x0 = w*((0-phiMin)/span);
+  ctx.beginPath();ctx.moveTo(x0,0);ctx.lineTo(x0,h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,midY);ctx.lineTo(w,midY);ctx.stroke();
+
+  // sínus – plná čiara
+  ctx.strokeStyle='#22c55e';
+  ctx.lineWidth=2;
+  ctx.setLineDash([]);
+
+  ctx.beginPath();
+  for(let i=0;i<w;i++){
+    const phi = phiMin + (i/w)*span;
+    const y = midY - (t3State.Um)*Math.sin(deg2rad(phi + t3State.psi));
+    if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
+  }
+  ctx.stroke();
+
+  // kurzory – štart na ½ štvorčeka
+  const cv = document.getElementById('t3-cv');
+  const ch = document.getElementById('t3-ch');
+
+  cv.style.left = `${x0 - 10}px`;
+  ch.style.top  = `${midY + 10}px`;
+}
+
+function drawT3Phasor(){
+  const c = document.getElementById('t3-phasor');
+  const ctx = c.getContext('2d');
+
+  const r = c.parentElement.getBoundingClientRect();
+  const size = r.height * 0.75;
+
+  const DPR = devicePixelRatio || 1;
+  c.width = r.width*DPR;
+  c.height = size*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  const w = r.width;
+  const h = size;
+  const cx = w/2;
+  const cy = h/2;
+
+  ctx.clearRect(0,0,w,h);
+
+  // osi
+  ctx.strokeStyle='#fff';
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(w,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,h);ctx.stroke();
+
+  // fázor
+  const UmInput = Number(document.getElementById('t3-Um-num').value||0);
+  const psiInput = Number(document.getElementById('t3-psi-num').value||0);
+
+  const len = (UmInput/150)*(h*0.45);
+  const ang = deg2rad(-psiInput);
+  const x = cx + len*Math.cos(ang);
+  const y = cy + len*Math.sin(ang);
+
+  ctx.strokeStyle='#22c55e';
+  ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();
+}
+
+document.getElementById('t3-check').onclick = () => {
+  const Um = Number(document.getElementById('t3-Um-num').value);
+  const psi = Number(document.getElementById('t3-psi-num').value);
+
+  const okUm = Math.abs(Um - t3State.Um) <= 2;
+  const okPsi = Math.abs(psi - t3State.psi) <= 2;
+
+  const fb = document.getElementById('t3-feedback');
+
+  if(okUm && okPsi){
+    fb.textContent='✅ Tak to je! Tvoja šípka zasiahla jadro vedomostí!';
+    fb.style.color='#22c55e';
+  }else{
+    if(Math.abs(psi)>100) fb.textContent='Tento uhol je väčší ako moja trpezlivosť!';
+    else fb.textContent='Radián a stupeň nie sú len tak jedno! Mením zadanie.';
+    fb.style.color='#ef4444';
+  }
+
+  drawT3Phasor();
+};
+
+window.addEventListener('Resize',()=>{
+  drawT3Wave();
+  drawT3Phasor();
+});
+
       function drawT3Wave(){
         if(!t3WaveCtx) return;
         const ctx=t3WaveCtx;
