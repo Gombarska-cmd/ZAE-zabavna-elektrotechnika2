@@ -789,847 +789,880 @@
     </section>
   </main>
 
-  <script>
-    // bublina
-    document.getElementById('bubbleClose').onclick =
-      () => document.getElementById('bubble').style.display='none';
+<script>
+  // bublina
+  document.getElementById('bubbleClose').onclick =
+    () => document.getElementById('bubble').style.display='none';
 
-    // HUD / stav
-    const pills={
-      mistakes:document.getElementById('mistakesPill'),
-      locks:document.getElementById('locksPill'),
-      time:document.getElementById('timePill')
-    };
-    const state={
-      mode:'EASY',mistakes:0,
-      U:230,f:50,psi:10,tGiven:2.0,
-      playing:false,tAnim:2.0
-    };
-    const el={
-      taskText:document.getElementById('taskText'),
-      tSlider:document.getElementById('tSlider'),
-      tRead:document.getElementById('tReadout'),
-      play:document.getElementById('playBtn'),
-      answer:document.getElementById('answer'),
-      check:document.getElementById('checkBtn'),
-      feedback:document.getElementById('feedback'),
-      taskPanel:document.getElementById('taskPanel'),
-      bubble:document.getElementById('bubble'),
-      osc:document.getElementById('osc'),
-      spark:document.getElementById('spark'),
-      locksCol:document.getElementById('locksCol'),
-      modeSelect:document.getElementById('modeSelect')
-    };
+  // HUD / stav
+  const pills={
+    mistakes:document.getElementById('mistakesPill'),
+    locks:document.getElementById('locksPill'),
+    time:document.getElementById('timePill')
+  };
+  const state={
+    mode:'EASY',mistakes:0,
+    U:230,f:50,psi:10,tGiven:2.0,
+    playing:false,tAnim:2.0
+  };
+  const el={
+    taskText:document.getElementById('taskText'),
+    tSlider:document.getElementById('tSlider'),
+    tRead:document.getElementById('tReadout'),
+    play:document.getElementById('playBtn'),
+    answer:document.getElementById('answer'),
+    check:document.getElementById('checkBtn'),
+    feedback:document.getElementById('feedback'),
+    taskPanel:document.getElementById('taskPanel'),
+    bubble:document.getElementById('bubble'),
+    osc:document.getElementById('osc'),
+    spark:document.getElementById('spark'),
+    locksCol:document.getElementById('locksCol'),
+    modeSelect:document.getElementById('modeSelect')
+  };
 
-    const TAU=Math.PI*2,
-          deg2rad=d=>d*Math.PI/180,
-          rad2deg=r=>r*180/Math.PI,
-          round2=x=>Math.round(x*100)/100,
-          randFrom=a=>a[Math.floor(Math.random()*a.length)];
-    // ÚLOHA 3 – povolené fázy (±5°, ±10°, ..., ±85°) a "virtuálna" frekvencia
-    const T3_PSI_CHOICES = (() => {
-      const arr = [];
-      for(let phi = 5; phi <= 85; phi += 5){
-        arr.push(phi, -phi);
-      }
-      return arr;
-    })();
-    const T3_F = 50; // Hz – horizontálna os je ωt [°] pre f = 50 Hz
+  const TAU=Math.PI*2,
+        deg2rad=d=>d*Math.PI/180,
+        round2=x=>Math.round(x*100)/100,
+        randFrom=a=>a[Math.floor(Math.random()*a.length)];
 
-    function tolByMode(){
-      return state.mode==='EASY'?0.50 :
-             state.mode==='MEDIUM'?0.20 : 0.05;
+  // ÚLOHA 3 – možné fázy (±5°, ±10°, ..., ±85°) a frekvencia
+  const T3_PSI_CHOICES = (() => {
+    const arr = [];
+    for(let phi = 5; phi <= 85; phi += 5){
+      arr.push(phi, -phi);
     }
+    return arr;
+  })();
+  const T3_F = 50; // Hz
 
-    // prepínanie úloh
-    function showTask(id){
-      document.querySelectorAll('.task-screen').forEach(s=>s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      document.getElementById('btnTask1').classList.toggle('active',id==='task1');
-      document.getElementById('btnTask2').classList.toggle('active',id==='task2');
-      document.getElementById('btnTask3').classList.toggle('active',id==='task3');
+  function tolByMode(){
+    return state.mode==='EASY'?0.50 :
+           state.mode==='MEDIUM'?0.20 : 0.05;
+  }
 
-      if(id==='task1'){
-        resizeOsc();
-        newTask1();
-      }
-      if(id==='task2'){
-        t2_init();
-        el.taskText.innerHTML =
-          'Úloha 2: Pripoj sondy osciloskopu a multimetra na svorky <b>A</b> a <b>B</b>. '+
-          'Potom rozhodni, ktorý prístroj meria okamžitú hodnotu <var>u(t)</var>, ktorý '+
-          'amplitúdu <var>U<sub>m</sub></var> a kde patrí efektívna hodnota <var>U</var>.';
-      }
-      if(id==='task3'){
-        t3_init();
-        newTask3();
-      }
-    }
+  // prepínanie úloh
+  function showTask(id){
+    document.querySelectorAll('.task-screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('btnTask1').classList.toggle('active',id==='task1');
+    document.getElementById('btnTask2').classList.toggle('active',id==='task2');
+    document.getElementById('btnTask3').classList.toggle('active',id==='task3');
 
-    function updateHud(){
-      const left=el.locksCol.querySelectorAll('.lock').length;
-      pills.mistakes.textContent=`MISTAKES: ${state.mistakes}/2`;
-      pills.locks.textContent   =`LOCKS LEFT: ${left}`;
+    if(id==='task1'){
+      resizeOsc();
+      newTask1();
     }
-    function failFeedback(){
-      el.taskPanel.classList.add('shake','flash');
-      setTimeout(()=>el.taskPanel.classList.remove('shake','flash'),450);
-    }
-    function showMuhaha(){
-      el.bubble.style.display='block';
-      el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
-      document.getElementById('bubbleClose2').onclick=
-        ()=>el.bubble.style.display='none';
-    }
-    function dropOneLock(){
-      const locks=el.locksCol.querySelectorAll('.lock');
-      if(locks.length) locks[0].remove();
-    }
-
-    // nové zadanie – ÚLOHA 1
-    function newTask1(){
-      state.mistakes=0;
-      state.U=randFrom([230,120,100,60]);
-      state.f=50;
-      state.psi=randFrom([-30,-15,0,10,15,30]);
-      const Tms=1000/state.f;
-      state.tGiven=+(Math.random()*Tms).toFixed(1);
+    if(id==='task2'){
+      t2_init();
       el.taskText.innerHTML =
-        `Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.`+
-        `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="psi">ψ</span>), `+
-        `kde <var>U</var><sub>m</sub> = √2·<var>U</var>.`+
-        `<br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, `+
-        `<span class="psi">ψ</span> = ${state.psi}°.`;      
-      el.tSlider.max=Tms.toFixed(1);
-      el.tSlider.value=state.tGiven;
-      el.tRead.textContent=state.tGiven.toFixed(1)+' ms';
-      state.tAnim=state.tGiven;
-      el.answer.value='';
-      el.feedback.textContent='';
+        'Úloha 2: Pripoj sondy osciloskopu a multimetra na svorky <b>A</b> a <b>B</b>. '+
+        'Potom rozhodni, ktorý prístroj meria okamžitú hodnotu <var>u(t)</var>, ktorý '+
+        'amplitúdu <var>U<sub>m</sub></var> a kde patrí efektívna hodnota <var>U</var>.';
+    }
+    if(id==='task3'){
+      t3_init();
+      newTask3();
+    }
+  }
+
+  function updateHud(){
+    const left=el.locksCol.querySelectorAll('.lock').length;
+    pills.mistakes.textContent=`MISTAKES: ${state.mistakes}/2`;
+    pills.locks.textContent   =`LOCKS LEFT: ${left}`;
+  }
+  function failFeedback(){
+    el.taskPanel.classList.add('shake','flash');
+    setTimeout(()=>el.taskPanel.classList.remove('shake','flash'),450);
+  }
+  function showMuhaha(){
+    el.bubble.style.display='block';
+    el.bubble.innerHTML='MUHAHA! Nové zadanie…<div class="close" id="bubbleClose2">×</div>';
+    document.getElementById('bubbleClose2').onclick=
+      ()=>el.bubble.style.display='none';
+  }
+  function dropOneLock(){
+    const locks=el.locksCol.querySelectorAll('.lock');
+    if(locks.length) locks[0].remove();
+  }
+
+  // nové zadanie – ÚLOHA 1
+  function newTask1(){
+    state.mistakes=0;
+    state.U=randFrom([230,120,100,60]);
+    state.f=50;
+    state.psi=randFrom([-30,-15,0,10,15,30]);
+    const Tms=1000/state.f;
+    state.tGiven=+(Math.random()*Tms).toFixed(1);
+    el.taskText.innerHTML =
+      `Vypočítaj <var>u</var>(<var>t</var>) v čase ${state.tGiven.toFixed(1)} ms.`+
+      `<br>Vzorec: <var>u</var>(<var>t</var>) = <var>U</var><sub>m</sub> sin(<var>ωt</var> + <span class="psi">ψ</span>), `+
+      `kde <var>U</var><sub>m</sub> = √2·<var>U</var>.`+
+      `<br>Parametre: <var>U</var> = ${state.U} V, <var>f</var> = ${state.f} Hz, `+
+      `<span class="psi">ψ</span> = ${state.psi}°.`;      
+    el.tSlider.max=Tms.toFixed(1);
+    el.tSlider.value=state.tGiven;
+    el.tRead.textContent=state.tGiven.toFixed(1)+' ms';
+    state.tAnim=state.tGiven;
+    el.answer.value='';
+    el.feedback.textContent='';
+    document.getElementById('hintText').textContent='';
+    drawOsc();
+    updateHud();
+  }
+  function u_of_t_ms(tms){
+    const Um=Math.SQRT2*state.U,
+          w=TAU*state.f,
+          t=tms/1000,
+          psi=deg2rad(state.psi);
+    return Um*Math.sin(w*t+psi);
+  }
+
+  /* OSCILOSKOP – ÚLOHA 1 */
+  let oscCtx=null,DPR=window.devicePixelRatio||1,rafId=null,lastTs=0,audioCtx=null;
+  function resizeOsc(){
+    const r=el.osc.getBoundingClientRect();
+    el.osc.width=Math.floor(r.width*DPR);
+    el.osc.height=Math.floor(r.height*DPR);
+    oscCtx=el.osc.getContext('2d');
+  }
+  const SCOPE_STYLE={
+    gridFine:'rgba(255,255,255,0.22)',
+    gridBold:'rgba(255,255,255,0.38)',
+    axis:'#f9fafb',axisW:2.0,sineW:2.2
+  };
+  function drawOsc(){
+    if(!oscCtx) resizeOsc();
+    const W=el.osc.width/DPR,H=el.osc.height/DPR;
+    const ctx=oscCtx;
+    ctx.save();ctx.scale(DPR,DPR);ctx.clearRect(0,0,W,H);
+    const G=20,PAD=2*G,
+          xmin=PAD,xmax=W-PAD,
+          ymin=PAD,ymax=H-PAD,
+          midX=(xmin+xmax)/2,midY=(ymin+ymax)/2;
+    // mriežka
+    ctx.lineWidth=1;ctx.strokeStyle=SCOPE_STYLE.gridFine;
+    for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){
+      ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
+    }
+    for(let y=Math.ceil(ymin/G)*G;y<=ymax;y+=G){
+      ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
+    }
+    const G10=10*G;
+    ctx.lineWidth=1.4;ctx.strokeStyle=SCOPE_STYLE.gridBold;
+    for(let x=Math.ceil(xmin/G10)*G10;x<=xmax;x+=G10){
+      ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
+    }
+    for(let y=Math.ceil(ymin/G10)*G10;y<=ymax;y+=G10){
+      ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
+    }
+    // osi
+    ctx.strokeStyle=SCOPE_STYLE.axis;ctx.lineWidth=SCOPE_STYLE.axisW;
+    ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
+    // sinus
+    const T=1/state.f,viewT=2*T,
+          tToX=t=>xmin+(t/viewT)*(xmax-xmin),
+          A=(ymax-ymin)*0.28,
+          psi=deg2rad(state.psi),w=TAU*state.f;
+    ctx.strokeStyle='#22c55e';ctx.lineWidth=SCOPE_STYLE.sineW;
+    ctx.beginPath();
+    const STEPS=Math.max(240,Math.floor(xmax-xmin));
+    for(let i=0;i<=STEPS;i++){
+      const x=xmin+(i/STEPS)*(xmax-xmin);
+      const t=((x-xmin)/(xmax-xmin))*viewT;
+      const y=midY-A*Math.sin(w*t+psi);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // bodka
+    const Tms=1000/state.f;
+    const tms=state.playing?state.tAnim:+el.tSlider.value;
+    const t=(tms/1000)%viewT;
+    const bx=tToX(t);
+    const by=midY-A*Math.sin(w*t+psi);
+    ctx.fillStyle='#a7f3d0';
+    ctx.beginPath();ctx.arc(bx,by,4,0,TAU);ctx.fill();
+    ctx.restore();
+  }
+  function loop(ts){
+    if(!state.playing){rafId=null;return;}
+    if(!lastTs) lastTs=ts;
+    const dt=(ts-lastTs)/1000;lastTs=ts;
+    const Tms=1000/state.f;
+    state.tAnim+=dt*500;
+    if(state.tAnim>=Tms){state.tAnim-=Tms;beep();}
+    el.tSlider.value=state.tAnim.toFixed(1);
+    el.tRead.textContent=el.tSlider.value+' ms';
+    drawOsc();
+    rafId=requestAnimationFrame(loop);
+  }
+  el.play.onclick=()=>{
+    state.playing=!state.playing;
+    el.play.textContent=state.playing?'⏸︎ Pause':'▶︎ Play';
+    el.play.classList.toggle('paused',!state.playing);
+    if(state.playing){lastTs=0;rafId=requestAnimationFrame(loop);}
+    else if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  };
+  addEventListener('resize',()=>{resizeOsc();drawOsc();});
+  el.tSlider.oninput=e=>{
+    const v=+e.target.value;
+    el.tRead.textContent=v.toFixed(1)+' ms';
+    if(!state.playing) state.tAnim=v;
+    drawOsc();
+  };
+  function beep(){
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';o.frequency.value=880;g.gain.value=0.04;
+    o.connect(g).connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+0.08);
+  }
+
+  // kontrola odpovede – ÚLOHA 1
+  el.check.onclick = () => {
+    const raw = el.answer.value.trim().replace(',', '.');
+    const ans = parseFloat(raw);
+
+    if (!Number.isFinite(ans)) {
+      el.feedback.textContent = 'Zadaj číslo (V).';
+      el.feedback.style.color = '#ef4444';
+      return;
+    }
+
+    const correctGiven  = u_of_t_ms(state.tGiven);
+    const currentTms    = +el.tSlider.value;
+    const correctSlider = u_of_t_ms(currentTms);
+
+    const diffGiven  = Math.abs(ans - correctGiven);
+    const diffSlider = Math.abs(ans - correctSlider);
+    const diff = Math.min(diffGiven, diffSlider);
+    const correct = (diffGiven <= diffSlider) ? correctGiven : correctSlider;
+
+    const baseTol = tolByMode();
+    const relTol  = Math.abs(correct) * 0.01;
+    const tol = Math.max(baseTol, relTol);
+
+    if (diff <= tol) {
+      el.feedback.textContent = `Správne! u(t) ≈ ${round2(correct).toFixed(2)} V 🔓`;
+      el.feedback.style.color = '#16a34a';
+      dropOneLock();
       document.getElementById('hintText').textContent='';
-      drawOsc();
-      updateHud();
-    }
-    function u_of_t_ms(tms){
-      const Um=Math.SQRT2*state.U,
-            w=TAU*state.f,
-            t=tms/1000,
-            psi=deg2rad(state.psi);
-      return Um*Math.sin(w*t+psi);
-    }
+      newTask1();
+    } else {
+      state.mistakes++;
 
-    /* OSCILOSKOP – ÚLOHA 1 */
-    let oscCtx=null,DPR=window.devicePixelRatio||1,rafId=null,lastTs=0,audioCtx=null;
-    function resizeOsc(){
-      const r=el.osc.getBoundingClientRect();
-      el.osc.width=Math.floor(r.width*DPR);
-      el.osc.height=Math.floor(r.height*DPR);
-      oscCtx=el.osc.getContext('2d');
-    }
-    const SCOPE_STYLE={
-      gridFine:'rgba(255,255,255,0.22)',
-      gridBold:'rgba(255,255,255,0.38)',
-      axis:'#f9fafb',axisW:2.6,sineW:2.4
-    };
-    function drawOsc(){
-      if(!oscCtx) resizeOsc();
-      const W=el.osc.width/DPR,H=el.osc.height/DPR;
-      const ctx=oscCtx;
-      ctx.save();ctx.scale(DPR,DPR);ctx.clearRect(0,0,W,H);
-      const G=20,PAD=2*G,
-            xmin=PAD,xmax=W-PAD,
-            ymin=PAD,ymax=H-PAD,
-            midX=(xmin+xmax)/2,midY=(ymin+ymax)/2;
-      // mriežka
-      ctx.lineWidth=1;ctx.strokeStyle=SCOPE_STYLE.gridFine;
-      for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){
-        ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
-      }
-      for(let y=Math.ceil(ymin/G)*G;y<=ymax;y+=G){
-        ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
-      }
-      const G10=10*G;
-      ctx.lineWidth=1.4;ctx.strokeStyle=SCOPE_STYLE.gridBold;
-      for(let x=Math.ceil(xmin/G10)*G10;x<=xmax;x+=G10){
-        ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
-      }
-      for(let y=Math.ceil(ymin/G10)*G10;y<=ymax;y+=G10){
-        ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
-      }
-      // osi
-      ctx.strokeStyle=SCOPE_STYLE.axis;ctx.lineWidth=SCOPE_STYLE.axisW;
-      ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
-      // sinus
-      const T=1/state.f,viewT=2*T,
-            tToX=t=>xmin+(t/viewT)*(xmax-xmin),
-            A=(ymax-ymin)*0.28,
-            psi=deg2rad(state.psi),w=TAU*state.f;
-      ctx.strokeStyle='#22c55e';ctx.lineWidth=SCOPE_STYLE.sineW;
-      ctx.beginPath();
-      const STEPS=Math.max(240,Math.floor(xmax-xmin));
-      for(let i=0;i<=STEPS;i++){
-        const x=xmin+(i/STEPS)*(xmax-xmin);
-        const t=((x-xmin)/(xmax-xmin))*viewT;
-        const y=midY-A*Math.sin(w*t+psi);
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-      // bodka
-      const Tms=1000/state.f;
-      const tms=state.playing?state.tAnim:+el.tSlider.value;
-      const t=(tms/1000)%viewT;
-      const bx=tToX(t);
-      const by=midY-A*Math.sin(w*t+psi);
-      ctx.fillStyle='#a7f3d0';
-      ctx.beginPath();ctx.arc(bx,by,4,0,TAU);ctx.fill();
-      ctx.restore();
-    }
-    function loop(ts){
-      if(!state.playing){rafId=null;return;}
-      if(!lastTs) lastTs=ts;
-      const dt=(ts-lastTs)/1000;lastTs=ts;
-      const Tms=1000/state.f;
-      state.tAnim+=dt*500;
-      if(state.tAnim>=Tms){state.tAnim-=Tms;beep();}
-      el.tSlider.value=state.tAnim.toFixed(1);
-      el.tRead.textContent=el.tSlider.value+' ms';
-      drawOsc();
-      rafId=requestAnimationFrame(loop);
-    }
-    el.play.onclick=()=>{
-      state.playing=!state.playing;
-      el.play.textContent=state.playing?'⏸︎ Pause':'▶︎ Play';
-      el.play.classList.toggle('paused',!state.playing);
-      if(state.playing){lastTs=0;rafId=requestAnimationFrame(loop);}
-      else if(rafId){cancelAnimationFrame(rafId);rafId=null;}
-    };
-    addEventListener('resize',()=>{resizeOsc();drawOsc();});
-    el.tSlider.oninput=e=>{
-      const v=+e.target.value;
-      el.tRead.textContent=v.toFixed(1)+' ms';
-      if(!state.playing) state.tAnim=v;
-      drawOsc();
-    };
-    function beep(){
-      if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-      o.type='sine';o.frequency.value=880;g.gain.value=0.04;
-      o.connect(g).connect(audioCtx.destination);
-      o.start();o.stop(audioCtx.currentTime+0.08);
-    }
-
-    // kontrola odpovede – ÚLOHA 1
-    el.check.onclick = () => {
-      const raw = el.answer.value.trim().replace(',', '.');
-      const ans = parseFloat(raw);
-
-      if (!Number.isFinite(ans)) {
-        el.feedback.textContent = 'Zadaj číslo (V).';
+      if (state.mode === 'EASY' && state.mistakes === 1) {
+        document.getElementById('hintText').textContent =
+          'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
+        el.feedback.textContent = 'Skús ešte raz. Pozri nápovedu dole.';
+        el.feedback.style.color = '#b45309';
+      } else if (state.mistakes >= 2) {
+        el.feedback.textContent = 'MUHAHA! Nové zadanie.';
         el.feedback.style.color = '#ef4444';
-        return;
-      }
-
-      const correctGiven  = u_of_t_ms(state.tGiven);
-      const currentTms    = +el.tSlider.value;
-      const correctSlider = u_of_t_ms(currentTms);
-
-      const diffGiven  = Math.abs(ans - correctGiven);
-      const diffSlider = Math.abs(ans - correctSlider);
-      const diff = Math.min(diffGiven, diffSlider);
-      const correct = (diffGiven <= diffSlider) ? correctGiven : correctSlider;
-
-      const baseTol = tolByMode();
-      const relTol  = Math.abs(correct) * 0.01;
-      const tol = Math.max(baseTol, relTol);
-
-      if (diff <= tol) {
-        el.feedback.textContent = `Správne! u(t) ≈ ${round2(correct).toFixed(2)} V 🔓`;
-        el.feedback.style.color = '#16a34a';
-        dropOneLock();
         document.getElementById('hintText').textContent='';
+        showMuhaha();
         newTask1();
       } else {
-        state.mistakes++;
-
-        if (state.mode === 'EASY' && state.mistakes === 1) {
-          document.getElementById('hintText').textContent =
-            'Nápoveda: U_m = √2·U, ω = 2πf, t v sekundách.';
-          el.feedback.textContent = 'Skús ešte raz. Pozri nápovedu dole.';
-          el.feedback.style.color = '#b45309';
-        } else if (state.mistakes >= 2) {
-          el.feedback.textContent = 'MUHAHA! Nové zadanie.';
-          el.feedback.style.color = '#ef4444';
-          document.getElementById('hintText').textContent='';
-          showMuhaha();
-          newTask1();
-        } else {
-          el.feedback.textContent = 'Skús ešte raz.';
-          el.feedback.style.color = '#ef4444';
-        }
-
-        failFeedback();
+        el.feedback.textContent = 'Skús ešte raz.';
+        el.feedback.style.color = '#ef4444';
       }
 
-      updateHud();
+      failFeedback();
+    }
+
+    updateHud();
+  };
+
+  el.modeSelect.onchange=e=>{state.mode=e.target.value;};
+  const startTs=Date.now();
+  setInterval(()=>{
+    const s=Math.floor((Date.now()-startTs)/1000);
+    const m=String(Math.floor(s/60)).padStart(2,'0');
+    const ss=String(s%60).padStart(2,'0');
+    pills.time.textContent=`TIME: ${m}:${ss}`;
+  },1000);
+
+  /* KALKULAČKA – ÚLOHA 1 */
+  const calc = {
+    disp: document.getElementById('calcDisplay'),
+    modeBtn: document.getElementById('degRad'),
+    grid: document.querySelector('.calc-grid'),
+    rad: true
+  };
+
+  calc.modeBtn.onclick = () => {
+    calc.rad = !calc.rad;
+    calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
+    calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
+  };
+
+  function insertToDisplay(s){
+    calc.disp.value += s;
+    calc.disp.focus();
+  }
+  function delOne(){
+    calc.disp.value = calc.disp.value.slice(0,-1);
+  }
+  function clearDisp(){
+    calc.disp.value = '';
+  }
+
+  function evalExpr(){
+    let expr = calc.disp.value
+      .replace(/,/g,'.')
+      .replace(/\^/g,'**')
+      .replace(/π/g,Math.PI.toString());
+
+    const wrapTrig = fn => (calc.rad ? fn : x => fn(x*Math.PI/180));
+
+    const scope = {
+      sin:x=>wrapTrig(Math.sin)(x),
+      cos:x=>wrapTrig(Math.cos)(x),
+      tan:x=>wrapTrig(Math.tan)(x),
+      sqrt:Math.sqrt
     };
 
-    el.modeSelect.onchange=e=>{state.mode=e.target.value;};
-    const startTs=Date.now();
-    setInterval(()=>{
-      const s=Math.floor((Date.now()-startTs)/1000);
-      const m=String(Math.floor(s/60)).padStart(2,'0');
-      const ss=String(s%60).padStart(2,'0');
-      pills.time.textContent=`TIME: ${m}:${ss}`;
-    },1000);
-
-    /* KALKULAČKA – ÚLOHA 1 */
-    const calc = {
-      disp: document.getElementById('calcDisplay'),
-      modeBtn: document.getElementById('degRad'),
-      grid: document.querySelector('.calc-grid'),
-      rad: true
-    };
-
-    calc.modeBtn.onclick = () => {
-      calc.rad = !calc.rad;
-      calc.modeBtn.textContent = calc.rad ? 'RAD' : 'DEG';
-      calc.modeBtn.title = calc.rad ? 'Radiány' : 'Stupne';
-    };
-
-    function insertToDisplay(s){
-      calc.disp.value += s;
-      calc.disp.focus();
+    try{
+      const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
+      const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
+      return Number.isFinite(val) ? val : NaN;
+    }catch(e){
+      return NaN;
     }
-    function delOne(){
-      calc.disp.value = calc.disp.value.slice(0,-1);
-    }
-    function clearDisp(){
-      calc.disp.value = '';
+  }
+
+  calc.grid.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    const num = b.getAttribute('data-num');
+    const op  = b.getAttribute('data-op');
+    const fn  = b.getAttribute('data-fn');
+
+    if(num !== null){
+      insertToDisplay(num);
+      return;
     }
 
-    function evalExpr(){
-      let expr = calc.disp.value
-        .replace(/,/g,'.')
-        .replace(/\^/g,'**')
-        .replace(/π/g,Math.PI.toString());
-
-      const wrapTrig = fn => (calc.rad ? fn : x => fn(x*Math.PI/180));
-
-      const scope = {
-        sin:x=>wrapTrig(Math.sin)(x),
-        cos:x=>wrapTrig(Math.cos)(x),
-        tan:x=>wrapTrig(Math.tan)(x),
-        sqrt:Math.sqrt
-      };
-
-      try{
-        const f = new Function('sin','cos','tan','sqrt',`return (${expr})`);
-        const val = f(scope.sin,scope.cos,scope.tan,scope.sqrt);
-        return Number.isFinite(val) ? val : NaN;
-      }catch(e){
-        return NaN;
-      }
+    if(op !== null){
+      if(op === ',') insertToDisplay(',');
+      else insertToDisplay(op);
+      return;
     }
 
-    calc.grid.addEventListener('click', e=>{
-      const b = e.target.closest('button'); if(!b) return;
-      const num = b.getAttribute('data-num');
-      const op  = b.getAttribute('data-op');
-      const fn  = b.getAttribute('data-fn');
+    if(!fn) return;
 
-      if(num !== null){
-        insertToDisplay(num);
-        return;
+    if(fn === 'pi'){
+      insertToDisplay('π');
+    }
+    else if(fn === 'tenpow'){
+      const s = calc.disp.value;
+      const needsMul = /[0-9)\]]$/.test(s);
+      insertToDisplay((needsMul ? '*10^(' : '10^('));
+    }
+    else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt'){
+      insertToDisplay(fn + '(');
+    }
+    else if(fn === 'back'){
+      delOne();
+    }
+    else if(fn === 'clear'){
+      clearDisp();
+    }
+    else if(fn === 'mode'){
+      calc.modeBtn.onclick();
+    }
+    else if(fn === 'pm'){
+      const v = calc.disp.value.trim();
+      if(v === ''){
+        insertToDisplay('-');
+      }else if(!Number.isNaN(Number(v))){
+        calc.disp.value = String(-Number(v));
+      }else{
+        insertToDisplay('-');
       }
-
-      if(op !== null){
-        if(op === ',') insertToDisplay(',');
-        else insertToDisplay(op);
-        return;
+    }
+    else if(fn === 'eq'){
+      const v = evalExpr();
+      calc.disp.value = Number.isFinite(v) ? v : 'NaN';
+    }
+    else if(fn === 'ans'){
+      const v = evalExpr();
+      if(Number.isFinite(v)){
+        document.getElementById('answer').value = round2(v).toFixed(2);
       }
+    }
+  });
 
-      if(!fn) return;
+  /* ÚLOHA 2 – inicializácia */
+  let t2Ready=false;
+  function t2_init(){
+    if(t2Ready) return;
+    t2Ready=true;
 
-      if(fn === 'pi'){
-        insertToDisplay('π');
-      }
-      else if(fn === 'tenpow'){
-        const s = calc.disp.value;
-        const needsMul = /[0-9)\]]$/.test(s);
-        insertToDisplay((needsMul ? '*10^(' : '10^('));
-      }
-      else if(fn === 'sin' || fn === 'cos' || fn === 'tan' || fn === 'sqrt'){
-        insertToDisplay(fn + '(');
-      }
-      else if(fn === 'back'){
-        delOne();
-      }
-      else if(fn === 'clear'){
-        clearDisp();
-      }
-      else if(fn === 'mode'){
-        calc.modeBtn.onclick();
-      }
-      else if(fn === 'pm'){
-        const v = calc.disp.value.trim();
-        if(v === ''){
-          insertToDisplay('-');
-        }else if(!Number.isNaN(Number(v))){
-          calc.disp.value = String(-Number(v));
-        }else{
-          insertToDisplay('-');
-        }
-      }
-      else if(fn === 'eq'){
-        const v = evalExpr();
-        calc.disp.value = Number.isFinite(v) ? v : 'NaN';
-      }
-      else if(fn === 'ans'){
-        const v = evalExpr();
-        if(Number.isFinite(v)){
-          document.getElementById('answer').value = round2(v).toFixed(2);
-        }
-      }
-    });
+    const UeffOptions=[40,60,110,230];
+    const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
+    const f=50;
 
-    /* ÚLOHA 2 – inicializácia */
-    let t2Ready=false;
-    function t2_init(){
-      if(t2Ready) return;
-      t2Ready=true;
+    let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
+    let dmmMode='ACV';
 
-      const UeffOptions=[40,60,110,230];
-      const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
-      const f=50;
+    const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
+    const sel=document.getElementById('sel');
 
-      let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
-      let dmmMode='ACV';
-
-      const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
-      const sel=document.getElementById('sel');
-
-      // prepínač rozsahu multimetra
-      document.querySelectorAll('.sel-btn').forEach(b=>{
-        b.onclick=()=>{
-          dmmMode=b.dataset.mode;
-          sel.style.setProperty('--angle',modeAngles[dmmMode]+'deg');
-          document.querySelectorAll('.sel-btn')
-            .forEach(x=>x.classList.toggle('active',x===b));
-          refreshInstruments();
-        };
-      });
-      document.querySelector('.sel-btn[data-mode="ACV"]').click();
-
-      // sondy – drag z jackov na svorky A/B
-      const probes=[...document.querySelectorAll('#t2 .jack')];
-      probes.forEach(p=>{
-        p.addEventListener('dragstart',e=>{
-          e.dataTransfer.setData('text/probe',p.dataset.probe);
-        });
-      });
-
-      const terms=[...document.querySelectorAll('#t2 .terminal')];
-      terms.forEach(t=>{
-        t.addEventListener('dragover',e=>e.preventDefault());
-        t.addEventListener('drop',e=>{
-          e.preventDefault();
-          const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
-          connMap[pid]=t.dataset.terminal;
-
-          scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
-          scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
-          dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
-          dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
-          dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
-
-          refreshInstruments();
-        });
-      });
-
-      // reset – odpojí sondy aj vyčistí kartičky
-      document.getElementById('t2-reset').onclick=()=>{
-        connMap={};
-        scopeConnected={A:false,B:false};
-        dmmConnected={V:false,COM:false,A:false};
-        document.getElementById('dz-scope').innerHTML='';
-        document.getElementById('dz-dmm').innerHTML='';
-        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
-        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
+    // prepínač rozsahu multimetra
+    document.querySelectorAll('.sel-btn').forEach(b=>{
+      b.onclick=()=>{
+        dmmMode=b.dataset.mode;
+        sel.style.setProperty('--angle',modeAngles[dmmMode]+'deg');
+        document.querySelectorAll('.sel-btn')
+          .forEach(x=>x.classList.toggle('active',x===b));
         refreshInstruments();
       };
+    });
+    document.querySelector('.sel-btn[data-mode="ACV"]').click();
 
-      // osciloskop 2 – animovaná sínusovka
-      const cvs=document.getElementById('t2-wave');
-      const ctx=cvs.getContext('2d');
-      function resizeScope2(){
-        const r=cvs.getBoundingClientRect();
-        const DPR2=window.devicePixelRatio||1;
-        cvs.width=Math.floor(r.width*DPR2);
-        cvs.height=Math.floor(r.height*DPR2);
-        ctx.setTransform(DPR2,0,0,DPR2,0,0);
-      }
-      resizeScope2();
-      addEventListener('resize',resizeScope2);
-
-      function drawScope2(){
-        const w=cvs.clientWidth,h=cvs.clientHeight;
-        ctx.clearRect(0,0,w,h);
-        const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
-        ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2;
-        ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
-        ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
-        const ok=scopeConnected.A&&scopeConnected.B;
-        if(ok){
-          const A=(ymax-ymin)*0.35,steps=Math.max(240,Math.floor(xmax-xmin)),tau=Math.PI*2,tt=performance.now()/1000;
-          ctx.strokeStyle='#22c55e';ctx.lineWidth=2.2;ctx.beginPath();
-          for(let i=0;i<=steps;i++){
-            const x=xmin+(i/steps)*(xmax-xmin);
-            const t=(i/steps)*2*(1/f);
-            const y=midY-A*Math.sin(tau*f*t+tt*2.0);
-            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-          }
-          ctx.stroke();
-          document.getElementById('t2-scope-rdg').textContent='živá vlna…';
-        }else{
-          document.getElementById('t2-scope-rdg').textContent='nepripojené';
-        }
-        requestAnimationFrame(drawScope2);
-      }
-      requestAnimationFrame(drawScope2);
-
-      // kartičky u(t), Um, U – drag na dropzóny
-      const tray=document.getElementById('t2-tray');
-      tray.addEventListener('dragstart',e=>{
-        const t=e.target.closest('.token');if(!t) return;
-        e.dataTransfer.setData('text/token',t.dataset.token);
-        e.dataTransfer.setData('text/id',t.outerHTML);
+    // sondy – drag z jackov na svorky A/B
+    const probes=[...document.querySelectorAll('#t2 .jack')];
+    probes.forEach(p=>{
+      p.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('text/probe',p.dataset.probe);
       });
+    });
 
-      const dzScope=document.getElementById('dz-scope');
-      const dzDmm=document.getElementById('dz-dmm');
+    const terms=[...document.querySelectorAll('#t2 .terminal')];
+    terms.forEach(t=>{
+      t.addEventListener('dragover',e=>e.preventDefault());
+      t.addEventListener('drop',e=>{
+        e.preventDefault();
+        const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
+        connMap[pid]=t.dataset.terminal;
 
-      function setupDz(dz){
-        dz.addEventListener('dragover',e=>e.preventDefault());
-        dz.addEventListener('drop',e=>{
-          e.preventDefault();
-          const tok=e.dataTransfer.getData('text/token');if(!tok) return;
-          const already=[...dz.querySelectorAll('.token')].some(t=>t.dataset.token===tok);
-          if(already) return;
-          const html=e.dataTransfer.getData('text/id');
-          dz.insertAdjacentHTML('beforeend',html);
-          checkAssignments();
-        });
-      }
-      setupDz(dzScope);
-      setupDz(dzDmm);
+        scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
+        scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
+        dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
+        dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
+        dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
 
-      function checkAssignments(){
-        const tScope=[...dzScope.querySelectorAll('.token')].map(t=>t.dataset.token);
-        const tDmm  =[...dzDmm.querySelectorAll('.token')].map(t=>t.dataset.token);
+        refreshInstruments();
+      });
+    });
 
-        const scopeOk = tScope.length>0 &&
-                        (tScope.includes('u(t)') || tScope.includes('Um')) &&
-                        !tScope.includes('U');
-
-        const dmmOk   = tDmm.length>0 &&
-                        tDmm.includes('U') &&
-                        tDmm.every(x=>x==='U');
-
-        dzScope.classList.toggle('dz-ok',scopeOk);
-        dzScope.classList.toggle('dz-bad',tScope.length>0 && !scopeOk);
-        dzDmm.classList.toggle('dz-ok',dmmOk);
-        dzDmm.classList.toggle('dz-bad',tDmm.length>0 && !dmmOk);
-
-        if(scopeOk && dmmOk){
-          setTimeout(()=>alert('Správne! Osciloskop → u(t), U_m; Multimeter → Uef.'),150);
-        }
-      }
-
-      function refreshInstruments(){
-        const lamp=document.getElementById('t2-lamp');
-        const dmmLbl=document.getElementById('t2-dmm-rdg');
-
-        const sOK=scopeConnected.A&&scopeConnected.B;
-        const vOK=dmmConnected.V&&dmmConnected.COM;
-        const aOK=dmmConnected.A&&dmmConnected.COM;
-
-        lamp.classList.toggle('off',!(sOK||vOK||aOK));
-
-        let txt='--.-',unit='V';
-        if(dmmMode==='ACV'){unit='V';txt=vOK?Ueff.toFixed(1):'--.-';}
-        else if(dmmMode==='DCV'){unit='V';txt=vOK?'0.0':'--.-';}
-        else if(dmmMode==='OHM'){unit='Ω';txt=vOK?'∞':'--';}
-        else if(dmmMode==='ACA'){unit='A';txt=aOK?'??':'--';}
-        else if(dmmMode==='DCA'){unit='A';txt=aOK?'0.00':'--';}
-        dmmLbl.textContent=`${txt} ${unit}`;
-      }
+    // reset – odpojí sondy aj vyčistí kartičky
+    document.getElementById('t2-reset').onclick=()=>{
+      connMap={};
+      scopeConnected={A:false,B:false};
+      dmmConnected={V:false,COM:false,A:false};
+      document.getElementById('dz-scope').innerHTML='';
+      document.getElementById('dz-dmm').innerHTML='';
+      document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
+      document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
       refreshInstruments();
-    }
-
-    /* ÚLOHA 3 – fázory v reálnom čase (bez duplikátov) */
-
-    const T3_UM_CHOICES = [40,60,80,100,120];
-
-    let t3State = {
-      Um: 80,
-      psi: 20,
-      ymax: 120
     };
 
-    let t3Initialized = false;
+    // osciloskop 2 – animovaná sínusovka
+    const cvs=document.getElementById('t2-wave');
+    const ctx=cvs.getContext('2d');
+    function resizeScope2(){
+      const r=cvs.getBoundingClientRect();
+      const DPR2=window.devicePixelRatio||1;
+      cvs.width=Math.floor(r.width*DPR2);
+      cvs.height=Math.floor(r.height*DPR2);
+      ctx.setTransform(DPR2,0,0,DPR2,0,0);
+    }
+    resizeScope2();
+    addEventListener('resize',resizeScope2);
 
-    function t3_init(){
-      if(t3Initialized) return;
-      t3Initialized = true;
-
-      const plotBox = document.getElementById('t3-plot');
-      const cv      = document.getElementById('t3-cv');
-      const ch      = document.getElementById('t3-ch');
-      const cvTag   = document.getElementById('t3-cv-tag');
-      const chTag   = document.getElementById('t3-ch-tag');
-
-      let dragging = null;
-
-      // začiatok ťahania kurzorov
-      plotBox.addEventListener('pointerdown', e => {
-        const cvRect = cv.getBoundingClientRect();
-        const chRect = ch.getBoundingClientRect();
-
-        const nearV = Math.abs(e.clientX - (cvRect.left + cvRect.width/2)) < 10;
-        const nearH = Math.abs(e.clientY - (chRect.top  + chRect.height/2)) < 10;
-
-        if(nearV) dragging = 'v';
-        else if(nearH) dragging = 'h';
-      });
-
-      window.addEventListener('pointerup', () => dragging = null);
-
-      window.addEventListener('pointermove', e => {
-        if(!dragging) return;
-
-        const rect = plotBox.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-        const w = rect.width;
-        const h = rect.height;
-
-        const PADX = 40, PADY = 20;
-        const xmin = PADX, xmax = w - 10;
-        const ymin = PADY, ymax = h - PADY;
-        const midY = (ymin + ymax) / 2;
-
-        const phiMin = -90, phiMax = 630;
-        const span   = phiMax - phiMin;
-
-        if(dragging === 'v'){
-          if(x < xmin) x = xmin;
-          if(x > xmax) x = xmax;
-          cv.style.left = `${x}px`;
-          const phi = phiMin + ((x - xmin) / (xmax - xmin)) * span;
-          cvTag.textContent = `ωt ≈ ${phi.toFixed(0)}°`;
-        }else if(dragging === 'h'){
-          if(y < ymin) y = ymin;
-          if(y > ymax) y = ymax;
-          ch.style.top = `${y}px`;
-          const u = ((midY - y) / ((ymax - ymin)/2)) * t3State.ymax;
-          chTag.textContent = `U ≈ ${u.toFixed(1)} V`;
+    function drawScope2(){
+      const w=cvs.clientWidth,h=cvs.clientHeight;
+      ctx.clearRect(0,0,w,h);
+      const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
+      ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
+      const ok=scopeConnected.A&&scopeConnected.B;
+      if(ok){
+        const A=(ymax-ymin)*0.35,steps=Math.max(240,Math.floor(xmax-xmin)),tau=Math.PI*2,tt=performance.now()/1000;
+        ctx.strokeStyle='#22c55e';ctx.lineWidth=2.2;ctx.beginPath();
+        for(let i=0;i<=steps;i++){
+          const x=xmin+(i/steps)*(xmax-xmin);
+          const t=(i/steps)*2*(1/f);
+          const y=midY-A*Math.sin(tau*f*t+tt*2.0);
+          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
         }
-      });
+        ctx.stroke();
+        document.getElementById('t2-scope-rdg').textContent='živá vlna…';
+      }else{
+        document.getElementById('t2-scope-rdg').textContent='nepripojené';
+      }
+      requestAnimationFrame(drawScope2);
+    }
+    requestAnimationFrame(drawScope2);
 
-      // prekreslenie pri zmene veľkosti
-      window.addEventListener('resize', () => {
-        if(document.getElementById('task3').classList.contains('active')){
-          drawT3Wave();
-          drawT3Phasor();
-        }
+    // kartičky u(t), Um, U – drag na dropzóny
+    const tray=document.getElementById('t2-tray');
+    tray.addEventListener('dragstart',e=>{
+      const t=e.target.closest('.token');if(!t) return;
+      e.dataTransfer.setData('text/token',t.dataset.token);
+      e.dataTransfer.setData('text/id',t.outerHTML);
+    });
+
+    const dzScope=document.getElementById('dz-scope');
+    const dzDmm=document.getElementById('dz-dmm');
+
+    function setupDz(dz){
+      dz.addEventListener('dragover',e=>e.preventDefault());
+      dz.addEventListener('drop',e=>{
+        e.preventDefault();
+        const tok=e.dataTransfer.getData('text/token');if(!tok) return;
+        const already=[...dz.querySelectorAll('.token')].some(t=>t.dataset.token===tok);
+        if(already) return;
+        const html=e.dataTransfer.getData('text/id');
+        dz.insertAdjacentHTML('beforeend',html);
+        checkAssignments();
       });
     }
+    setupDz(dzScope);
+    setupDz(dzDmm);
 
-    function drawT3Wave(){
-      const canvas = document.getElementById('t3-wave');
-      const box    = document.getElementById('t3-plot');
-      const rect   = box.getBoundingClientRect();
-      const DPR    = window.devicePixelRatio || 1;
+    function checkAssignments(){
+      const tScope=[...dzScope.querySelectorAll('.token')].map(t=>t.dataset.token);
+      const tDmm  =[...dzDmm.querySelectorAll('.token')].map(t=>t.dataset.token);
 
-      canvas.width  = rect.width  * DPR;
-      canvas.height = rect.height * DPR;
+      const scopeOk = tScope.length>0 &&
+                      (tScope.includes('u(t)') || tScope.includes('Um')) &&
+                      !tScope.includes('U');
 
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(DPR,0,0,DPR,0,0);
+      const dmmOk   = tDmm.length>0 &&
+                      tDmm.includes('U') &&
+                      tDmm.every(x=>x==='U');
 
+      dzScope.classList.toggle('dz-ok',scopeOk);
+      dzScope.classList.toggle('dz-bad',tScope.length>0 && !scopeOk);
+      dzDmm.classList.toggle('dz-ok',dmmOk);
+      dzDmm.classList.toggle('dz-bad',tDmm.length>0 && !dmmOk);
+
+      if(scopeOk && dmmOk){
+        setTimeout(()=>alert('Správne! Osciloskop → u(t), U_m; Multimeter → Uef.'),150);
+      }
+    }
+
+    function refreshInstruments(){
+      const lamp=document.getElementById('t2-lamp');
+      const dmmLbl=document.getElementById('t2-dmm-rdg');
+
+      const sOK=scopeConnected.A&&scopeConnected.B;
+      const vOK=dmmConnected.V&&dmmConnected.COM;
+      const aOK=dmmConnected.A&&dmmConnected.COM;
+
+      lamp.classList.toggle('off',!(sOK||vOK||aOK));
+
+      let txt='--.-',unit='V';
+      if(dmmMode==='ACV'){unit='V';txt=vOK?Ueff.toFixed(1):'--.-';}
+      else if(dmmMode==='DCV'){unit='V';txt=vOK?'0.0':'--.-';}
+      else if(dmmMode==='OHM'){unit='Ω';txt=vOK?'∞':'--';}
+      else if(dmmMode==='ACA'){unit='A';txt=aOK?'??':'--';}
+      else if(dmmMode==='DCA'){unit='A';txt=aOK?'0.00':'--';}
+      dmmLbl.textContent=`${txt} ${unit}`;
+    }
+    refreshInstruments();
+  }
+
+  /* ÚLOHA 3 – fázory */
+
+  const T3_UM_CHOICES = [40,60,80,100,120];
+
+  let t3State = {
+    Um: 80,
+    psi: 20,
+    ymax: 120
+  };
+
+  let t3Initialized = false;
+
+  function t3_init(){
+    if(t3Initialized) return;
+    t3Initialized = true;
+
+    const plotBox = document.getElementById('t3-plot');
+    const cv      = document.getElementById('t3-cv');
+    const ch      = document.getElementById('t3-ch');
+    const cvTag   = document.getElementById('t3-cv-tag');
+    const chTag   = document.getElementById('t3-ch-tag');
+
+    let dragging = null;
+
+    // začiatok ťahania kurzorov
+    plotBox.addEventListener('pointerdown', e => {
+      const cvRect = cv.getBoundingClientRect();
+      const chRect = ch.getBoundingClientRect();
+
+      const nearV = Math.abs(e.clientX - (cvRect.left + cvRect.width/2)) < 10;
+      const nearH = Math.abs(e.clientY - (chRect.top  + chRect.height/2)) < 10;
+
+      if(nearV) dragging = 'v';
+      else if(nearH) dragging = 'h';
+    });
+
+    window.addEventListener('pointerup', () => dragging = null);
+
+    window.addEventListener('pointermove', e => {
+      if(!dragging) return;
+
+      const rect = plotBox.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
       const w = rect.width;
       const h = rect.height;
 
-      const phiMin = -90;
-      const phiMax = 630;
+      const PADX = 40, PADY = 20;
+      const xmin = PADX, xmax = w - 10;
+      const ymin = PADY, ymax = h - PADY;
+      const midY = (ymin + ymax) / 2;
+
+      const phiMin = 0, phiMax = 720;
       const span   = phiMax - phiMin;
 
-      ctx.clearRect(0,0,w,h);
-
-      const midY = h/2;
-
-      // osi
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth   = 2;
-
-      const x0 = w * ((0 - phiMin)/span);
-      ctx.beginPath(); ctx.moveTo(x0,0);   ctx.lineTo(x0,h);   ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,midY); ctx.lineTo(w,midY); ctx.stroke();
-
-      // sinus: u(t) = Um*sin(φ+ψ)
-      ctx.strokeStyle = '#22c55e';
-      ctx.lineWidth   = 2;
-      ctx.setLineDash([]);
-
-      ctx.beginPath();
-      for(let i=0;i<=w;i++){
-        const phi = phiMin + (i/w)*span;
-        const y   = midY - t3State.Um*Math.sin(deg2rad(phi + t3State.psi));
-        if(i===0) ctx.moveTo(i,y); else ctx.lineTo(i,y);
+      if(dragging === 'v'){
+        if(x < xmin) x = xmin;
+        if(x > xmax) x = xmax;
+        cv.style.left = `${x}px`;
+        const phi = phiMin + ((x - xmin) / (xmax - xmin)) * span;
+        cvTag.textContent = `ωt ≈ ${phi.toFixed(0)}°`;
+      }else if(dragging === 'h'){
+        if(y < ymin) y = ymin;
+        if(y > ymax) y = ymax;
+        ch.style.top = `${y}px`;
+        const u = ((midY - y) / ((ymax - ymin)/2)) * t3State.ymax;
+        chTag.textContent = `U ≈ ${u.toFixed(1)} V`;
       }
-      ctx.stroke();
+    });
 
-      // kurzory do stredovej polohy (ωt ≈ 0°, U ≈ 0)
-      const cv    = document.getElementById('t3-cv');
-      const ch    = document.getElementById('t3-ch');
-      const cvTag = document.getElementById('t3-cv-tag');
-      const chTag = document.getElementById('t3-ch-tag');
+    // prekreslenie pri zmene veľkosti
+    window.addEventListener('resize', () => {
+      if(document.getElementById('task3').classList.contains('active')){
+        drawT3Wave();
+        drawT3Phasor();
+      }
+    });
 
-      cv.style.left = `${x0 - 10}px`;
-      ch.style.top  = `${midY + 10}px`;
+    // fázor sa má prepočítavať pri písaní
+    document.getElementById('t3-Um-num').addEventListener('input', drawT3Phasor);
+    document.getElementById('t3-psi-num').addEventListener('input', drawT3Phasor);
+  }
 
-      cvTag.textContent = 'ωt ≈ 0°';
-      chTag.textContent = 'U ≈ 0 V';
+  function drawT3Wave(){
+    const canvas = document.getElementById('t3-wave');
+    const box    = document.getElementById('t3-plot');
+    const rect   = box.getBoundingClientRect();
+    const DPR    = window.devicePixelRatio || 1;
+
+    canvas.width  = rect.width  * DPR;
+    canvas.height = rect.height * DPR;
+
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+
+    const w = rect.width;
+    const h = rect.height;
+
+    const PADX=40, PADY=20;
+    const xmin=PADX, xmax=w-10;
+    const ymin=PADY, ymax=h-PADY;
+    const midY=(ymin+ymax)/2;
+
+    const phiMin = 0;
+    const phiMax = 720;
+    const span   = phiMax - phiMin;
+
+    ctx.clearRect(0,0,w,h);
+
+    // mriežka – vertikálne po 90°
+    ctx.strokeStyle='rgba(148,163,184,.25)';
+    ctx.lineWidth=1;
+    for(let deg=0;deg<=720;deg+=90){
+      const x = xmin + ((deg-phiMin)/span)*(xmax-xmin);
+      ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
+    }
+    // horizontálne po 20 V
+    const uStep=20;
+    for(let u=-t3State.ymax;u<=t3State.ymax;u+=uStep){
+      const y = midY - (u/t3State.ymax)*((ymax-ymin)/2);
+      ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
     }
 
-    function drawT3Phasor(){
-      const canvas = document.getElementById('t3-phasor');
-      const parent = canvas.parentElement;
-      const rect   = parent.getBoundingClientRect();
-      const DPR    = window.devicePixelRatio || 1;
+    // osi
+    ctx.setLineDash([]);
+    ctx.strokeStyle='#e5e7eb';
+    ctx.lineWidth=1.4;
+    // U=0
+    ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+    // ωt=0
+    const x0=xmin + ((0-phiMin)/span)*(xmax-xmin);
+    ctx.beginPath();ctx.moveTo(x0,ymin);ctx.lineTo(x0,ymax);ctx.stroke();
 
-      const hPix = rect.height * 0.75;
+    // sínus: u = Um*sin(φ+ψ)
+    ctx.strokeStyle='#22c55e';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    const steps = Math.max(360, Math.floor(xmax-xmin));
+    for(let i=0;i<=steps;i++){
+      const phi = phiMin + (i/steps)*span;
+      const rad = deg2rad(phi + t3State.psi);
+      const u   = t3State.Um*Math.sin(rad);
+      const x   = xmin + ((phi-phiMin)/span)*(xmax-xmin);
+      const y   = midY - (u/t3State.ymax)*((ymax-ymin)/2);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
 
-      canvas.width  = rect.width * DPR;
-      canvas.height = hPix       * DPR;
+    // kurzory na ωt=0, U=0
+    const cv    = document.getElementById('t3-cv');
+    const ch    = document.getElementById('t3-ch');
+    const cvTag = document.getElementById('t3-cv-tag');
+    const chTag = document.getElementById('t3-ch-tag');
 
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(DPR,0,0,DPR,0,0);
+    cv.style.left = `${x0}px`;
+    ch.style.top  = `${midY}px`;
 
-      const w = rect.width;
-      const h = hPix;
-      const cx = w/2;
-      const cy = h/2;
+    cvTag.textContent = 'ωt ≈ 0°';
+    chTag.textContent = 'U ≈ 0.0 V';
+  }
 
-      ctx.clearRect(0,0,w,h);
+  function drawT3Phasor(){
+    const canvas = document.getElementById('t3-phasor');
+    const box    = canvas.parentElement; // .t3-phasorBox
+    const rect   = box.getBoundingClientRect();
+    const DPR    = window.devicePixelRatio || 1;
 
-      // osi
-      ctx.strokeStyle='#ffffff';
-      ctx.lineWidth=1.4;
-      ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(w,cy);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,h);ctx.stroke();
+    const hPix = rect.height*0.8; // komplexná rovina väčšia
 
-      // vstupy od študenta
-      const UmInput  = Number(document.getElementById('t3-Um-num').value || 0);
-      const psiInput = Number(document.getElementById('t3-psi-num').value || 0);
+    canvas.width  = rect.width * DPR;
+    canvas.height = hPix       * DPR;
 
-      const maxLen = h*0.45;
-      const len    = (UmInput/150)*maxLen;
-      const ang    = deg2rad(psiInput); // kladný uhol proti smeru hodín
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(DPR,0,0,DPR,0,0);
 
-      const x = cx + len*Math.cos(ang);
-      const y = cy - len*Math.sin(ang);
+    const w = rect.width;
+    const h = hPix;
+    const cx = w/2;
+    const cy = h/2;
 
-      ctx.strokeStyle='#22c55e';
-      ctx.lineWidth=3;
-      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();
+    ctx.clearRect(0,0,w,h);
+
+    // osi
+    ctx.strokeStyle='#e5e7eb';
+    ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(w,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,h);ctx.stroke();
+
+    // vstup od študenta
+    const UmInput  = Number(document.getElementById('t3-Um-num').value || 0);
+    const psiInput = Number(document.getElementById('t3-psi-num').value || 0);
+
+    if(!Number.isFinite(UmInput) || !Number.isFinite(psiInput)) return;
+
+    const maxLen = Math.min(w,h)*0.4;
+    const len    = Math.min(Math.abs(UmInput),150)/150*maxLen;
+    const ang    = deg2rad(psiInput); // kladný proti smeru hodinových ručičiek
+
+    const x = cx + len*Math.cos(ang);
+    const y = cy - len*Math.sin(ang);
+
+    ctx.strokeStyle='#22c55e';
+    ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();
+
+    // malý bod na konci
+    ctx.beginPath();ctx.arc(x,y,4,0,TAU);ctx.fillStyle='#22c55e';ctx.fill();
+  }
+
+  function newTask3(){
+    state.mistakes = 0;
+
+    // náhodné zadanie – ψu je nenulový násobok 5°
+    t3State.Um   = randFrom(T3_UM_CHOICES);
+    t3State.psi  = randFrom(T3_PSI_CHOICES);
+    t3State.ymax = t3State.Um * 1.4;
+
+    el.taskText.innerHTML =
+      'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
+      'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
+      '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
+      'Potom nastav fázor napravo tak, aby zodpovedal signálu. '+
+      '(Predpokladaj frekvenciu <var>f</var> = ' + T3_F + ' Hz.)';
+
+    const UmNum  = document.getElementById('t3-Um-num');
+    const psiNum = document.getElementById('t3-psi-num');
+
+    UmNum.value  = 0;
+    psiNum.value = 0;
+
+    const fb = document.getElementById('t3-feedback');
+    fb.textContent = '';
+    fb.style.color = '#e5e7eb';
+
+    drawT3Wave();
+    drawT3Phasor();
+    updateHud();
+  }
+
+  // kontrola – ÚLOHA 3
+  document.getElementById('t3-check').onclick = ()=>{
+    const UmUser  = parseFloat(document.getElementById('t3-Um-num').value);
+    const psiUser = parseFloat(document.getElementById('t3-psi-num').value);
+    const fb = document.getElementById('t3-feedback');
+
+    if(!Number.isFinite(UmUser) || !Number.isFinite(psiUser)){
+      fb.textContent='Najprv nastav obe hodnoty – amplitúdu aj uhol.';
+      fb.style.color='#ef4444';
+      return;
     }
 
-    function newTask3(){
-      state.mistakes = 0;
+    const UmTrue  = t3State.Um;
+    const psiTrue = t3State.psi;
 
-      // náhodné zadanie – ψu je nenulový násobok 5°
-      t3State.Um   = randFrom(T3_UM_CHOICES);
-      t3State.psi  = randFrom(T3_PSI_CHOICES);
-      t3State.ymax = t3State.Um * 1.4;
+    const ampOk = Math.abs(UmUser-UmTrue) <= Math.max(3, UmTrue*0.05); // min 3 V alebo 5 %
+    const angOk = Math.abs(psiUser-psiTrue) <= 5; // ±5°
 
-      el.taskText.innerHTML =
-        'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
-        'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
-        '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
-        'Potom nastav fázor napravo tak, aby zodpovedal signálu. '+
-        '(Predpokladaj frekvenciu <var>f</var> = ' + T3_F + ' Hz.)';
+    drawT3Phasor(); // aby sa fázor určite prekreslil podľa zadania
 
-      const UmNum  = document.getElementById('t3-Um-num');
-      const psiNum = document.getElementById('t3-psi-num');
-
-      UmNum.value  = 0;
-      psiNum.value = 0;
-
-      const fb = document.getElementById('t3-feedback');
-      fb.textContent = '';
-      fb.style.color = '#e5e7eb';
-
-      drawT3Wave();
-      drawT3Phasor();
-      updateHud();
+    if(ampOk && angOk){
+      fb.textContent='Tak to je! Tvoja šípka zasiahla jadro vedomostí! 🔓';
+      fb.style.color='#22c55e';
+      dropOneLock();
+      newTask3();
+      return;
     }
 
-    // kontrola – ÚLOHA 3
-    document.getElementById('t3-check').onclick = ()=>{
-      const UmUser  = parseFloat(document.getElementById('t3-Um-num').value);
-      const psiUser = parseFloat(document.getElementById('t3-psi-num').value);
-      const fb = document.getElementById('t3-feedback');
+    // chyby
+    state.mistakes++;
 
-      if(!Number.isFinite(UmUser) || !Number.isFinite(psiUser)){
-        fb.textContent='Najprv nastav obe hodnoty – amplitúdu aj uhol.';
-        fb.style.color='#ef4444';
-        return;
-      }
+    if(!angOk && ampOk){
+      fb.textContent='Tento uhol je väčší ako moja trpezlivosť!';
+    }else if(!ampOk && angOk){
+      fb.textContent='Nezamieňaj sinus za kosinus a uvidíš pravdu!';
+    }else{
+      fb.textContent='„Radián a stupeň nie sú len tak jedno!“';
+    }
+    fb.style.color='#f97316';
+    failFeedback();
 
-      const UmTrue  = t3State.Um;
-      const psiTrue = t3State.psi;
+    if(state.mistakes>=2){
+      fb.textContent='Radián a stupeň nie sú len tak jedno! Mením zadanie.';
+      fb.style.color='#ef4444';
+      showMuhaha();
+      newTask3();
+    }
 
-      const ampOk = Math.abs(UmUser-UmTrue) <= Math.max(3, UmTrue*0.05); // min 3 V alebo 5 %
-      const angOk = Math.abs(psiUser-psiTrue) <= 5; // ±5°
+    updateHud();
+  };
 
-      if(ampOk && angOk){
-        fb.textContent='Tak to je! Tvoja šípka zasiahla jadro vedomostí! 🔓';
-        fb.style.color='#22c55e';
-        dropOneLock();
-        newTask3();
-        return;
-      }
+  // ŠTART – Úloha 1 po načítaní
+  (function boot(){
+    resizeOsc();
+    newTask1();
+  })();
+</script>
 
-      // chyby
-      state.mistakes++;
-
-      if(!angOk && ampOk){
-        fb.textContent='Tento uhol je väčší ako moja trpezlivosť!';
-      }else if(!ampOk && angOk){
-        fb.textContent='Nezamieňaj sinus za kosinus a uvidíš pravdu!';
-      }else{
-        fb.textContent='„Radián a stupeň nie sú len tak jedno!“';
-      }
-      fb.style.color='#f97316';
-      failFeedback();
-
-      if(state.mistakes>=2){
-        fb.textContent='Radián a stupeň nie sú len tak jedno! Mením zadanie.';
-        fb.style.color='#ef4444';
-        showMuhaha();
-        newTask3();
-      }
-
-      updateHud();
-    };
-
-    // ŠTART – Úloha 1 po načítaní
-    (function boot(){
-      resizeOsc();
-      newTask1();
-    })();
-  </script>
 </body>
 </html>
