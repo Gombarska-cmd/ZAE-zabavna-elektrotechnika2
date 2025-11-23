@@ -1386,19 +1386,6 @@ const T3_PSI_CHOICES = (() => {
   return arr;
 })();
 
-function newTask3(){
-  t3State.Um = randFrom([40,60,80,100,120]);
-  t3State.psi = randFrom(T3_PSI_CHOICES);
-
-  document.getElementById('t3-Um-num').value = 0;
-  document.getElementById('t3-psi-num').value = 0;
-
-  document.getElementById('taskText').innerHTML =
-    'Z grafu urči U<sub>m</sub> a ψ<sub>u</sub>.';
-
-  drawT3Wave();
-  drawT3Phasor();
-}
 
 function drawT3Wave(){
   const c = document.getElementById('t3-wave');
