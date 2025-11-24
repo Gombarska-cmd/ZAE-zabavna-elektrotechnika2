@@ -1375,248 +1375,287 @@
       refreshInstruments();
     }
 
-    /* ÚLOHA 3 – WAVE + FÁZOR */
-    const T3_UM_CHOICES=[40,60,80,100,120];
-    const T3_PSI_CHOICES=(()=>{
-      const arr=[];for(let p=5;p<=85;p+=5){arr.push(p,-p);}return arr;
-    })();
-    const T3_F=50;
+   /* ÚLOHA 3 – WAVE + FÁZOR */
+const T3_UM_CHOICES=[40,60,80,100,120];
+const T3_PSI_CHOICES=(()=>{
+  const arr=[];for(let p=5;p<=85;p+=5){arr.push(p,-p);}return arr;
+})();
+const T3_F=50;
 
-    let t3State={Um:80,psi:0};
-    let t3Ready=false;
+let t3State={Um:80,psi:0};
+let t3Ready=false;
 
-    function t3_init(){
-      if(t3Ready) return;
-      t3Ready=true;
+// kurzory – DOM referencie
+let t3PlotBox, t3Cv, t3Ch, t3CvTag, t3ChTag;
+let t3Dragging=null;
 
-      const UmNum=document.getElementById('t3-Um-num');
-      const psiNum=document.getElementById('t3-psi-num');
+function t3_init(){
+  if(t3Ready) return;
+  t3Ready=true;
 
-      UmNum.addEventListener('input',drawT3Phasor);
-      psiNum.addEventListener('input',drawT3Phasor);
+  const UmNum=document.getElementById('t3-Um-num');
+  const psiNum=document.getElementById('t3-psi-num');
 
-      window.addEventListener('resize',()=>{
-        drawT3Wave();
-        drawT3Phasor();
-      });
+  UmNum.addEventListener('input',drawT3Phasor);
+  psiNum.addEventListener('input',drawT3Phasor);
+
+  t3PlotBox=document.getElementById('t3-plot');
+  t3Cv=document.getElementById('t3-cv');
+  t3Ch=document.getElementById('t3-ch');
+  t3CvTag=document.getElementById('t3-cv-tag');
+  t3ChTag=document.getElementById('t3-ch-tag');
+
+  // interaktivita kurzorov
+  t3PlotBox.addEventListener('pointerdown',e=>{
+    const cvRect=t3Cv.getBoundingClientRect();
+    const chRect=t3Ch.getBoundingClientRect();
+    const nearV=Math.abs(e.clientX-(cvRect.left+cvRect.width/2))<10;
+    const nearH=Math.abs(e.clientY-(chRect.top+chRect.height/2))<10;
+    if(nearV) t3Dragging='v';
+    else if(nearH) t3Dragging='h';
+  });
+  window.addEventListener('pointerup',()=>t3Dragging=null);
+  window.addEventListener('pointermove',e=>{
+    if(!t3Dragging) return;
+    const rect=t3PlotBox.getBoundingClientRect();
+    let x=e.clientX-rect.left;
+    let y=e.clientY-rect.top;
+    const w=rect.width,h=rect.height;
+
+    const PADX=40,PADY=20;
+    const xmin=PADX,xmax=w-10;
+    const ymin=PADY,ymax=h-PADY;
+    const midY=(ymin+ymax)/2;
+    const phiMin=0,phiMax=720;
+    const span=phiMax-phiMin;
+
+    if(t3Dragging==='v'){
+      if(x<xmin) x=xmin;
+      if(x>xmax) x=xmax;
+      t3Cv.style.left=`${x}px`;
+      const phi=phiMin+((x-xmin)/(xmax-xmin))*span;
+      t3CvTag.textContent=`ωt ≈ ${phi.toFixed(0)}°`;
+    }else if(t3Dragging==='h'){
+      if(y<ymin) y=ymin;
+      if(y>ymax) y=ymax;
+      t3Ch.style.top=`${y}px`;
+      const u=((midY-y)/((ymax-ymin)/2))*t3State.ymax;
+      t3ChTag.textContent=`U ≈ ${u.toFixed(1)} V`;
     }
+  });
 
-    function newTask3(){
-      state.mistakes=0;
+  window.addEventListener('resize',()=>{
+    drawT3Wave();
+    drawT3Phasor();
+  });
+}
 
-      t3State.Um = randFrom(T3_UM_CHOICES);
-      t3State.psi = randFrom(T3_PSI_CHOICES);
+function newTask3(){
+  state.mistakes=0;
 
-      t3State.ymax = t3State.Um*1.4;
+  t3State.Um = randFrom(T3_UM_CHOICES);
+  t3State.psi = randFrom(T3_PSI_CHOICES);
+  t3State.ymax = t3State.Um*1.4;
 
-      el.taskText.innerHTML =
-        'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
-        'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
-        '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
-        'Potom nastav fázor napravo tak, aby zodpovedal signálu. '+
-        '(Predpokladaj frekvenciu <var>f</var> = '+T3_F+' Hz.)';
+  el.taskText.innerHTML =
+    'Úloha 3: Z vlny urob šípku – nech viem, aký šok dostaneš! '+
+    'Z grafu časového priebehu pomocou posuvných kurzorov vyčítaj '+
+    '<var>U</var><sub>m</sub> a počiatočnú fázu <span class="psi">ψ</span><sub>u</sub>. '+
+    'Potom nastav fázor napravo tak, aby zodpovedal signálu. '+
+    '(Predpokladaj frekvenciu <var>f</var> = '+T3_F+' Hz.)';
 
-      document.getElementById('t3-Um-num').value='0';
-      document.getElementById('t3-psi-num').value='0';
+  document.getElementById('t3-Um-num').value='0';
+  document.getElementById('t3-psi-num').value='0';
 
-      const fb=document.getElementById('t3-feedback');
-      fb.textContent='';
-      fb.style.color='#e5e7eb';
+  const fb=document.getElementById('t3-feedback');
+  fb.textContent='';
+  fb.style.color='#e5e7eb';
 
-      drawT3Wave();
-      drawT3Phasor();
-      updateHud();
-    }
+  drawT3Wave();
+  drawT3Phasor();
+  updateHud();
+}
 
-    function drawT3Wave(){
-      const c=document.getElementById('t3-wave');
-      const ctx=c.getContext('2d');
-      const box=document.getElementById('t3-plot').getBoundingClientRect();
-      const DPR=window.devicePixelRatio||1;
-      c.width=box.width*DPR;
-      c.height=box.height*DPR;
-      ctx.setTransform(DPR,0,0,DPR,0,0);
+function drawT3Wave(){
+  const c=document.getElementById('t3-wave');
+  const ctx=c.getContext('2d');
+  const box=document.getElementById('t3-plot').getBoundingClientRect();
+  const DPR=window.devicePixelRatio||1;
+  c.width=box.width*DPR;
+  c.height=box.height*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
 
-      const w=box.width,h=box.height;
-      ctx.clearRect(0,0,w,h);
+  const w=box.width,h=box.height;
+  ctx.clearRect(0,0,w,h);
 
-      const PADX=40,PADY=20;
-      const xmin=PADX,xmax=w-10;
-      const ymin=PADY,ymax=h-PADY;
-      const midY=(ymin+ymax)/2;
+  const PADX=40,PADY=20;
+  const xmin=PADX,xmax=w-10;
+  const ymin=PADY,ymax=h-PADY;
+  const midY=(ymin+ymax)/2;
 
-      const phiMin=0,phiMax=720; // 0° až 720°
-      const span=phiMax-phiMin;
+  const phiMin=0,phiMax=720;
+  const span=phiMax-phiMin;
 
-      // mriežka – vertikálne každých 90°
-      ctx.strokeStyle='rgba(148,163,184,.22)';
-      ctx.lineWidth=1;
-      for(let xDeg=0;xDeg<=720;xDeg+=90){
-        const px=xmin + ((xDeg-phiMin)/span)*(xmax-xmin);
-        ctx.beginPath();ctx.moveTo(px,ymin);ctx.lineTo(px,ymax);ctx.stroke();
-      }
-      // horizontálne línie po 20 V
-      const yStep=20;
-      ctx.strokeStyle='rgba(148,163,184,.22)';
-      for(let y=-100;y<=100;y+=yStep){
-        const py=midY - (y/(t3State.ymax))*((ymax-ymin)/2);
-        ctx.beginPath();ctx.moveTo(xmin,py);ctx.lineTo(xmax,py);ctx.stroke();
-      }
+  // mriežka
+  ctx.strokeStyle='rgba(148,163,184,.22)';
+  ctx.lineWidth=1;
+  for(let xDeg=0;xDeg<=720;xDeg+=90){
+    const px=xmin+((xDeg-phiMin)/span)*(xmax-xmin);
+    ctx.beginPath();ctx.moveTo(px,ymin);ctx.lineTo(px,ymax);ctx.stroke();
+  }
+  const yStep=20;
+  for(let y=-100;y<=100;y+=yStep){
+    const py=midY-(y/t3State.ymax)*((ymax-ymin)/2);
+    ctx.beginPath();ctx.moveTo(xmin,py);ctx.lineTo(xmax,py);ctx.stroke();
+  }
 
-      // osi – U=0 a ωt=0
-      ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1.4;
-      ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
-      const x0=xmin + ((0-phiMin)/span)*(xmax-xmin);
-      ctx.beginPath();ctx.moveTo(x0,ymin);ctx.lineTo(x0,ymax);ctx.stroke();
+  // osi
+  ctx.strokeStyle='#e5e7eb';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
+  const x0=xmin+((0-phiMin)/span)*(xmax-xmin);
+  ctx.beginPath();ctx.moveTo(x0,ymin);ctx.lineTo(x0,ymax);ctx.stroke();
 
-      // sínusovka
-      ctx.strokeStyle='#22c55e';ctx.lineWidth=2.2;
-      ctx.beginPath();
-      const steps=span;
-      for(let i=0;i<=steps;i++){
-        const phi=phiMin + (i/steps)*span;
-        const rad=deg2rad(phi + t3State.psi);
-        const u=t3State.Um*Math.sin(rad);
-        const x=xmin + ((phi-phiMin)/span)*(xmax-xmin);
-        const y=midY - (u/(t3State.ymax))*((ymax-ymin)/2);
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      }
-      ctx.stroke();
+  // sínus
+  ctx.strokeStyle='#22c55e';ctx.lineWidth=2.2;
+  ctx.beginPath();
+  const steps=span;
+  for(let i=0;i<=steps;i++){
+    const phi=phiMin+(i/steps)*span;
+    const rad=deg2rad(phi+t3State.psi);
+    const u=t3State.Um*Math.sin(rad);
+    const x=xmin+((phi-phiMin)/span)*(xmax-xmin);
+    const y=midY-(u/t3State.ymax)*((ymax-ymin)/2);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
 
-      // kurzory – 0° a U=0
-      const cv=document.getElementById('t3-cv');
-      const ch=document.getElementById('t3-ch');
-      const cvTag=document.getElementById('t3-cv-tag');
-      const chTag=document.getElementById('t3-ch-tag');
+  // nastavenie kurzorov na (0°, 0 V)
+  if(!t3Cv || !t3Ch) return;
+  t3Cv.style.left=`${x0}px`;
+  t3Ch.style.top =`${midY}px`;
+  t3CvTag.textContent='ωt ≈ 0°';
+  t3ChTag.textContent='U ≈ 0.0 V';
+}
 
-      const xCursor=x0;
-      const yCursor=midY;
+function drawT3Phasor(){
+  const c=document.getElementById('t3-phasor');
+  const ctx=c.getContext('2d');
+  const box=c.getBoundingClientRect();
+  const DPR=window.devicePixelRatio||1;
+  c.width=box.width*DPR;
+  c.height=box.height*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
 
-      cv.style.left=`${xCursor}px`;
-      ch.style.top =`${yCursor}px`;
-      cvTag.textContent='ωt ≈ 0°';
-      chTag.textContent='U ≈ 0.0 V';
-    }
+  const w=box.width,h=box.height;
+  ctx.clearRect(0,0,w,h);
 
-    function drawT3Phasor(){
-      const c=document.getElementById('t3-phasor');
-      const ctx=c.getContext('2d');
-      const box=c.getBoundingClientRect();
-      const DPR=window.devicePixelRatio||1;
-      c.width=box.width*DPR;
-      c.height=box.height*DPR;
-      ctx.setTransform(DPR,0,0,DPR,0,0);
+  const PAD=24;
+  const xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD;
+  const cx=(xmin+xmax)/2,cy=(ymin+ymax)/2;
+  const R=Math.min(xmax-xmin,ymax-ymin)/2;
 
-      const w=box.width,h=box.height;
-      ctx.clearRect(0,0,w,h);
+  // mriežka
+  const G=R/3;
+  ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(148,163,184,.22)';
+  for(let x=cx-3*G;x<=cx+3*G+1;x+=G){
+    ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
+  }
+  for(let y=cy-3*G;y<=cy+3*G+1;y+=G){
+    ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
+  }
 
-      const PAD=24;
-      const xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD;
-      const cx=(xmin+xmax)/2,cy=(ymin+ymax)/2;
-      const R=Math.min(xmax-xmin,ymax-ymin)/2;
+  // osi Re / Im
+  ctx.lineWidth=1.4;
+  ctx.strokeStyle='rgba(226,232,240,.9)';
+  ctx.beginPath();ctx.moveTo(xmin,cy);ctx.lineTo(xmax,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,ymin);ctx.lineTo(cx,ymax);ctx.stroke();
 
-      // mriežka (štvorcová) – 6x6
-      const G=R/3;
-      ctx.lineWidth=1;
-      ctx.strokeStyle='rgba(148,163,184,.22)';
-      for(let x=cx-3*G;x<=cx+3*G+1;x+=G){
-        ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
-      }
-      for(let y=cy-3*G;y<=cy+3*G+1;y+=G){
-        ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
-      }
+  ctx.fillStyle='rgba(209,213,219,.9)';
+  ctx.font='12px system-ui';
+  ctx.fillText('Re',xmax-26,cy-6);
+  ctx.fillText('Im',cx+6,ymin+12);
 
-      // osi Re / Im
-      ctx.lineWidth=1.4;
-      ctx.strokeStyle='rgba(226,232,240,.9)';
-      ctx.beginPath();ctx.moveTo(xmin,cy);ctx.lineTo(xmax,cy);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(cx,ymin);ctx.lineTo(cx,ymax);ctx.stroke();
+  // kružnica
+  ctx.strokeStyle='rgba(55,65,81,.85)';
+  ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.stroke();
 
-      ctx.fillStyle='rgba(209,213,219,.9)';
-      ctx.font='12px system-ui';
-      ctx.fillText('Re', xmax-26, cy-6);
-      ctx.fillText('Im', cx+6, ymin+12);
+  // fázor z odpovede
+  const UmInput=Number(document.getElementById('t3-Um-num').value||0);
+  const psiInput=Number(document.getElementById('t3-psi-num').value||0);
+  const scale=R/150;
+  const len=UmInput*scale;
+  if(len<=0) return;
 
-      // referenčná kružnica
-      ctx.strokeStyle='rgba(55,65,81,.85)';
-      ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.stroke();
+  const ang=deg2rad(psiInput);
+  const ex=cx+len*Math.cos(ang);
+  const ey=cy-len*Math.sin(ang);
 
-      // fázor z odpovede
-      const UmInput=Number(document.getElementById('t3-Um-num').value||0);
-      const psiInput=Number(document.getElementById('t3-psi-num').value||0);
+  ctx.strokeStyle='#22c55e';
+  ctx.fillStyle='#22c55e';
+  ctx.lineWidth=2.4;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();
 
-      const scale=R/150; // 150 V -> R
-      const len=UmInput*scale;
-      if(len<=0) return;
+  const ah=8;
+  const leftAng=ang+Math.PI-0.3;
+  const rightAng=ang+Math.PI+0.3;
+  ctx.beginPath();
+  ctx.moveTo(ex,ey);
+  ctx.lineTo(ex+ah*Math.cos(leftAng),ey-ah*Math.sin(leftAng));
+  ctx.lineTo(ex+ah*Math.cos(rightAng),ey-ah*Math.sin(rightAng));
+  ctx.closePath();ctx.fill();
+}
 
-      const ang=deg2rad(psiInput);
-      const ex=cx + len*Math.cos(ang);
-      const ey=cy - len*Math.sin(ang);
+// kontrola – ÚLOHA 3
+document.getElementById('t3-check').onclick=()=>{
+  const UmUser=parseFloat(document.getElementById('t3-Um-num').value);
+  const psiUser=parseFloat(document.getElementById('t3-psi-num').value);
+  const fb=document.getElementById('t3-feedback');
 
-      ctx.strokeStyle='#22c55e';
-      ctx.fillStyle='#22c55e';
-      ctx.lineWidth=2.4;
-      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.stroke();
+  if(!Number.isFinite(UmUser)||!Number.isFinite(psiUser)){
+    fb.textContent='Najprv nastav obe hodnoty – amplitúdu aj uhol.';
+    fb.style.color='#ef4444';
+    return;
+  }
 
-      const ah=8;
-      const leftAng = ang+Math.PI-0.3;
-      const rightAng= ang+Math.PI+0.3;
-      ctx.beginPath();
-      ctx.moveTo(ex,ey);
-      ctx.lineTo(ex + ah*Math.cos(leftAng), ey - ah*Math.sin(leftAng));
-      ctx.lineTo(ex + ah*Math.cos(rightAng),ey - ah*Math.sin(rightAng));
-      ctx.closePath();ctx.fill();
-    }
+  const UmTrue=t3State.Um;
+  const psiTrue=t3State.psi;
 
-    // kontrola – ÚLOHA 3
-    document.getElementById('t3-check').onclick=()=>{
-      const UmUser=parseFloat(document.getElementById('t3-Um-num').value);
-      const psiUser=parseFloat(document.getElementById('t3-psi-num').value);
-      const fb=document.getElementById('t3-feedback');
+  const ampOk=Math.abs(UmUser-UmTrue)<=Math.max(3,UmTrue*0.05);
+  const angOk=Math.abs(psiUser-psiTrue)<=5;
 
-      if(!Number.isFinite(UmUser) || !Number.isFinite(psiUser)){
-        fb.textContent='Najprv nastav obe hodnoty – amplitúdu aj uhol.';
-        fb.style.color='#ef4444';
-        return;
-      }
+  drawT3Phasor();
 
-      const UmTrue=t3State.Um;
-      const psiTrue=t3State.psi;
+  if(ampOk&&angOk){
+    fb.textContent='Tak to je! Tvoja šípka zasiahla jadro vedomostí! 🔓';
+    fb.style.color='#22c55e';
+    dropOneLock();
+    newTask3();
+    return;
+  }
 
-      const ampOk=Math.abs(UmUser-UmTrue)<=Math.max(3,UmTrue*0.05);
-      const angOk=Math.abs(psiUser-psiTrue)<=5;
+  state.mistakes++;
 
-      drawT3Phasor();
+  if(!angOk&&ampOk){
+    fb.textContent='Tento uhol je väčší ako moja trpezlivosť!';
+  }else if(!ampOk&&angOk){
+    fb.textContent='Nezamieňaj sinus za kosinus a uvidíš pravdu!';
+  }else{
+    fb.textContent='„Radián a stupeň nie sú len tak jedno!“';
+  }
+  fb.style.color='#f97316';
+  failFeedback();
 
-      if(ampOk && angOk){
-        fb.textContent='Tak to je! Tvoja šípka zasiahla jadro vedomostí! 🔓';
-        fb.style.color='#22c55e';
-        dropOneLock();
-        newTask3();
-        return;
-      }
+  if(state.mistakes>=2){
+    fb.textContent='Radián a stupeň nie sú len tak jedno! Mením zadanie.';
+    fb.style.color='#ef4444';
+    showMuhaha();
+    newTask3();
+  }
 
-      state.mistakes++;
+  updateHud();
+};
 
-      if(!angOk && ampOk){
-        fb.textContent='Tento uhol je väčší ako moja trpezlivosť!';
-      }else if(!ampOk && angOk){
-        fb.textContent='Nezamieňaj sinus za kosinus a uvidíš pravdu!';
-      }else{
-        fb.textContent='„Radián a stupeň nie sú len tak jedno!“';
-      }
-      fb.style.color='#f97316';
-      failFeedback();
-
-      if(state.mistakes>=2){
-        fb.textContent='Radián a stupeň nie sú len tak jedno! Mením zadanie.';
-        fb.style.color='#ef4444';
-        showMuhaha();
-        newTask3();
-      }
-
-      updateHud();
-    };
 
     // štart
     (function boot(){
