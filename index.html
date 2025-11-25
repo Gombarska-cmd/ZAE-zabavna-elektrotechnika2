@@ -265,6 +265,20 @@
       border-radius:12px;padding:12px;color:#e5e7eb;
     }
     .t2-h{font-weight:800;margin:0 0 8px 0}
+   
+    .t2-bottom-panel{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:25%;
+  border-top:1px solid rgba(255,255,255,.2);
+}
+
+#t2-msg{
+  font-weight:700;
+  margin-top:6px;
+}
 
     .scope2,.dmm{
       position:relative;border-radius:12px;padding:12px;
@@ -684,32 +698,38 @@
         <div class="t2-card">
           <h3 class="t2-h">Priraď, čo zobrazuje ktorý prístroj</h3>
 
-          <div class="tray" id="t2-tray">
-            <div class="token" draggable="true" data-token="u(t)">u(t)</div>
-            <div class="token" draggable="true" data-token="Um">U<sub>m</sub></div>
-            <div class="token" draggable="true" data-token="U">U</div>
-          </div>
-          <p class="hint" style="margin-top:4px;margin-bottom:8px">
-            Potiahni kartičky na <b>Osciloskop</b> alebo <b>Multimeter</b>.
-            Osciloskop zobrazuje časový priebeh, multimeter efektívnu hodnotu.
-          </p>
+<div class="tray" id="t2-tray">
+  <div class="token" draggable="true" data-token="u(t)">u(t)</div>
+  <div class="token" draggable="true" data-token="Um">U<sub>m</sub></div>
+  <div class="token" draggable="true" data-token="U">U</div>
+  <div class="token" draggable="true" data-token="Us">U<sub>s</sub></div>
+  <div class="token" draggable="true" data-token="i(t)">i(t)</div>
+  <div class="token" draggable="true" data-token="Im">I<sub>m</sub></div>
+  <div class="token" draggable="true" data-token="I">I</div>
+  <div class="token" draggable="true" data-token="Is">I<sub>s</sub></div>
+  <div class="token" draggable="true" data-token="t">t</div>
+  <div class="token" draggable="true" data-token="f">f</div>
+  <div class="token" draggable="true" data-token="R">R</div>
+</div>
 
-          <h3 class="t2-h" style="margin-top:4px">Obvod: zdroj – žiarovka</h3>
-          <div class="circuit">
-            <div class="lamp off" id="t2-lamp"></div>
+<p class="hint">
+  Potiahni kartičku na <b>Osciloskop</b> a <b>Multimeter</b>.
+</p>
 
-            <div class="terminal tA" data-terminal="A" title="svorka A"></div>
-            <div class="terminal tB" data-terminal="B" title="svorka B"></div>
-            <div class="termLabel labA">A</div>
-            <div class="termLabel labB">B</div>
+<div class="circuit">
+  <div class="lamp" id="t2-lamp"></div>
 
-            <div class="source">
-              <div class="src-post pos" title="+ zdroj"></div>
-              <div style="font-weight:700;color:#334155">LAB AC SOURCE</div>
-              <div class="src-post neg" title="− zdroj"></div>
-            </div>
-            <button class="t2-btn" id="t2-reset">Reset pripojení</button>
-          </div>
+  <div class="terminal tA" data-terminal="A"></div>
+  <div class="terminal tB" data-terminal="B"></div>
+  <div class="termLabel labA">A</div>
+  <div class="termLabel labB">B</div>
+
+  <img src="/mnt/data/meranie1.png" style="width:100%;max-height:240px;object-fit:contain;">
+
+  <button class="t2-btn" id="t2-check">Skontrolovať</button>
+  <button class="t2-btn" id="t2-reset" style="right:130px">Reset</button>
+</div>
+
 
           <p class="hint" style="margin-top:8px">
             Úloha 2: Pripoj sondy osciloskopu a multimetra na svorky
@@ -1209,77 +1229,57 @@
     /* ÚLOHA 2 – inicializácia */
     let t2Ready=false;
     function t2_init(){
-      if(t2Ready) return;
-      t2Ready=true;
+  const lamp=document.getElementById('t2-lamp');
+  const checkBtn=document.getElementById('t2-check');
+  const resetBtn=document.getElementById('t2-reset');
 
-      const UeffOptions=[40,60,110,230];
-      const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
-      const f=50;
+  let connMap={};
+  let solved=false;
 
-      let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
-      let dmmMode='ACV';
+  document.querySelectorAll('#t2 .terminal').forEach(t=>{
+    t.addEventListener('dragover',e=>e.preventDefault());
+    t.addEventListener('drop',e=>{
+      e.preventDefault();
+      const pid=e.dataTransfer.getData('text/probe');
+      connMap[pid]=t.dataset.terminal;
+    });
+  });
 
-      const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
-      const sel=document.getElementById('sel');
+  resetBtn.onclick=()=>{
+    solved=false;
+    lamp.classList.remove('off');
+    document.getElementById('dz-scope').innerHTML='';
+    document.getElementById('dz-dmm').innerHTML='';
+  };
 
-      document.querySelectorAll('.sel-btn').forEach(b=>{
-        b.onclick=()=>{
-          dmmMode=b.dataset.mode;
-          sel.style.setProperty('--angle',modeAngles[dmmMode]+'deg');
-          document.querySelectorAll('.sel-btn')
-            .forEach(x=>x.classList.toggle('active',x===b));
-          refreshInstruments();
-        };
-      });
-      document.querySelector('.sel-btn[data-mode="ACV"]').click();
+  const dzScope=document.getElementById('dz-scope');
+  const dzDmm=document.getElementById('dz-dmm');
 
-      const probes=[...document.querySelectorAll('#t2 .jack')];
-      probes.forEach(p=>{
-        p.addEventListener('dragstart',e=>{
-          e.dataTransfer.setData('text/probe',p.dataset.probe);
-        });
-      });
+  function getTokens(dz){
+    return [...dz.querySelectorAll('.token')].map(t=>t.dataset.token);
+  }
 
-      const terms=[...document.querySelectorAll('#t2 .terminal')];
-      terms.forEach(t=>{
-        t.addEventListener('dragover',e=>e.preventDefault());
-        t.addEventListener('drop',e=>{
-          e.preventDefault();
-          const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
-          connMap[pid]=t.dataset.terminal;
+  checkBtn.onclick=()=>{
+    const scopeOK = getTokens(dzScope).includes('u(t)');
+    const dmmOK   = getTokens(dzDmm).includes('U');
 
-          scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
-          scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
-          dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
-          dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
-          dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
+    const probesOK =
+      (connMap.scopeA==='A' || connMap.scopeB==='A') &&
+      (connMap.scopeA==='B' || connMap.scopeB==='B') &&
+      (connMap.dmmV && connMap.dmmCOM);
 
-          refreshInstruments();
-        });
-      });
+    if(scopeOK && dmmOK && probesOK){
+      lamp.classList.remove('off');
+      alert('Správne zapojenie!');
+      dropOneLock();
+      solved=true;
+    }else{
+      lamp.classList.add('off');
+      alert('Zlé zapojenie.');
+    }
+  };
+}
 
-      document.getElementById('t2-reset').onclick=()=>{
-        connMap={};
-        scopeConnected={A:false,B:false};
-        dmmConnected={V:false,COM:false,A:false};
-        document.getElementById('dz-scope').innerHTML='';
-        document.getElementById('dz-dmm').innerHTML='';
-        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
-        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
-        refreshInstruments();
-      };
-
-      const cvs=document.getElementById('t2-wave');
-      const ctx=cvs.getContext('2d');
-      function resizeScope2(){
-        const r=cvs.getBoundingClientRect();
-        const DPR2=window.devicePixelRatio||1;
-        cvs.width=Math.floor(r.width*DPR2);
-        cvs.height=Math.floor(r.height*DPR2);
-        ctx.setTransform(DPR2,0,0,DPR2,0,0);
-      }
-      resizeScope2();
-      addEventListener('resize',resizeScope2);
 
       function drawScope2(){
         const w=cvs.clientWidth,h=cvs.clientHeight;
