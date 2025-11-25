@@ -1282,6 +1282,7 @@
 
 
       function drawScope2(){
+        if(!document.getElementById('task2').classList.contains('active')) return;
         const w=cvs.clientWidth,h=cvs.clientHeight;
         ctx.clearRect(0,0,w,h);
         const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
