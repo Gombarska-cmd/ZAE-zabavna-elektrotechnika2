@@ -1232,78 +1232,148 @@
 
     /* ÚLOHA 2 – inicializácia (plná verzia, opravená) */
     let t2Ready=false;
-    function t2_init(){
-      if(t2Ready) return;
-      t2Ready=true;
+    /* ========= ÚLOHA 2 – OPRAVENÁ LOGIKA ========= */
 
-      const UeffOptions=[40,60,110,230];
-      const Ueff=UeffOptions[Math.floor(Math.random()*UeffOptions.length)];
-      const f=50;
+function t2_init(){
+  const Ueff = 230;
+  const f = 50;
 
-      let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
-      let dmmMode='ACV';
+  let data = {
+    probes: {},
+    scopeOK: false,
+    dmmOK: false,
+    checked:false
+  };
 
-      const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
-      const sel=document.getElementById('sel');
+  const dzScope = document.getElementById('dz-scope');
+  const dzDmm   = document.getElementById('dz-dmm');
+  const lamp    = document.getElementById('t2-lamp');
+  const scopeText = document.getElementById('t2-scope-rdg');
+  const dmmText   = document.getElementById('t2-dmm-rdg');
+  const btnCheck  = document.getElementById('t2-check');
+  const btnReset  = document.getElementById('t2-reset');
+  const cvs       = document.getElementById('t2-wave');
+  const ctx       = cvs.getContext('2d');
 
-      document.querySelectorAll('.sel-btn').forEach(b=>{
-        b.onclick=()=>{
-          dmmMode=b.dataset.mode;
-          sel.style.setProperty('--angle',modeAngles[dmmMode]+'deg');
-          document.querySelectorAll('.sel-btn')
-            .forEach(x=>x.classList.toggle('active',x===b));
-          refreshInstruments();
-        };
-      });
-      document.querySelector('.sel-btn[data-mode="ACV"]').click();
+  // DEFAULT STAV
+  dmmText.textContent = "OFF";
+  scopeText.textContent = "nepripojené";
+  lamp.classList.add("off");
 
-      const probes=[...document.querySelectorAll('#t2 .jack')];
-      probes.forEach(p=>{
-        p.addEventListener('dragstart',e=>{
-          e.dataTransfer.setData('text/probe',p.dataset.probe);
-        });
-      });
+  /* ========== DRAG sondy ========== */
+  document.querySelectorAll('#t2 .jack').forEach(j=>{
+    j.innerHTML = `<span class="dot"></span> sonda`;
 
-      const terms=[...document.querySelectorAll('#t2 .terminal')];
-      terms.forEach(t=>{
-        t.addEventListener('dragover',e=>e.preventDefault());
-        t.addEventListener('drop',e=>{
-          e.preventDefault();
-          const pid=e.dataTransfer.getData('text/probe');if(!pid) return;
-          connMap[pid]=t.dataset.terminal;
+    j.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('probe',j.dataset.probe);
+    });
+  });
 
-          scopeConnected.A=(connMap['scopeA']==='A'||connMap['scopeB']==='A');
-          scopeConnected.B=(connMap['scopeA']==='B'||connMap['scopeB']==='B');
-          dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
-          dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
-          dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
+  document.querySelectorAll('#t2 .terminal').forEach(t=>{
+    t.addEventListener('dragover',e=>e.preventDefault());
 
-          refreshInstruments();
-        });
-      });
+    t.addEventListener('drop',e=>{
+      const p = e.dataTransfer.getData('probe');
+      data.probes[p]=t.dataset.terminal;
+    });
+  });
 
-      document.getElementById('t2-reset').onclick=()=>{
-        connMap={};
-        scopeConnected={A:false,B:false};
-        dmmConnected={V:false,COM:false,A:false};
-        document.getElementById('dz-scope').innerHTML='';
-        document.getElementById('dz-dmm').innerHTML='';
-        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
-        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
-        refreshInstruments();
-      };
+  /* ========== DRAG kartičiek ========== */
+  document.querySelectorAll('.token').forEach(tok=>{
+    tok.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('tok',tok.dataset.token);
+      e.dataTransfer.setData('html',tok.outerHTML);
+    });
+  });
 
-      const cvs=document.getElementById('t2-wave');
-      const ctx=cvs.getContext('2d');
-      function resizeScope2(){
-        const r=cvs.getBoundingClientRect();
-        const DPR2=window.devicePixelRatio||1;
-        cvs.width=Math.floor(r.width*DPR2);
-        cvs.height=Math.floor(r.height*DPR2);
-        ctx.setTransform(DPR2,0,0,DPR2,0,0);
-      }
-      resizeScope2();
-      addEventListener('resize',resizeScope2);
+  function enableDrop(zone){
+    zone.addEventListener('dragover',e=>e.preventDefault());
+    zone.addEventListener('drop',e=>{
+      const html = e.dataTransfer.getData('html');
+      zone.insertAdjacentHTML('beforeend',html);
+    });
+  }
+
+  enableDrop(dzScope);
+  enableDrop(dzDmm);
+
+  /* ========== KONTROLA PO KLIKU ========= */
+  btnCheck.onclick = ()=>{
+
+    const scopeTokens = [...dzScope.querySelectorAll('.token')].map(x=>x.dataset.token);
+    const dmmTokens   = [...dzDmm.querySelectorAll('.token')].map(x=>x.dataset.token);
+
+    const ok1 = scopeTokens.includes('u(t)') || scopeTokens.includes('Um');
+    const ok2 = dmmTokens.includes('U') && dmmTokens.length===1;
+
+    if(ok1){
+      dzScope.classList.add('dz-ok');
+      dzScope.classList.remove('dz-bad');
+    }else{
+      dzScope.classList.add('dz-bad');
+      dzScope.classList.remove('dz-ok');
+    }
+
+    if(ok2){
+      dzDmm.classList.add('dz-ok');
+      dzDmm.classList.remove('dz-bad');
+    }else{
+      dzDmm.classList.add('dz-bad');
+      dzDmm.classList.remove('dz-ok');
+    }
+
+    // zobraz prístroje len keď je správne zapojené
+    const probesOK =
+      (data.probes.scopeA==='A' || data.probes.scopeB==='A') &&
+      (data.probes.scopeA==='B' || data.probes.scopeB==='B');
+
+    if(ok1 && probesOK){
+      drawWave();
+      scopeText.textContent = "pripojené";
+    }
+
+    if(ok2 && probesOK){
+      dmmText.textContent = Ueff.toFixed(1)+" V";
+    }
+
+    lamp.classList.toggle('off', !(ok1 && ok2 && probesOK));
+  };
+
+  /* ========== RESET ========= */
+  btnReset.onclick = ()=>{
+    dzScope.className = "dropzone";
+    dzDmm.className   = "dropzone";
+    dzScope.innerHTML="";
+    dzDmm.innerHTML="";
+    data.probes={};
+    lamp.classList.add('off');
+    dmmText.textContent="OFF";
+    scopeText.textContent="nepripojené";
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+  };
+
+  /* ========== VYKRESLENIE SÍNUS ========= */
+  function drawWave(){
+    const w=cvs.width = cvs.clientWidth;
+    const h=cvs.height = cvs.clientHeight;
+    const mid=h/2;
+    const A=h*0.45;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle="#22c55e";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+
+    for(let x=0;x<w;x++){
+      const t = (x/w)*2*Math.PI;
+      const y = mid - A*Math.sin(t);
+      if(x===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+}
+
 
       function drawScope2(){
         if(!document.getElementById('task2').classList.contains('active')) {
