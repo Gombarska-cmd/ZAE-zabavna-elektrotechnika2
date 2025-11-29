@@ -378,35 +378,61 @@
     }
     .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 
-    /* ÚLOHA 3 – graf + fázor */
-    .t3-cols{
-      position:absolute;
-      inset:18px;
-      display:flex;
-      gap:16px;
-    }
-    .t3-waveBox,
-    .t3-phasorBox{
-      flex:1;
-      background:#020617;
-      border-radius:14px;
-      padding:10px 12px;
-      box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
-      color:#e5e7eb;
-      display:flex;
-      flex-direction:column;
-    }
-    .t3-title{
-      font-weight:700;font-size:14px;margin-bottom:4px;
-    }
-    .t3-plot{
-      position:relative;
-      flex:1;
-      margin-top:4px;
-      border-radius:10px;
-      background:#020617;
-      overflow:hidden;
-    }
+   /* ÚLOHA 3 – graf + fázor (opravené rozloženie) */
+.t3-cols{
+  position:absolute;
+  inset:18px;
+  display:grid;
+  grid-template-columns:200px 1fr; /* vľavo úzky stĺpik, vpravo veľký fázor */
+  gap:16px;
+}
+
+.t3-waveBox{
+  background:#020617;
+  border-radius:14px;
+  padding:10px 8px;
+  box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
+  color:#e5e7eb;
+  display:flex;
+  flex-direction:column;
+}
+
+.t3-phasorBox{
+  background:#020617;
+  border-radius:14px;
+  padding:10px 12px;
+  box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
+  color:#e5e7eb;
+  display:flex;
+  flex-direction:column;
+}
+
+/* titul vľavo zvislo ako na obrazku */
+.t3-waveBox .t3-title{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  text-align:center;
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+/* plátno so sínusovkou vyplní zvyšok úzkeho stĺpika */
+.t3-plot{
+  position:relative;
+  flex:1;
+  border-radius:10px;
+  background:#020617;
+  overflow:hidden;
+  margin-top:4px;
+}
+
+#t3-wave{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
     #t3-wave{
       width:100%;height:100%;display:block;
     }
