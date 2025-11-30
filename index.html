@@ -265,11 +265,19 @@
       border-radius:12px;padding:12px;color:#e5e7eb;
     }
     .t2-h{font-weight:800;margin:0 0 8px 0}
+   
+    .t2-bottom-panel{
+      position:absolute;
+      bottom:0;
+      left:0;
+      right:0;
+      height:25%;
+      border-top:1px solid rgba(255,255,255,.2);
+    }
 
     #t2-msg{
       font-weight:700;
       margin-top:6px;
-      min-height:1.2em;
     }
 
     .scope2,.dmm{
@@ -286,7 +294,6 @@
       repeating-linear-gradient(0deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px),
       repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 1px,transparent 1px 20px);
       opacity:.55;
-      pointer-events:none;
     }
     .dmm-face{
       display:grid;grid-template-columns:1fr 140px;gap:12px;align-items:center;
@@ -306,7 +313,7 @@
       content:"";position:absolute;left:50%;top:50%;
       width:6px;height:38px;background:#e5e7eb;border-radius:3px;
       transform-origin:50% 90%;
-      transform:translate(-50%,-90%) rotate(var(--angle,-120deg)); /* OFF default */
+      transform:translate(-50%,-90%) rotate(var(--angle,-20deg));
     }
     .sel-row{display:flex;justify-content:space-between;font-size:12px;color:#cbd5e1;margin-top:6px}
     .sel-btn{
@@ -355,6 +362,17 @@
     .labA{left:calc(50% - 70px);}
     .labB{left:calc(50% + 50px);}
 
+    .source{
+      position:absolute;left:50%;transform:translateX(-50%);
+      bottom:10px;width:260px;height:60px;border-radius:10px;
+      background:linear-gradient(90deg,#e8eef6 0 60%,#cbd5e1 60 100%);
+      border:2px solid #93a3b8;
+      display:flex;align-items:center;justify-content:space-around;
+    }
+    .src-post{width:18px;height:18px;border-radius:50%;border:2px solid #111}
+    .src-post.pos{background:#ffdddd;border-color:#b91c1c}
+    .src-post.neg{background:#dde9ff;border-color:#1d4ed8}
+
     .t2-btn{
       position:absolute;right:12px;bottom:10px;
       padding:6px 10px;border-radius:8px;
@@ -378,78 +396,62 @@
     }
     .tray{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 
-   /* ÚLOHA 3 – graf + fázor (opravené rozloženie) */
-.t3-cols{
-  position:absolute;
-  inset:18px;
-  display:flex;        /* namiesto display:grid */
-  gap:16px;
-}
-
-.t3-waveBox,
-.t3-phasorBox{
-  flex:1;              /* oba panely rovnako široké */
-  background:#020617;
-  border-radius:14px;
-  padding:10px 12px;
-  box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
-  color:#e5e7eb;
-  display:flex;
-  flex-direction:column;
-}
-
-.t3-title{
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-.t3-phasorBox{
-  background:#020617;
-  border-radius:14px;
-  padding:10px 12px;
-  box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
-  color:#e5e7eb;
-  display:flex;
-  flex-direction:column;
-}
-
-/* titul vľavo zvislo ako na obrazku */
-.t3-waveBox .t3-title{
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-  text-align:center;
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:6px;
-}
-
-/* plátno so sínusovkou vyplní zvyšok úzkeho stĺpika */
-.t3-plot{
-  position:relative;
-  flex:1;
-  border-radius:10px;
-  background:#020617;
-  overflow:hidden;
-  margin-top:4px;
-}
-
-#t3-wave{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
+    /* ÚLOHA 3 – graf + fázor (layout 50/50) */
+    .t3-cols{
+      position:absolute;
+      inset:18px;
+      display:flex;
+      gap:16px;
+    }
+    .t3-waveBox,
+    .t3-phasorBox{
+      flex:1;
+      background:#020617;
+      border-radius:14px;
+      padding:10px 12px;
+      box-shadow:inset 0 0 0 2px #1f2933,inset 0 0 18px rgba(0,0,0,.7);
+      color:#e5e7eb;
+      display:flex;
+      flex-direction:column;
+    }
+    .t3-title{
+      font-weight:700;
+      font-size:14px;
+      margin-bottom:4px;
+      writing-mode:horizontal-tb; /* istota, že nebude vertikálne */
+      transform:none;
+    }
+    .t3-plot{
+      position:relative;
+      flex:1;
+      margin-top:4px;
+      border-radius:10px;
+      background:#020617;
+      overflow:hidden;
+    }
     #t3-wave{
       width:100%;height:100%;display:block;
     }
+
+    /* NOVÉ – osové popisy: U[V] hore vľavo, ωt dole vpravo */
     .t3-axes-labels{
       position:absolute;
-      inset:auto 10px 4px 10px;
-      display:flex;justify-content:space-between;
-      font-size:12px;color:#cbd5e1;
+      inset:0;
+      font-size:12px;
+      color:#cbd5e1;
       pointer-events:none;
     }
+    .t3-axes-labels span:first-child{
+      position:absolute;
+      top:4px;
+      left:10px;
+    }
+    .t3-axes-labels span:last-child{
+      position:absolute;
+      bottom:4px;
+      right:10px;
+    }
+
     .t3-cursor-v,
     .t3-cursor-h{
       position:absolute;
@@ -492,6 +494,7 @@
       min-height:220px;
     }
 
+    /* spodná štvrtina – vstupy + výsledok */
     .t3-bottom{
       display:flex;
       gap:12px;
@@ -508,6 +511,7 @@
       flex-direction:column;
       gap:6px;
       font-size:13px;
+      margin-top:0;
     }
     .t3-inputRow{
       display:flex;
@@ -673,13 +677,12 @@
         <!-- ľavá karta – prístroje -->
         <div class="t2-card">
           <h3 class="t2-h">Meracie prístroje</h3>
-
           <div class="scope2">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong>Osciloskop</strong><span class="hint">pripoj obidve sondy</span>
             </div>
             <div class="scope-screen"><canvas id="t2-wave"></canvas></div>
-            <div class="dmm-reading" id="t2-scope-rdg" style="margin-top:8px">OFF</div>
+            <div class="dmm-reading" id="t2-scope-rdg" style="margin-top:8px">nepripojené</div>
             <div class="jacks">
               <div class="jack red"   draggable="true" data-probe="scopeA"><span class="dot"></span> sonda</div>
               <div class="jack black" draggable="true" data-probe="scopeB"><span class="dot"></span> sonda</div>
@@ -692,9 +695,9 @@
               <strong>Multimeter</strong><span class="hint">pripoj šnúry a zvoľ rozsah</span>
             </div>
             <div class="dmm-face">
-              <div class="dmm-reading" id="t2-dmm-rdg">OFF</div>
+              <div class="dmm-reading" id="t2-dmm-rdg">--.- V</div>
               <div>
-                <div class="selector" id="sel"></div>
+                <div class="selector" id="sel" style="--angle:-20deg"></div>
                 <div class="sel-row" style="margin-top:8px">
                   <button class="sel-btn" data-mode="ACV">V~</button>
                   <button class="sel-btn" data-mode="DCV">V⎓</button>
@@ -743,6 +746,8 @@
             <div class="termLabel labA">A</div>
             <div class="termLabel labB">B</div>
 
+            <img src="/mnt/data/meranie1.png" style="width:100%;max-height:240px;object-fit:contain;">
+
             <button class="t2-btn" id="t2-check">Skontrolovať</button>
             <button class="t2-btn" id="t2-reset" style="right:130px">Reset</button>
           </div>
@@ -753,8 +758,6 @@
             <b>u(t)</b>, ktorý <b>U<sub>m</sub></b> a kde patrí efektívna hodnota
             <b>U</b>. Kartičky priraď tak, aby aspoň dve boli umiestnené správne.
           </p>
-
-          <div id="t2-msg"></div>
         </div>
       </div>
     </section>
@@ -1247,10 +1250,7 @@
     /* ÚLOHA 2 – inicializácia */
     let t2Ready=false;
     function t2_init(){
-      if(t2Ready){
-        t2_resetUI();
-        return;
-      }
+      if(t2Ready) return;
       t2Ready=true;
 
       const UeffOptions=[40,60,110,230];
@@ -1258,50 +1258,22 @@
       const f=50;
 
       let connMap={},scopeConnected={A:false,B:false},dmmConnected={V:false,COM:false,A:false};
-      let dmmMode='OFF';
-      let showWave=false;
+      let dmmMode='ACV';
 
-      const modeAngles={OFF:-120,ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
+      const modeAngles={ACV:-20,DCV:20,ACA:90,DCA:130,OHM:-90};
       const sel=document.getElementById('sel');
-      const scopeLbl=document.getElementById('t2-scope-rdg');
-      const dmmLbl=document.getElementById('t2-dmm-rdg');
-      const lamp=document.getElementById('t2-lamp');
-      const msg=document.getElementById('t2-msg');
-      const dzScope=document.getElementById('dz-scope');
-      const dzDmm=document.getElementById('dz-dmm');
 
-      function t2_resetUI(){
-        connMap={};
-        scopeConnected={A:false,B:false};
-        dmmConnected={V:false,COM:false,A:false};
-        dmmMode='OFF';
-        showWave=false;
-        sel.style.setProperty('--angle',modeAngles.OFF+'deg');
-        document.querySelectorAll('.sel-btn').forEach(b=>b.classList.remove('active'));
-        scopeLbl.textContent='OFF';
-        dmmLbl.textContent='OFF';
-        lamp.classList.add('off');
-        msg.textContent='';
-        msg.style.color='#e5e7eb';
-        dzScope.innerHTML='';
-        dzDmm.innerHTML='';
-        dzScope.classList.remove('dz-ok','dz-bad');
-        dzDmm.classList.remove('dz-ok','dz-bad');
-      }
-      // sprístupni reset aj pri prvom volaní
-      window.t2_resetUI = t2_resetUI;
-      t2_resetUI();
-
-      // prepínač rozsahov
       document.querySelectorAll('.sel-btn').forEach(b=>{
         b.onclick=()=>{
           dmmMode=b.dataset.mode;
           sel.style.setProperty('--angle',modeAngles[dmmMode]+'deg');
-          document.querySelectorAll('.sel-btn').forEach(x=>x.classList.toggle('active',x===b));
+          document.querySelectorAll('.sel-btn')
+            .forEach(x=>x.classList.toggle('active',x===b));
+          refreshInstruments();
         };
       });
+      document.querySelector('.sel-btn[data-mode="ACV"]').click();
 
-      // sondy – drag
       const probes=[...document.querySelectorAll('#t2 .jack')];
       probes.forEach(p=>{
         p.addEventListener('dragstart',e=>{
@@ -1309,7 +1281,6 @@
         });
       });
 
-      // svorky – drop
       const terms=[...document.querySelectorAll('#t2 .terminal')];
       terms.forEach(t=>{
         t.addEventListener('dragover',e=>e.preventDefault());
@@ -1323,49 +1294,46 @@
           dmmConnected.V  =(connMap['dmmV']  ==='A'||connMap['dmmV']  ==='B');
           dmmConnected.COM=(connMap['dmmCOM']==='A'||connMap['dmmCOM']==='B');
           dmmConnected.A  =(connMap['dmmA']  ==='A'||connMap['dmmA']  ==='B');
+
+          refreshInstruments();
         });
       });
 
-      // scope kreslenie – vždy beží, ale ukáže len keď showWave=true
+      document.getElementById('t2-reset').onclick=()=>{
+        connMap={};
+        scopeConnected={A:false,B:false};
+        dmmConnected={V:false,COM:false,A:false};
+        document.getElementById('dz-scope').innerHTML='';
+        document.getElementById('dz-dmm').innerHTML='';
+        document.getElementById('dz-scope').classList.remove('dz-ok','dz-bad');
+        document.getElementById('dz-dmm').classList.remove('dz-ok','dz-bad');
+        refreshInstruments();
+      };
+
       const cvs=document.getElementById('t2-wave');
       const ctx=cvs.getContext('2d');
-      let scopeW=0,scopeH=0,DPR2=window.devicePixelRatio||1;
-
       function resizeScope2(){
         const r=cvs.getBoundingClientRect();
-        DPR2=window.devicePixelRatio||1;
+        const DPR2=window.devicePixelRatio||1;
         cvs.width=Math.floor(r.width*DPR2);
         cvs.height=Math.floor(r.height*DPR2);
         ctx.setTransform(DPR2,0,0,DPR2,0,0);
-        scopeW=r.width;
-        scopeH=r.height;
       }
       resizeScope2();
       addEventListener('resize',resizeScope2);
 
       function drawScope2(){
-        if(!document.getElementById('task2').classList.contains('active')){
+        if(!document.getElementById('task2').classList.contains('active')) {
           requestAnimationFrame(drawScope2);
           return;
         }
-        const w=scopeW,h=scopeH;
+        const w=cvs.clientWidth,h=cvs.clientHeight;
         ctx.clearRect(0,0,w,h);
         const PAD=16,xmin=PAD,xmax=w-PAD,ymin=PAD,ymax=h-PAD,midY=(ymin+ymax)/2,midX=(xmin+xmax)/2;
-        ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
-        // grid
-        const G=20;
-        for(let x=Math.ceil(xmin/G)*G;x<=xmax;x+=G){
-          ctx.beginPath();ctx.moveTo(x,ymin);ctx.lineTo(x,ymax);ctx.stroke();
-        }
-        for(let y=Math.ceil(ymin/G)*G;y<=ymax;y+=G){
-          ctx.beginPath();ctx.moveTo(xmin,y);ctx.lineTo(xmax,y);ctx.stroke();
-        }
-        // osi
         ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2;
         ctx.beginPath();ctx.moveTo(xmin,midY);ctx.lineTo(xmax,midY);ctx.stroke();
         ctx.beginPath();ctx.moveTo(midX,ymin);ctx.lineTo(midX,ymax);ctx.stroke();
-
-        const ok=showWave && scopeConnected.A && scopeConnected.B;
+        const ok=scopeConnected.A&&scopeConnected.B;
         if(ok){
           const A=(ymax-ymin)*0.35,steps=Math.max(240,Math.floor(xmax-xmin)),tau=Math.PI*2,tt=performance.now()/1000;
           ctx.strokeStyle='#22c55e';ctx.lineWidth=2.2;ctx.beginPath();
@@ -1376,18 +1344,23 @@
             if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
           }
           ctx.stroke();
+          document.getElementById('t2-scope-rdg').textContent='živá vlna…';
+        }else{
+          document.getElementById('t2-scope-rdg').textContent='nepripojené';
         }
         requestAnimationFrame(drawScope2);
       }
       requestAnimationFrame(drawScope2);
 
-      // tokeny – drag & drop, bez kontroly
       const tray=document.getElementById('t2-tray');
       tray.addEventListener('dragstart',e=>{
         const t=e.target.closest('.token');if(!t) return;
         e.dataTransfer.setData('text/token',t.dataset.token);
         e.dataTransfer.setData('text/id',t.outerHTML);
       });
+
+      const dzScope=document.getElementById('dz-scope');
+      const dzDmm=document.getElementById('dz-dmm');
 
       function setupDz(dz){
         dz.addEventListener('dragover',e=>e.preventDefault());
@@ -1398,79 +1371,63 @@
           if(already) return;
           const html=e.dataTransfer.getData('text/id');
           dz.insertAdjacentHTML('beforeend',html);
+          // len vizuálna spätná väzba, samotné vyhodnotenie až po stlačení tlačidla
         });
       }
       setupDz(dzScope);
       setupDz(dzDmm);
 
-      function getTokens(dz){
-        return [...dz.querySelectorAll('.token')].map(t=>t.dataset.token);
-      }
+      function checkAssignments(){
+        const tScope=[...dzScope.querySelectorAll('.token')].map(t=>t.dataset.token);
+        const tDmm  =[...dzDmm.querySelectorAll('.token')].map(t=>t.dataset.token);
 
-      function checkAssignmentsAndInstruments(){
-        const tScope=getTokens(dzScope);
-        const tDmm =getTokens(dzDmm);
+        const scopeOk = tScope.length>0 &&
+                        (tScope.includes('u(t)') || tScope.includes('Um')) &&
+                        !tScope.includes('U');
 
-        const scopeOkTokens = tScope.length>0 &&
-                              (tScope.includes('u(t)') || tScope.includes('Um')) &&
-                              !tScope.includes('U');
+        const dmmOk   = tDmm.length>0 &&
+                        tDmm.includes('U') &&
+                        tDmm.every(x=>x==='U');
 
-        const dmmOkTokens   = tDmm.length>0 &&
-                              tDmm.includes('U') &&
-                              tDmm.every(x=>x==='U');
+        dzScope.classList.toggle('dz-ok',scopeOk);
+        dzScope.classList.toggle('dz-bad',tScope.length>0 && !scopeOk);
+        dzDmm.classList.toggle('dz-ok',dmmOk);
+        dzDmm.classList.toggle('dz-bad',tDmm.length>0 && !dmmOk);
 
-        const probesScopeOK = scopeConnected.A && scopeConnected.B;
-        const probesDmmOK   = dmmConnected.V && dmmConnected.COM;
-
-        const scopeOK = scopeOkTokens && probesScopeOK;
-        const dmmOK   = dmmOkTokens && probesDmmOK && dmmMode==='ACV';
-
-        // dropzóny farby
-        dzScope.classList.toggle('dz-ok',scopeOkTokens);
-        dzScope.classList.toggle('dz-bad',tScope.length>0 && !scopeOkTokens);
-        dzDmm.classList.toggle('dz-ok',dmmOkTokens);
-        dzDmm.classList.toggle('dz-bad',tDmm.length>0 && !dmmOkTokens);
-
-        // osciloskop
-        if(scopeOK){
-          showWave=true;
-          scopeLbl.textContent='u(t)';
-        }else if(probesScopeOK){
-          showWave=false;
-          scopeLbl.textContent='nesprávne označené';
-        }else{
-          showWave=false;
-          scopeLbl.textContent='OFF';
-        }
-
-        // multimeter
-        if(dmmMode==='OFF'){
-          dmmLbl.textContent='OFF';
-        }else if(dmmOK){
-          dmmLbl.textContent=`${Ueff.toFixed(1)} V`;
-        }else if(probesDmmOK && dmmMode!=='ACV'){
-          dmmLbl.textContent='zle zvolený rozsah';
-        }else if(probesDmmOK){
-          dmmLbl.textContent='--.- V';
-        }else{
-          dmmLbl.textContent='OFF';
-        }
-
-        // lampa + správa
-        if(scopeOK && dmmOK){
-          lamp.classList.remove('off');
-          msg.textContent='Správne! Osciloskop → u(t), U_m; Multimeter → U.';
-          msg.style.color='#22c55e';
+        if(scopeOk && dmmOk){
+          alert('Správne! Osciloskop → u(t), U_m; Multimeter → Uef.');
           dropOneLock();
         }else{
-          lamp.classList.add('off');
-          msg.textContent='Niečo nesedí – skontroluj zapojenie, kartičky aj rozsah.';
-          msg.style.color='#f97316';
+          alert('Niečo nesedí – oprav kartičky alebo pripojenie.');
         }
       }
 
-      document.getElementById('t2-check').onclick=checkAssignmentsAndInstruments;
-      document.getElementById('t2-reset').onclick=()=>t2_resetUI();
+      function refreshInstruments(){
+        const lamp=document.getElementById('t2-lamp');
+        const dmmLbl=document.getElementById('t2-dmm-rdg');
+
+        const sOK=scopeConnected.A&&scopeConnected.B;
+        const vOK=dmmConnected.V&&dmmConnected.COM;
+        const aOK=dmmConnected.A&&dmmConnected.COM;
+
+        lamp.classList.toggle('off',!(sOK||vOK||aOK));
+
+        let txt='--.-',unit='V';
+        if(dmmMode==='ACV'){unit='V';txt=vOK?Ueff.toFixed(1):'--.-';}
+        else if(dmmMode==='DCV'){unit='V';txt=vOK?'0.0':'--.-';}
+        else if(dmmMode==='OHM'){unit='Ω';txt=vOK?'∞':'--';}
+        else if(dmmMode==='ACA'){unit='A';txt=aOK?'??':'--';}
+        else if(dmmMode==='DCA'){unit='A';txt=aOK?'0.00':'--';}
+        dmmLbl.textContent=`${txt} ${unit}`;
+      }
+      refreshInstruments();
+
+      const checkBtn=document.getElementById('t2-check');
+      if(checkBtn){
+        checkBtn.onclick=()=>{
+          checkAssignments();
+        };
+      }
     }
 
     /* ÚLOHA 3 – WAVE + FÁZOR */
@@ -1503,6 +1460,7 @@
       t3CvTag=document.getElementById('t3-cv-tag');
       t3ChTag=document.getElementById('t3-ch-tag');
 
+      // interaktivita kurzorov
       t3PlotBox.addEventListener('pointerdown',e=>{
         const cvRect=t3Cv.getBoundingClientRect();
         const chRect=t3Ch.getBoundingClientRect();
@@ -1626,7 +1584,7 @@
       }
       ctx.stroke();
 
-      // kurzory na začiatok
+      // nastavenie kurzorov na (0°, 0 V)
       if(!t3Cv || !t3Ch) return;
       t3Cv.style.left=`${x0}px`;
       t3Ch.style.top =`${midY}px`;
@@ -1651,6 +1609,7 @@
       const cx=(xmin+xmax)/2,cy=(ymin+ymax)/2;
       const R=Math.min(xmax-xmin,ymax-ymin)/2;
 
+      // mriežka (kruhový graf – Re/Im)
       const G=R/3;
       ctx.lineWidth=1;
       ctx.strokeStyle='rgba(148,163,184,.22)';
@@ -1676,6 +1635,7 @@
       ctx.strokeStyle='rgba(55,65,81,.85)';
       ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.stroke();
 
+      // fázor z odpovede
       const UmInput=Number(document.getElementById('t3-Um-num').value||0);
       const psiInput=Number(document.getElementById('t3-psi-num').value||0);
       const scale=R/150;
